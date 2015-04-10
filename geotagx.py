@@ -92,7 +92,7 @@ def geotagx_render_task_presenter():
 	geotagx_collect_js_css()
 	#Render minified CSS and JS files
 	template = tEnv.get_template(TEMPLATE_TASK_PRESENTER)
-	return template.render(js=JS_minified, css=CSS_minified, help_html=HELP_TEXT)
+	return template.render(js=JS_minified, css=CSS_minified, help_html=HELP_TEXT, slug="geotagx_project_template")
 
 def main():
 	print geotagx_render_task_presenter()
