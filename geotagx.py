@@ -11,7 +11,7 @@ sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 Temporary Variables for debugging
 """
 
-HELP_TEXT="""
+HELP_TEXT = """
 						<p>In this question we are trying to identify photos in which there is water and would therefore be relevant to the application.</p>
     					<p>If you can see water in this photo select <button class="btn btn-xs btn-success" disabled>Yes</button>. Water includes smaller water bodies such as irrigation channels, open sewers, ponds, puddles of water, or pools of water accumulated in garbage like tyres and bits of plastic, along with large water bodies such as lakes, rivers, and flood waters.</p>
     					<p>In short, if you see a water body, big, small, or even just a puddle, click <button class="btn btn-xs btn-success" disabled>Yes</button></p>
@@ -38,6 +38,10 @@ HELP_TEXT="""
     							<small><p><i class="fa fa-fw fa-lg fa-photo"></i><a target="_blank" rel="nofollow" href="http://yamuna.womenforsustainablecities.org/">Yamuna's Daughters</a></p></small>
     						</div>
     					</div>
+"""
+
+CONTRIBUTION_REMINDER = """
+	By contributing to the Yamuna Flood Waters project, you're helping ...[Remind the user why their contribution is important]
 """
 
 
@@ -92,7 +96,7 @@ def geotagx_render_task_presenter():
 	geotagx_collect_js_css()
 	#Render minified CSS and JS files
 	template = tEnv.get_template(TEMPLATE_TASK_PRESENTER)
-	return template.render(js=JS_minified, css=CSS_minified, help_html=HELP_TEXT, slug="geotagx_project_template")
+	return template.render(js=JS_minified, css=CSS_minified, help_html=HELP_TEXT, slug="geotagx_project_template", contribution_reminder = CONTRIBUTION_REMINDER)
 
 def main():
 	print geotagx_render_task_presenter()

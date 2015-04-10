@@ -8,6 +8,8 @@ geotagx.task.run("{{slug}}", function(question, answer, $submitter){
         case 3:
             if(answer=="No"){
                 geotagx.task.showQuestion(6);
+            }else{
+                geotagx.task.showNextQuestion();
             }
             break;
         default:
