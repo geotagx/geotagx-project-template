@@ -6,7 +6,7 @@ from rcssmin import cssmin
 
 
 TEMPLATE_DIRECTORY = "templates"
-TEMPLATE_ENTRY_FILE = "task_presenter.html"
+TEMPLATE_TASK_PRESENTER = "task_presenter.html"
 TEMPLATE_STATIC_FILES = "render_static_files.html"
 
 tLoader = jinja2.FileSystemLoader( searchpath="./"+TEMPLATE_DIRECTORY )
@@ -49,17 +49,17 @@ def geotagx_collect_js_css():
 	JS_minified = minify(JS_raw)
 
 """
-Returns minified render ready versions of js and css files from the static folder
+Renders the task task_presenter after collecting the necessary data
 """
-def geotagx_render_js_css():
+def geotagx_render_task_presenter():
 	#Collect JS and CSS files
 	geotagx_collect_js_css()
 	#Render minified CSS and JS files
-	template = tEnv.get_template(TEMPLATE_STATIC_FILES)
+	template = tEnv.get_template(TEMPLATE_TASK_PRESENTER)
 	return template.render(js=JS_minified, css=CSS_minified)
 
 def main():
-	print geotagx_render_js_css();
+	print geotagx_render_task_presenter()
 	
 
 if __name__ == "__main__":
