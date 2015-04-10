@@ -474,8 +474,7 @@
         });
 
         // Run the task.
-        pybossa.run("yamuna_waters");
-        // make_run(project, "monsoon2013");
+        pybossa.run(project);
 	};
 
 	geotagx.task = task_;

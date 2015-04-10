@@ -1,5 +1,5 @@
 // Run the application.
-geotagx.task.run("geotagx_project_template_aksjdh", function(question, answer, $submitter){
+geotagx.task.run("{{slug}}", function(question, answer, $submitter){
     geotagx.task.saveAnswer(answer); 
     switch (question){
         case 8: //Final Question
