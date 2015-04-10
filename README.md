@@ -9,4 +9,5 @@ cd geotagx_project_template
 pip install virtualenv
 virtualenv env
 source ./env/bin/activate
+pip install -r requirements.txt
 ```
