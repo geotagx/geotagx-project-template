@@ -13,8 +13,6 @@
 (function(geotagx, $, undefined){
 	"use strict";
 
-	document.write('<script src="/static/js/pybossa/unosat.js">\x3C/script>'); // Load the unosat.js script. This will soon be deprecated.
-
 	var task_ = {}; // The GeoTag-X task helper object.
 	var taskRun_ = {}; // The results to submit for the current task.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
@@ -289,39 +287,36 @@
             if (isSubmissionForm(question)){
                 console.log("Showing answer card...");
 				console.log(taskRun_);
-/*
-        var $currentQuestionHtml = getCurrentQuestionHtml();
-        var $rewindButton = $("#questionnaire-rewind");
-        // var $summary = $("#questionnaire-summary");
+        /*
+                var $currentQuestionHtml = getCurrentQuestionHtml();
+                var $rewindButton = $("#questionnaire-rewind");
+                // var $summary = $("#questionnaire-summary");
 
-        // Hide the current question and enable the rewind button.
-        $currentQuestionHtml.addClass("hide");
-        $rewindButton.prop("disabled", false);
+                // Hide the current question and enable the rewind button.
+                $currentQuestionHtml.addClass("hide");
+                $rewindButton.prop("disabled", false);
 
-        // $summary.collapse("show");
-
-
-        // $answerCard.addClass("expanded");
-        // $answerCard.removeClass("collapsed");
+                // $summary.collapse("show");
 
 
+                // $answerCard.addClass("expanded");
+                // $answerCard.removeClass("collapsed");
+        */
 
-*/
+        // $("#questionnaire-answers").collapse("show");
+        // setTimeout(function(){ $("#questionnaire-answers").collapse("hide") }, 1000);
 
-// $("#questionnaire-answers").collapse("show");
-// setTimeout(function(){ $("#questionnaire-answers").collapse("hide") }, 1000);
-
-/*
-if (percentageComplete_ >= 100){
-    $("#questionnaire-submit").removeClass("hide");
-    $("#questionnaire-conclusion").removeClass("hide");
-    $("#questionnaire-answers").collapse();
-}
-else {
-    $("#questionnaire-submit").addClass("hide");
-    $("#questionnaire-conclusion").addClass("hide");
-}
-*/
+        /*
+        if (percentageComplete_ >= 100){
+            $("#questionnaire-submit").removeClass("hide");
+            $("#questionnaire-conclusion").removeClass("hide");
+            $("#questionnaire-answers").collapse();
+        }
+        else {
+            $("#questionnaire-submit").addClass("hide");
+            $("#questionnaire-conclusion").addClass("hide");
+        }
+        */
             }
             else {
 				getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);
