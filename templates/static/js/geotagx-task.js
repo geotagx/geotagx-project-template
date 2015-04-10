@@ -457,9 +457,10 @@
                         });
 */
                     }
-                    else
+                    else {
+                        //TO-DO :: Preprocess stuff here based on question class
                         onAnswerSubmitted_(question, answer, $submitter);
-
+                    }
                     addAnswerCardEntry(question, answer);
                 }, 800));
 
