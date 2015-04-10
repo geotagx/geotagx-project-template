@@ -48,6 +48,9 @@ def geotagx_collect_js_css():
 	CSS_minified = cssmin(CSS_raw, keep_bang_comments=False)
 	JS_minified = minify(JS_raw)
 
+"""
+Returns minified render ready versions of js and css files from the static folder
+"""
 def geotagx_render_js_css():
 	#Collect JS and CSS files
 	geotagx_collect_js_css()
@@ -58,7 +61,6 @@ def geotagx_render_js_css():
 def main():
 	print geotagx_render_js_css();
 	
-
 
 if __name__ == "__main__":
     main()
