@@ -1,0 +1,94 @@
+{
+	"name":"GeoTag-X Project Sample",
+	"short_name":"sample",
+	"description":"A sample GeoTag-X project.",
+	"questions":[
+		{
+			"id":1,
+			"title":"Can you see any water in the photo?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"water"
+			}
+		},
+		{
+			"id":2,
+			"title":"Can you see small pools of water?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"waterSmall"
+			}
+		},
+		{
+			"id":3,
+			"title":"Are these small pools of water near human shelters or a settlement?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"waterSmallShelter"
+			}
+		},
+		{
+			"id":4,
+			"title":"Can you see a large body of water?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"waterLarge"
+			}
+		},
+		{
+			"id":5,
+			"title":"Can you see any signs of fast moving water?",
+			"type":"multiple_choice",
+			"answer":{
+				"saved_as":"waterLargeFast",
+				"choices":[
+					{"label":"White peaks in the water",      "value":"Peaks"},
+					{"label":"Rough water surface",           "value":"Rough"},
+					{"label":"Water swirling around objects", "value":"Swirling"}
+				]
+			}
+		},
+		{
+			"id":6,
+			"title":"Can you see any of the following flood protection measures?",
+			"type":"multiple_choice",
+			"answer":{
+				"saved_as":"waterLargeProtection",
+				"choices":[
+					{"label":"Sandbags",           "value":"Sandbags"},
+					{"label":"Makeshift barriers", "value":"Barriers"},
+					{"label":"Embankments",        "value":"Embankments"},
+					{"label":"Other",              "value":"Other"}
+				]
+			}
+		},
+		{
+			"id":7,
+			"title":"Can you see any sources of drinking water?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"waterDrinking"
+			}
+		},
+		{
+			"id":8,
+			"title":"Which sources of drinking water can you see?",
+			"type":"multiple_choice",
+			"answer":{
+				"saved_as":"waterDrinkingSources",
+				"choices":[
+					{"label":"Water pipes and access taps", "value":"Pipes"},
+					{"label":"Water tankers",               "value":"Tankers"}
+				]
+			}
+		},
+		{
+			"id":9,
+			"title":"Have they been affected by the flood waters?",
+			"type":"binary",
+			"answer":{
+				"saved_as":"waterDrinkingSourcesAffected"
+			}
+		}
+	]
+}

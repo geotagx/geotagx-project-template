@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="/static/css/geotagx-template.css">
+{% if css %}<style>{{css}}</style>{% endif %}
+{% include 'messages.html' %}
+<div class="row skeleton">
+    {% include "questionnaire.html" %}
+    {% include "image.html" %}
+</div>
+<script src="/static/js/vendor/wheelzoom.js"></script>
+<script src="/static/js/geotagx-task.js"></script>
+{% if js %}<script>{{js}}</script>{% endif %}
