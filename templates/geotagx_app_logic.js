@@ -2,7 +2,7 @@
 geotagx.task.run("{{slug}}", function(question, answer, $submitter){
     geotagx.task.saveAnswer(answer); 
     switch (question){
-        case 8: //Final Question
+        case 6: //Final Question
             geotagx.task.finish();
             break;
         default:
