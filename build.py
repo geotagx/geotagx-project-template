@@ -6,47 +6,16 @@ from rcssmin import cssmin
 
 sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
+USAGE = """Usage: """ + __file__ + """ directory [OPTIONS]
+Build the task presenter for the GeoTag-X project located in the specified directory.
+The following is a list of OPTIONS you can use to modify the script's behavior:\n
+\r    -f, --force       overwrites the file 'template.html' in the specified directory.
+\r    -c, --compress    compresses the generated task presenter.
+\r    -h, --help        prints this help message.\n"""
+
+
 LAYOUT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
 TEMPLATE = "base.html"
-
-HELP_TEXT = """
-<p>In this question we are trying to identify photos in which there is water and would therefore be relevant to the application.</p>
-<p>If you can see water in this photo select <button class="btn btn-xs btn-success" disabled>Yes</button>. Water includes smaller water bodies such as irrigation channels, open sewers, ponds, puddles of water, or pools of water accumulated in garbage like tyres and bits of plastic, along with large water bodies such as lakes, rivers, and flood waters.</p>
-<p>In short, if you see a water body, big, small, or even just a puddle, click <button class="btn btn-xs btn-success" disabled>Yes</button></p>
-<p>Here are some examples for which you would click <button class="btn btn-xs btn-success" disabled>Yes</button></p>
-<div class="row">
-	<div class="col-sm-4">
-		<a target="_blank" rel="nofollow" href="http://i.dailymail.co.uk/i/pix/2013/06/19/article-2344673-1A686A7B000005DC-545_634x396.jpg"><img src="http://i.dailymail.co.uk/i/pix/2013/06/19/article-2344673-1A686A7B000005DC-545_634x396.jpg" class="img-responsive img-thumbnail"></a>
-		<small><p><i class="fa fa-fw fa-lg fa-photo"></i>Reuters</p></small>
-	</div>
-	<div class="col-sm-4">
-		<a target="_blank" rel="nofollow" href="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0434.JPG"><img src="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0434.JPG" class="img-responsive img-thumbnail"></a>
-		<small><p><i class="fa fa-fw fa-lg fa-photo"></i><a target="_blank" rel="nofollow" href="http://yamuna.womenforsustainablecities.org/">Yamuna's Daughters</a></p></small>
-	</div>
-	<div class="col-sm-4">
-		<a target="_blank" rel="nofollow" href="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0145.JPG"><img src="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0145.JPG" class="img-responsive img-thumbnail"></a>
-		<small><p><i class="fa fa-fw fa-lg fa-photo"></i><a target="_blank" rel="nofollow" href="http://yamuna.womenforsustainablecities.org/">Yamuna's Daughters</a></p></small>
-	</div>
-</div>
-<hr>
-<p>In this photo there is no water body, large or small, and so you should click <button class="btn btn-xs btn-danger" disabled>No</button></p>
-<div class="row">
-	<div class="col-sm-4">
-		<a target="_blank" rel="nofollow" href="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0074.JPG"><img src="https://dl.dropboxusercontent.com/u/46576246/India/DSCI0074.JPG" class="img-responsive img-thumbnail"></a>
-		<small><p><i class="fa fa-fw fa-lg fa-photo"></i><a target="_blank" rel="nofollow" href="http://yamuna.womenforsustainablecities.org/">Yamuna's Daughters</a></p></small>
-	</div>
-</div>
-"""
-
-
-
-def print_usage():
-	print """Usage: """ + __file__ + """ directory [OPTIONS]
-	\rBuild the task presenter for the GeoTag-X project located in the specified directory.
-	\rThe following is a list of OPTIONS you can use to modify the script's behavior:\n
-\r    -f, --force       overwrites the file 'template.html' in the specified directory.
-\r    -c, --compress    compresses the generated HTML file.
-\r    -h, --help        prints this help message."""
 
 
 def has_valid_project(path):
@@ -54,6 +23,12 @@ def has_valid_project(path):
 	return  os.path.isdir(path) \
 		and os.access(path, os.W_OK) \
 		and os.access(os.path.join(path, "project.json"), os.F_OK | os.R_OK)
+
+
+def is_valid_project_json(path):
+	"""Returns true if the JSON object has a valid structure, false otherwise."""
+	# TODO
+	return True
 
 
 def get_project_json(filename):
@@ -77,31 +52,65 @@ def get_project_js(filename, compress):
 		return js if not compress else minify(js)
 
 
+def get_project_help(directory):
+	"""Returns a dictionary that contains the help provided for a specific question."""
+	help = {}
+	filenames = filter(lambda file: file.endswith(".html"), os.listdir(directory))
+
+	for filename in filenames:
+		with open(os.path.join(directory, filename)) as file:
+			filedata = file.read().strip()
+			if filedata:
+				# Associate the file's content with a question identifier.
+				id = os.path.splitext(os.path.basename(filename))[0]
+				help[id] = filedata
+
+	return help
+
+
 def build(path, compress=False):
 	"""Builds the task presenter for the project located at the specified path."""
-	project_dir = os.path.realpath(path)
+	basedir = os.path.realpath(path)
 
-	with open(os.path.join(project_dir, "template.html"), "w") as output:
-		json = get_project_json(os.path.join(project_dir, "project.json"))
-		css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
-		js_  = get_project_js(os.path.join(project_dir, "project.js"), compress)
+	json = get_project_json(os.path.join(basedir, "project.json"))
+	if not is_valid_project_json(json):
+		print "Error! The 'project.json' file is not valid."
+		sys.exit(1)
+	else:
+		template   = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template(TEMPLATE)
+		short_name = json["short_name"]
+		questions_ = json["questions"]
 
-		env = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR))
-		template = env.get_template(TEMPLATE)
-		html = template.render(css=css_, js=js_, slug=json["short_name"], questions=json["questions"], help=HELP_TEXT)
-		html = html if not compress else htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+		# Assign the help to its corresponding question.
+		help = get_project_help(os.path.join(basedir, "help"))
+		if len(help) > 0:
+			for question in questions_:
+				key = str(question["id"])
+				try:
+					question[u"help"] = help[key]
+				except:
+					pass
 
-		output.write(html.encode("UTF-8"))
+		# Build the template.
+		with open(os.path.join(basedir, "template.html"), "w") as output:
+			css_ = get_project_css(os.path.join(basedir, "project.css"), compress)
+			js_  = get_project_js(os.path.join(basedir, "project.js"), compress)
+			html = template.render(questions=questions_, css=css_, js=js_, slug=short_name)
+
+			if compress:
+				html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+
+			output.write(html.encode("UTF-8"))
 
 
 def main(argv):
 	argc = len(argv)
 	if argc != 2:
-		print_usage()
+		print USAGE
 	else:
 		path = argv[1]
 		if not path or path in ("-h", "--help"):
-			print_usage()
+			print USAGE
 		else:
 			if has_valid_project(path):
 				build(path)

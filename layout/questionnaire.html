@@ -34,22 +34,16 @@
 		<p>{{question.hint}}</p>
 		{% endif %}
 
-		{% call questions_helper.help_modal(question.title) -%}
-		{{help}}
-		{%- endcall %}
-{#
-		{% if question.help %}
+		{% set has_help = True if question.help else False %}
+		{% if has_help %}
 		{% call questions_helper.help_modal(question.title) %}
 		{{question.help}}
 		{% endcall %}
 		{% endif %}
-#}
-		{% if question.type == "binary" %}
-		{{questions_helper.binary_answer(question.answer)}}
-		{% elif question.type == "multiple_choice" %}
-		{{questions_helper.multiple_choice_answer(question.answer)}}
-		{% elif question.type == "geotagging" %}
-		{{questions_helper.geotagging_choice_answer(question.answer)}}
+
+		{%   if question.type == "binary"          %}{{questions_helper.binary_answer(question.answer, has_help)}}
+		{% elif question.type == "multiple_choice" %}{{questions_helper.multiple_choice_answer(question.answer, has_help)}}
+		{% elif question.type == "geotagging"      %}{{questions_helper.geotagging_choice_answer(question.answer, has_help)}}
 		{% endif %}
 	</div>
 	{%- endfor %}
