@@ -28,6 +28,15 @@ This is a sample project built for use with the GeoTag-X crowdsourcing platform.
 
 ## TESTING
 
-When installation is done, run the `build.py` script to create the template's task presenter, i.e. `template.html`.
+When installation is done, you can build a project's task presenter by running
+```
+python build.py /path/to/your/project/
+```
 
-To test the template, a project has been provided in the sample folder, ...
+A sample project has been provided in case you do not having a working project.
+Its task presenter can be built by running
+```
+python build.py sample/
+```
+
+The task presenter will be saved as `template.html` in the specified directory.
