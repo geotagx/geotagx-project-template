@@ -2,6 +2,7 @@
 	"name":"GeoTag-X Project Sample",
 	"short_name":"sample",
 	"description":"A sample GeoTag-X project.",
+	"why":"By contributing to the sample project, you're helping ... [Remind the user why their contribution is important]",
 	"questions":[
 		{
 			"id":1,
@@ -30,7 +31,7 @@
 			"answer":{
 				"saved_as":"waterSmallShelter"
 			},
-			"branch":7,
+			"branch":7
 		},
 		{
 			"id":4,

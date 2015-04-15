@@ -25,8 +25,8 @@ def has_valid_project(path):
 		and os.access(os.path.join(path, "project.json"), os.F_OK | os.R_OK)
 
 
-def is_valid_project_json(path):
-	"""Returns true if the JSON object has a valid structure, false otherwise."""
+def is_valid_project_json(json):
+	"""Returns true if the specified JSON object has a valid project structure, false otherwise."""
 	# TODO
 	return True
 
@@ -70,19 +70,20 @@ def get_project_help(directory):
 
 def build(path, compress=False):
 	"""Builds the task presenter for the project located at the specified path."""
-	basedir = os.path.realpath(path)
+	project_dir = os.path.realpath(path)
 
-	json = get_project_json(os.path.join(basedir, "project.json"))
+	json = get_project_json(os.path.join(project_dir, "project.json"))
 	if not is_valid_project_json(json):
 		print "Error! The 'project.json' file is not valid."
 		sys.exit(1)
 	else:
 		template   = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template(TEMPLATE)
-		short_name = json["short_name"]
+		short_name = json["short_name"].strip()
+		why_       = json["why"].strip()
 		questions_ = json["questions"]
 
 		# Assign the help to its corresponding question.
-		help = get_project_help(os.path.join(basedir, "help"))
+		help = get_project_help(os.path.join(project_dir, "help"))
 		if len(help) > 0:
 			for question in questions_:
 				key = str(question["id"])
@@ -92,10 +93,10 @@ def build(path, compress=False):
 					pass
 
 		# Build the template.
-		with open(os.path.join(basedir, "template.html"), "w") as output:
-			css_ = get_project_css(os.path.join(basedir, "project.css"), compress)
-			js_  = get_project_js(os.path.join(basedir, "project.js"), compress)
-			html = template.render(questions=questions_, css=css_, js=js_, slug=short_name)
+		with open(os.path.join(project_dir, "template.html"), "w") as output:
+			css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
+			js_  = get_project_js(os.path.join(project_dir, "project.js"), compress)
+			html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
 
 			if compress:
 				html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
