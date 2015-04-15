@@ -287,36 +287,18 @@
             if (isSubmissionForm(question)){
                 console.log("Showing answer card...");
 				console.log(taskRun_);
-        /*
-                var $currentQuestionHtml = getCurrentQuestionHtml();
-                var $rewindButton = $("#questionnaire-rewind");
-                // var $summary = $("#questionnaire-summary");
 
-                // Hide the current question and enable the rewind button.
-                $currentQuestionHtml.addClass("hide");
-                $rewindButton.prop("disabled", false);
-
-                // $summary.collapse("show");
-
-
-                // $answerCard.addClass("expanded");
-                // $answerCard.removeClass("collapsed");
-        */
-
-        // $("#questionnaire-answers").collapse("show");
-        // setTimeout(function(){ $("#questionnaire-answers").collapse("hide") }, 1000);
-
-        /*
-        if (percentageComplete_ >= 100){
-            $("#questionnaire-submit").removeClass("hide");
-            $("#questionnaire-conclusion").removeClass("hide");
-            $("#questionnaire-answers").collapse();
-        }
-        else {
-            $("#questionnaire-submit").addClass("hide");
-            $("#questionnaire-conclusion").addClass("hide");
-        }
-        */
+                
+                if (percentageComplete_ >= 100){
+                    $("#questionnaire-submit").show()
+                    $("#questionnaire-conclusion").show();
+                    $("#questionnaire-summary-details .show-on-expanded").click() //Show the Questionnaire summary
+                }
+                else {
+                    $("#questionnaire-submit").hide();
+                    $("#questionnaire-conclusion").hide();
+                }
+                
             }
             else {
 				getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);
@@ -450,12 +432,17 @@
 
                         console.log("Saving result...");
                         console.log(taskRun_);
-/*
+
                         pybossa.saveTask(task.id, taskRun_).done(function(){
                             deferred.resolve();
 							$button.prop("disabled", false);
+
+                            //Collapse the Questionnaire summary again by faking another click
+                            $("#questionnaire-summary-details .show-on-expanded").click();
+                            $("#questionnaire-submit").hide(); //Hide the Submit Button
+                            $("#questionnaire-conclusion").hide(); //hide the conclusion
                         });
-*/
+
                     }
                     else {
                         //TO-DO :: Preprocess stuff here based on question class

@@ -416,17 +416,206 @@
 </div>
 
 <style type="text/css">
-img.wheelzoom{cursor:crosshair}@import url("http://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Patua+One|Martel+Sans|Noto+Sans");#content-main{font:400 1em Martel Sans,Open Sans,Lato}.show-on-task-loaded{display:none!important}.question{margin:0 0 1.5em 0}.question>header{font:400 1.85em Patua One;margin:0.1em 0}.btn{font-family:Montserrat;text-transform:uppercase;border-radius:2px}.answer{margin-top:1em}.help-toggle{margin:0;padding:0;cursor:help}#content{}#content-header{padding:1em 0}#questionnaire-topic{font:900 2.6em Montserrat,Open Sans!important;text-transform:uppercase}#questionnaire-section{}#questionnaire-summary{position:relative;background:#333;color:#FFF;border-radius:0.3em;overflow:hidden;margin:0 0 0.5em 0}#questionnaire-summary>header{font:400 1em Montserrat;text-transform:uppercase}#questionnaire-summary.minimized #questionnaire-submit,#questionnaire-summary.minimized #questionnaire-conclusion{display:none}#questionnaire-summary-details{color:#AAA;margin:0;padding:0;border:none;font:900 1em Montserrat;text-transform:uppercase;text-decoration:none;transition:color 0.1s ease-in-out;-o-transition:color 0.1s ease-in-out;-ms-transition:color 0.1s ease-in-out;-moz-transition:color 0.1s ease-in-out;-webkit-transition:color 0.1s ease-in-out}#questionnaire-summary-details:hover{color:#FFF}#questionnaire-summary-details:focus{outline:0 none}#questionnaire-summary-details[aria-expanded="true"] .hide-on-expanded,#questionnaire-summary-details[aria-expanded="false"] .show-on-expanded{display:none}#questionnaire-summary>ul>li{font:400 1.1em Noto Sans,Open Sans,Lato}#questionnaire-submit{color:#000;border-radius:2px;margin-top:0.75em}#questionnaire-progress-bar{position:absolute;left:0;bottom:0;width:0;height:0.25em;background:#66FFCC;transition:all 0.2s ease-in;-o-transition:all 0.2s ease-in;-ms-transition:all 0.2s ease-in;-moz-transition:all 0.2s ease-in;-webkit-transition:all 0.2s ease-in}#questionnaire-rewind{margin-bottom:1em}#image-section{}#image-loading{font:900 3em Montserrat;text-transform:uppercase;cursor:wait}#image{cursor:crosshair;border-radius:0.2em;border:1px dashed rgba(0,0,0,0.15)}#image-source-container{margin:0.5em 0;font:400 1.1em Open Sans,Lato}#image-source>.fa-external-link{position:absolute;font-size:0.7em;margin:0.15em 0 0 0.05em}#image-zoomtip{font:900 1em Lato,Open Sans}
+img.wheelzoom
+{
+    cursor:crosshair;
+}
+@import url("http://fonts.googleapis.com/css?family=Lato|Montserrat|Open+Sans|Patua+One|Martel+Sans|Noto+Sans");
+
+#content-main
+{
+    font:400 1em Martel Sans, Open Sans, Lato;
+}
+
+.show-on-task-loaded
+{
+    display:none !important;
+}
+
+.question
+{
+    margin:0 0 1.5em 0;
+}
+.question > header
+{
+    /*margin:0 0 0.25em 0;*/
+    font:400 1.85em Patua One;
+    margin:0.1em 0;
+}
+
+.btn
+{
+    font-family:Montserrat;
+    text-transform:uppercase;
+    border-radius:2px;
+}
+.answer
+{
+    margin-top:1em;
+}
+
+
+.help-toggle
+{
+    margin:0;
+    padding:0;
+    cursor:help;
+}
+
+
+#content
+{
+}
+    #content-header
+    {
+        padding:1em 0;
+        /*text-align:center;*/
+    }
+        #questionnaire-topic
+        {
+            font:900 2.6em Montserrat, Open Sans !important;
+
+            text-transform:uppercase;
+            /*margin:0;*/
+            /*background:red;*/
+        }
+
+
+
+
+
+
+#questionnaire-section
+{
+
+}
+    #questionnaire-summary
+    {
+        position:relative;
+        background:#333;
+        color:#FFF;
+        border-radius:0.3em;
+        overflow:hidden;
+        margin:0 0 0.5em 0;
+        /*font:400 0.8em Open Sans, Lato;*/
+
+
+        /*padding:0 0.5em 0.5em 0.5em;*/
+        /*padding:0.75em;*/
+        /*margin-bottom:1em;*/
+        /*margin:1em 0;*/
+        /*background:red;*/
+
+    }
+        #questionnaire-summary > header
+        {
+            font:400 1em Montserrat;
+            text-transform:uppercase;
+        }
+            #questionnaire-summary.minimized #questionnaire-submit,
+            #questionnaire-summary.minimized #questionnaire-conclusion
+            {
+                display:none;
+            }
+            #questionnaire-summary-details
+            {
+                color:#AAA;
+                margin:0;
+                padding:0;
+                border:none;
+                font:900 1em Montserrat;
+                text-transform:uppercase;
+                text-decoration:none;
+                transition:color 0.1s ease-in-out;
+                -o-transition:color 0.1s ease-in-out;
+                -ms-transition:color 0.1s ease-in-out;
+                -moz-transition:color 0.1s ease-in-out;
+                -webkit-transition:color 0.1s ease-in-out;
+            }
+            #questionnaire-summary-details:hover
+            {
+                color:#FFF;
+            }
+            #questionnaire-summary-details:focus
+            {
+                outline:0 none;
+            }
+            #questionnaire-summary-details[aria-expanded="true"]  .hide-on-expanded,
+            #questionnaire-summary-details[aria-expanded="false"] .show-on-expanded
+            {
+                display:none;
+            }
+        #questionnaire-summary > ul > li
+        {
+            /*font:400 1em Montserrat;*/
+            font:400 1.1em Noto Sans, Open Sans, Lato;
+        }
+        #questionnaire-submit
+        {
+            color:#000;
+            border-radius:2px;
+            margin-top:0.75em;
+        }
+        #questionnaire-progress-bar
+        {
+            position:absolute;
+            left:0;
+            bottom:0;
+            width:0;
+            height:0.25em;
+            background:#66FFCC;
+            transition:all 0.2s ease-in;
+            -o-transition:all 0.2s ease-in;
+            -ms-transition:all 0.2s ease-in;
+            -moz-transition:all 0.2s ease-in;
+            -webkit-transition:all 0.2s ease-in;
+        }
+
+    #questionnaire-rewind
+    {
+        margin-bottom:1em;
+    }
+#image-section
+{
+}
+    #image-loading
+    {
+        font:900 3em Montserrat;
+        text-transform:uppercase;
+        cursor:wait;
+    }
+    #image
+    {
+        cursor:crosshair;
+        border-radius:0.2em;
+        border:1px dashed rgba(0, 0, 0, 0.15);
+    }
+    #image-source-container
+    {
+        margin:0.5em 0;
+        font:400 1.1em Open Sans, Lato;
+    }
+        #image-source > .fa-external-link
+        {
+            position:absolute;
+            font-size:0.7em;
+            margin:0.15em 0 0 0.05em;
+        }
+    #image-zoomtip
+    {
+        font:900 1em Lato, Open Sans;
+    }
+
 </style>
 <script type="text/javascript">
-window.wheelzoom=(function(){var defaults={zoom:0.10};var canvas=document.createElement('canvas');function setSrcToBackground(img){img.style.backgroundImage="url('"+img.src+"')";img.style.backgroundRepeat='no-repeat';canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;img.src=canvas.toDataURL();}main=function(img,options){if(!img||!img.nodeName||img.nodeName!=='IMG')return;var settings={};var width;var height;var bgWidth;var bgHeight;var bgPosX;var bgPosY;var previousEvent;function updateBgStyle(){if(bgPosX>0)bgPosX=0;else if(bgPosX<width-bgWidth)bgPosX=width-bgWidth;if(bgPosY>0)bgPosY=0;else if(bgPosY<height-bgHeight)bgPosY=height-bgHeight;img.style.backgroundSize=bgWidth+'px '+bgHeight+'px';img.style.backgroundPosition=bgPosX+'px '+bgPosY+'px';}function reset(){bgWidth=width;bgHeight=height;bgPosX=bgPosY=0;updateBgStyle();}function onwheel(e){var deltaY=0;e.preventDefault();if(e.deltaY)deltaY=e.deltaY;else if(e.wheelDelta)deltaY=-e.wheelDelta;var rect=img.getBoundingClientRect();var offsetX=e.pageX-rect.left-document.body.scrollLeft;var offsetY=e.pageY-rect.top-document.body.scrollTop;var bgCursorX=offsetX-bgPosX;var bgCursorY=offsetY-bgPosY;var bgRatioX=bgCursorX/bgWidth;var bgRatioY=bgCursorY/bgHeight;if(deltaY<0){bgWidth+=bgWidth*settings.zoom;bgHeight+=bgHeight*settings.zoom;}else{bgWidth-=bgWidth*settings.zoom;bgHeight-=bgHeight*settings.zoom;}bgPosX=offsetX-(bgWidth*bgRatioX);bgPosY=offsetY-(bgHeight*bgRatioY);if(bgWidth<=width||bgHeight<=height)reset();else updateBgStyle();}function drag(e){e.preventDefault();bgPosX+=(e.pageX-previousEvent.pageX);bgPosY+=(e.pageY-previousEvent.pageY);previousEvent=e;updateBgStyle();}function removeDrag(){document.removeEventListener('mouseup',removeDrag);document.removeEventListener('mousemove',drag);}function draggable(e){e.preventDefault();previousEvent=e;document.addEventListener('mousemove',drag);document.addEventListener('mouseup',removeDrag);}function loaded(){var computedStyle=window.getComputedStyle(img,null);width=parseInt(computedStyle.width,10);height=parseInt(computedStyle.height,10);bgWidth=width;bgHeight=height;bgPosX=0;bgPosY=0;setSrcToBackground(img);img.style.backgroundSize=width+'px '+height+'px';img.style.backgroundPosition='0 0';img.addEventListener('wheelzoom.reset',reset);img.addEventListener('wheel',onwheel);img.addEventListener('mousedown',draggable);}img.addEventListener('wheelzoom.destroy',function(originalProperties){console.log(originalProperties);img.removeEventListener('wheelzoom.destroy');img.removeEventListener('wheelzoom.reset',reset);img.removeEventListener('load',onload);img.removeEventListener('mouseup',removeDrag);img.removeEventListener('mousemove',drag);img.removeEventListener('mousedown',draggable);img.removeEventListener('wheel',onwheel);img.style.backgroundImage=originalProperties.backgroundImage;img.style.backgroundRepeat=originalProperties.backgroundRepeat;img.src=originalProperties.src;}.bind(null,{backgroundImage:img.style.backgroundImage,backgroundRepeat:img.style.backgroundRepeat,src:img.src}));options=options||{};Object.keys(defaults).forEach(function(key){settings[key]=options[key]!==undefined?options[key]:defaults[key];});if(img.complete)loaded();else{function onload(){img.removeEventListener('load',onload);loaded();}img.addEventListener('load',onload);}};if(typeof window.getComputedStyle!=='function')return function(elements){return elements;};else return function(elements,options){if(elements&&elements.length)Array.prototype.forEach.call(elements,main,options);else if(elements&&elements.nodeName)main(elements,options);return elements;};}());(function(geotagx,$,undefined){"use strict";var task_={};var taskRun_={};var numberOfQuestions_=0;var percentageComplete_=0;var progress_=[];var onAnswerSubmitted_=function(){};$(document).ready(function(){numberOfQuestions_=$(".question").length;$("#questionnaire-rewind").click(task_.showPreviousQuestion);$("*[data-toggle=tooltip]").tooltip();$("#questionnaire-show-comments").on("click.loadDisqus",function(){var disqus_shortname='geotagx';(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='//'+disqus_shortname+'.disqus.com/embed.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(dsq);})();$(this).off("click.loadDisqus");}).click(function(){$(this).fadeOut(100,function(){$(this).addClass("hide");$("#questionnaire-hide-comments").removeClass("hide").hide().fadeIn();$("#disqus_thread").removeClass("hide").hide().fadeIn(100);});});$("#questionnaire-hide-comments").click(function(){$(this).fadeOut(100,function(){$(this).addClass("hide");$("#questionnaire-show-comments").removeClass("hide").hide().fadeIn();$("#disqus_thread").fadeOut(100,function(){$(this).addClass("hide");});});});$(".help-toggle").click(function(){var siblings=$(this).siblings("div.modal");if(siblings.length>0)$(siblings[0]).modal();});$("#questionnaire-summary-details").click(function(){$(this).attr("aria-expanded",$(this).attr("aria-expanded")==="true"?"false":"true");});$(".answer").each(function(){var property=$.trim($(this).data("saved-as"));if(property)taskRun_[property]=null;});});function getCurrentQuestion(){return progress_[progress_.length-1];}function getQuestionNodeId(question){return question>0&&question<numberOfQuestions_?"#questionnaire-question-"+question:question===0?"#questionnaire-filter":null;}function getCurrentQuestionNodeId(){return getQuestionNodeId(getCurrentQuestion());}function getQuestionHtml(question){return $(getQuestionNodeId(question));}function getCurrentQuestionHtml(){return getQuestionHtml(getCurrentQuestion());}function updateProgress(){percentageComplete_=progress_.length>0?((getCurrentQuestion()/numberOfQuestions_)*100).toFixed(0):0;$("#questionnaire-percentage-complete").html(percentageComplete_);$("#questionnaire-progress-bar").css("width",percentageComplete_+"%");};function isSpamFilter(question){return question===0;}function isSubmissionForm(question){return question===numberOfQuestions_;}function addAnswerCardEntry(questionId,answer){var $answerCard=$("#questionnaire-answer-card");if($answerCard.length>0){var nodeId=getQuestionNodeId(questionId);if(nodeId){var question=$(nodeId+" > header").html();if(question){var entry='<li id="questionnaire-answer-card-entry-'+questionId+'">'+question+' '+answer+'</li>';$(entry).hide().appendTo("#questionnaire-answer-card").fadeIn(200);}}var numberOfEntries=$("li",$answerCard).length;if($("#questionnaire-summary-details").hasClass("hide")&&numberOfEntries>0)$("#questionnaire-summary-details").removeClass("hide").hide().fadeIn();}}function removeAnswerCardEntry(question){setTimeout(function(){var $answerCard=$("#questionnaire-answer-card");$("#questionnaire-answer-card-entry-"+question).fadeOut(200,function(){$(this).remove();var numberOfEntries=$("li",$answerCard).length;if(!$("#questionnaire-summary-details").hasClass("hide")&&numberOfEntries==0)$("#questionnaire-summary-details").fadeOut(80,function(){$(this).addClass("hide");});});},150);}function beginTask(){$("input:checkbox").removeAttr("checked");$(".question").addClass("hide");progress_=[];for(var property in taskRun_)taskRun_[property]=null;task_.showQuestion(0);};function throttle(func,wait,options){var context,args,result,timeout=null,previous=0,_now=Date.now||function(){return new Date().getTime();};if(!options)options={};var later=function(){previous=options.leading===false?0:_now();timeout=null;result=func.apply(context,args);if(!timeout)context=args=null;};return function(){var now=_now();if(!previous&&options.leading===false)previous=now;var remaining=wait-(now-previous);context=this;args=arguments;if(remaining<=0||remaining>wait){if(timeout){clearTimeout(timeout);timeout=null;}previous=now;result=func.apply(context,args);if(!timeout)context=args=null;}else if(!timeout&&options.trailing!==false)timeout=setTimeout(later,remaining);return result;};};task_.saveAnswer=function(answer){var htmlNodeId=getCurrentQuestionNodeId();if(htmlNodeId){var property=$(htmlNodeId+" > div.answer").data("saved-as");if(property){var typeofAnswer=$.type(answer);if(typeofAnswer==="undefined")answer=null;else if(typeofAnswer==="object")if(answer.length>0){var tmp="";answer.each(function(){tmp+=","+$(this).val();});answer=tmp.substring(1);}else answer="None";taskRun_[property]=answer;}else console.log("[geotagx::task::saveAnswer] Could not find a 'saved-as' data attribute. Discarding answer...");}};task_.showQuestion=function(question){var hasAnsweredQuestion=progress_.length>0;$("#questionnaire-rewind").prop("disabled",!hasAnsweredQuestion);if(hasAnsweredQuestion)getCurrentQuestionHtml().addClass("hide");if(question>=0&&question<=numberOfQuestions_){progress_.push(question);updateProgress();if(isSubmissionForm(question)){console.log("Showing answer card...");console.log(taskRun_);}else getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);}else console.log("[geotagx::task::showQuestion] Error! Invalid question identifier '"+question+"'.");};task_.showNextQuestion=function(){task_.showQuestion(getCurrentQuestion()+1);};task_.showPreviousQuestion=function(){if(progress_.length>=2){var current=progress_[progress_.length-1];var previous=progress_[progress_.length-2];task_.saveAnswer(null);removeAnswerCardEntry(previous);progress_.pop();updateProgress();if(progress_.length===1)$("#questionnaire-rewind").prop("disabled",true);getQuestionHtml(previous).removeClass("hide");getQuestionHtml(current).addClass("hide");}else console.log("[geotagx::task::showPrevQuestion] Error! Could not load the previous question!");};task_.finish=function(){task_.showQuestion(numberOfQuestions_);};task_.run=function(project,onAnswerSubmitted){if($.type(project)!=="string"||$.type(onAnswerSubmitted)!=="function"){console.log("[geotagx::task::run] Error! Invalid function parameter.");return;}onAnswerSubmitted_=onAnswerSubmitted;pybossa.taskLoaded(function(task,deferred){if(!$.isEmptyObject(task)){var $image=$("<img/>");$image.load(function(){deferred.resolve(task);});$image.attr('src',task.info.url);$image.attr('id','anno_'+task.id);$image.addClass('img-polaroid');$image.addClass('annotable');task.info.image=$image;taskRun_.task_id=task.id;taskRun_.img=task.info.url;}else deferred.resolve(task);});pybossa.presentTask(function(task,deferred){if(!$.isEmptyObject(task)){$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);$(".hide-on-task-loaded").hide();var $image=$("#image");if($image.length>0){$image.attr("src",task.info.url);$image.addClass("highlight");$image.addClass("wheelzoom");$("#image-source").attr("href",task.info.uri);$("#image-loading").addClass("hide");wheelzoom($image);}else console.log("[pybossa::presentTask] Error! Could not find image to analyze.");$("#questionnaire-show-comments").prop("disabled",false);beginTask();$(".btn-answer").click(throttle(function(){var $submitter=$(this);var answer=$submitter.attr("value");var question=getCurrentQuestion();var questionHtml=getQuestionHtml(question);if(isSpamFilter(question))if(answer==="No")geotagx.task.showNextQuestion();else geotagx.task.finish();else if($submitter.attr("id")==="questionnaire-submit"){var $button=$(this);$button.prop("disabled",true);console.log("Saving result...");console.log(taskRun_);}else onAnswerSubmitted_(question,answer,$submitter);addAnswerCardEntry(question,answer);},800));}else{}});pybossa.run(project);};geotagx.task=task_;})(window.geotagx=window.geotagx||{},jQuery);
+window.wheelzoom=(function(){var defaults={zoom:0.10};var canvas=document.createElement('canvas');function setSrcToBackground(img){img.style.backgroundImage="url('"+img.src+"')";img.style.backgroundRepeat='no-repeat';canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;img.src=canvas.toDataURL();}main=function(img,options){if(!img||!img.nodeName||img.nodeName!=='IMG')return;var settings={};var width;var height;var bgWidth;var bgHeight;var bgPosX;var bgPosY;var previousEvent;function updateBgStyle(){if(bgPosX>0)bgPosX=0;else if(bgPosX<width-bgWidth)bgPosX=width-bgWidth;if(bgPosY>0)bgPosY=0;else if(bgPosY<height-bgHeight)bgPosY=height-bgHeight;img.style.backgroundSize=bgWidth+'px '+bgHeight+'px';img.style.backgroundPosition=bgPosX+'px '+bgPosY+'px';}function reset(){bgWidth=width;bgHeight=height;bgPosX=bgPosY=0;updateBgStyle();}function onwheel(e){var deltaY=0;e.preventDefault();if(e.deltaY)deltaY=e.deltaY;else if(e.wheelDelta)deltaY=-e.wheelDelta;var rect=img.getBoundingClientRect();var offsetX=e.pageX-rect.left-document.body.scrollLeft;var offsetY=e.pageY-rect.top-document.body.scrollTop;var bgCursorX=offsetX-bgPosX;var bgCursorY=offsetY-bgPosY;var bgRatioX=bgCursorX/bgWidth;var bgRatioY=bgCursorY/bgHeight;if(deltaY<0){bgWidth+=bgWidth*settings.zoom;bgHeight+=bgHeight*settings.zoom;}else{bgWidth-=bgWidth*settings.zoom;bgHeight-=bgHeight*settings.zoom;}bgPosX=offsetX-(bgWidth*bgRatioX);bgPosY=offsetY-(bgHeight*bgRatioY);if(bgWidth<=width||bgHeight<=height)reset();else updateBgStyle();}function drag(e){e.preventDefault();bgPosX+=(e.pageX-previousEvent.pageX);bgPosY+=(e.pageY-previousEvent.pageY);previousEvent=e;updateBgStyle();}function removeDrag(){document.removeEventListener('mouseup',removeDrag);document.removeEventListener('mousemove',drag);}function draggable(e){e.preventDefault();previousEvent=e;document.addEventListener('mousemove',drag);document.addEventListener('mouseup',removeDrag);}function loaded(){var computedStyle=window.getComputedStyle(img,null);width=parseInt(computedStyle.width,10);height=parseInt(computedStyle.height,10);bgWidth=width;bgHeight=height;bgPosX=0;bgPosY=0;setSrcToBackground(img);img.style.backgroundSize=width+'px '+height+'px';img.style.backgroundPosition='0 0';img.addEventListener('wheelzoom.reset',reset);img.addEventListener('wheel',onwheel);img.addEventListener('mousedown',draggable);}img.addEventListener('wheelzoom.destroy',function(originalProperties){console.log(originalProperties);img.removeEventListener('wheelzoom.destroy');img.removeEventListener('wheelzoom.reset',reset);img.removeEventListener('load',onload);img.removeEventListener('mouseup',removeDrag);img.removeEventListener('mousemove',drag);img.removeEventListener('mousedown',draggable);img.removeEventListener('wheel',onwheel);img.style.backgroundImage=originalProperties.backgroundImage;img.style.backgroundRepeat=originalProperties.backgroundRepeat;img.src=originalProperties.src;}.bind(null,{backgroundImage:img.style.backgroundImage,backgroundRepeat:img.style.backgroundRepeat,src:img.src}));options=options||{};Object.keys(defaults).forEach(function(key){settings[key]=options[key]!==undefined?options[key]:defaults[key];});if(img.complete)loaded();else{function onload(){img.removeEventListener('load',onload);loaded();}img.addEventListener('load',onload);}};if(typeof window.getComputedStyle!=='function')return function(elements){return elements;};else return function(elements,options){if(elements&&elements.length)Array.prototype.forEach.call(elements,main,options);else if(elements&&elements.nodeName)main(elements,options);return elements;};}());(function(geotagx,$,undefined){"use strict";var task_={};var taskRun_={};var numberOfQuestions_=0;var percentageComplete_=0;var progress_=[];var onAnswerSubmitted_=function(){};$(document).ready(function(){numberOfQuestions_=$(".question").length;$("#questionnaire-rewind").click(task_.showPreviousQuestion);$("*[data-toggle=tooltip]").tooltip();$("#questionnaire-show-comments").on("click.loadDisqus",function(){var disqus_shortname='geotagx';(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='//'+disqus_shortname+'.disqus.com/embed.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(dsq);})();$(this).off("click.loadDisqus");}).click(function(){$(this).fadeOut(100,function(){$(this).addClass("hide");$("#questionnaire-hide-comments").removeClass("hide").hide().fadeIn();$("#disqus_thread").removeClass("hide").hide().fadeIn(100);});});$("#questionnaire-hide-comments").click(function(){$(this).fadeOut(100,function(){$(this).addClass("hide");$("#questionnaire-show-comments").removeClass("hide").hide().fadeIn();$("#disqus_thread").fadeOut(100,function(){$(this).addClass("hide");});});});$(".help-toggle").click(function(){var siblings=$(this).siblings("div.modal");if(siblings.length>0)$(siblings[0]).modal();});$("#questionnaire-summary-details").click(function(){$(this).attr("aria-expanded",$(this).attr("aria-expanded")==="true"?"false":"true");});$(".answer").each(function(){var property=$.trim($(this).data("saved-as"));if(property)taskRun_[property]=null;});});function getCurrentQuestion(){return progress_[progress_.length-1];}function getQuestionNodeId(question){return question>0&&question<numberOfQuestions_?"#questionnaire-question-"+question:question===0?"#questionnaire-filter":null;}function getCurrentQuestionNodeId(){return getQuestionNodeId(getCurrentQuestion());}function getQuestionHtml(question){return $(getQuestionNodeId(question));}function getCurrentQuestionHtml(){return getQuestionHtml(getCurrentQuestion());}function updateProgress(){percentageComplete_=progress_.length>0?((getCurrentQuestion()/numberOfQuestions_)*100).toFixed(0):0;$("#questionnaire-percentage-complete").html(percentageComplete_);$("#questionnaire-progress-bar").css("width",percentageComplete_+"%");};function isSpamFilter(question){return question===0;}function isSubmissionForm(question){return question===numberOfQuestions_;}function addAnswerCardEntry(questionId,answer){var $answerCard=$("#questionnaire-answer-card");if($answerCard.length>0){var nodeId=getQuestionNodeId(questionId);if(nodeId){var question=$(nodeId+" > header").html();if(question){var entry='<li id="questionnaire-answer-card-entry-'+questionId+'">'+question+' '+answer+'</li>';$(entry).hide().appendTo("#questionnaire-answer-card").fadeIn(200);}}var numberOfEntries=$("li",$answerCard).length;if($("#questionnaire-summary-details").hasClass("hide")&&numberOfEntries>0)$("#questionnaire-summary-details").removeClass("hide").hide().fadeIn();}}function removeAnswerCardEntry(question){setTimeout(function(){var $answerCard=$("#questionnaire-answer-card");$("#questionnaire-answer-card-entry-"+question).fadeOut(200,function(){$(this).remove();var numberOfEntries=$("li",$answerCard).length;if(!$("#questionnaire-summary-details").hasClass("hide")&&numberOfEntries==0)$("#questionnaire-summary-details").fadeOut(80,function(){$(this).addClass("hide");});});},150);}function beginTask(){$("input:checkbox").removeAttr("checked");$(".question").addClass("hide");progress_=[];for(var property in taskRun_)taskRun_[property]=null;task_.showQuestion(0);};function throttle(func,wait,options){var context,args,result,timeout=null,previous=0,_now=Date.now||function(){return new Date().getTime();};if(!options)options={};var later=function(){previous=options.leading===false?0:_now();timeout=null;result=func.apply(context,args);if(!timeout)context=args=null;};return function(){var now=_now();if(!previous&&options.leading===false)previous=now;var remaining=wait-(now-previous);context=this;args=arguments;if(remaining<=0||remaining>wait){if(timeout){clearTimeout(timeout);timeout=null;}previous=now;result=func.apply(context,args);if(!timeout)context=args=null;}else if(!timeout&&options.trailing!==false)timeout=setTimeout(later,remaining);return result;};};task_.saveAnswer=function(answer){var htmlNodeId=getCurrentQuestionNodeId();if(htmlNodeId){var property=$(htmlNodeId+" > div.answer").data("saved-as");if(property){var typeofAnswer=$.type(answer);if(typeofAnswer==="undefined")answer=null;else if(typeofAnswer==="object")if(answer.length>0){var tmp="";answer.each(function(){tmp+=","+$(this).val();});answer=tmp.substring(1);}else answer="None";taskRun_[property]=answer;}else console.log("[geotagx::task::saveAnswer] Could not find a 'saved-as' data attribute. Discarding answer...");}};task_.showQuestion=function(question){var hasAnsweredQuestion=progress_.length>0;$("#questionnaire-rewind").prop("disabled",!hasAnsweredQuestion);if(hasAnsweredQuestion)getCurrentQuestionHtml().addClass("hide");if(question>=0&&question<=numberOfQuestions_){progress_.push(question);updateProgress();if(isSubmissionForm(question)){console.log("Showing answer card...");console.log(taskRun_);if(percentageComplete_>=100){$("#questionnaire-submit").show();$("#questionnaire-conclusion").show();$("#questionnaire-summary-details .show-on-expanded").click();}else{$("#questionnaire-submit").hide();$("#questionnaire-conclusion").hide();}}else getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);}else console.log("[geotagx::task::showQuestion] Error! Invalid question identifier '"+question+"'.");};task_.showNextQuestion=function(){task_.showQuestion(getCurrentQuestion()+1);};task_.showPreviousQuestion=function(){if(progress_.length>=2){var current=progress_[progress_.length-1];var previous=progress_[progress_.length-2];task_.saveAnswer(null);removeAnswerCardEntry(previous);progress_.pop();updateProgress();if(progress_.length===1)$("#questionnaire-rewind").prop("disabled",true);getQuestionHtml(previous).removeClass("hide");getQuestionHtml(current).addClass("hide");}else console.log("[geotagx::task::showPrevQuestion] Error! Could not load the previous question!");};task_.finish=function(){task_.showQuestion(numberOfQuestions_);};task_.run=function(project,onAnswerSubmitted){if($.type(project)!=="string"||$.type(onAnswerSubmitted)!=="function"){console.log("[geotagx::task::run] Error! Invalid function parameter.");return;}onAnswerSubmitted_=onAnswerSubmitted;pybossa.taskLoaded(function(task,deferred){if(!$.isEmptyObject(task)){var $image=$("<img/>");$image.load(function(){deferred.resolve(task);});$image.attr('src',task.info.url);$image.attr('id','anno_'+task.id);$image.addClass('img-polaroid');$image.addClass('annotable');task.info.image=$image;taskRun_.task_id=task.id;taskRun_.img=task.info.url;}else deferred.resolve(task);});pybossa.presentTask(function(task,deferred){if(!$.isEmptyObject(task)){$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);$(".hide-on-task-loaded").hide();var $image=$("#image");if($image.length>0){$image.attr("src",task.info.url);$image.addClass("highlight");$image.addClass("wheelzoom");$("#image-source").attr("href",task.info.uri);$("#image-loading").addClass("hide");wheelzoom($image);}else console.log("[pybossa::presentTask] Error! Could not find image to analyze.");$("#questionnaire-show-comments").prop("disabled",false);beginTask();$(".btn-answer").click(throttle(function(){var $submitter=$(this);var answer=$submitter.attr("value");var question=getCurrentQuestion();var questionHtml=getQuestionHtml(question);if(isSpamFilter(question))if(answer==="No")geotagx.task.showNextQuestion();else geotagx.task.finish();else if($submitter.attr("id")==="questionnaire-submit"){var $button=$(this);$button.prop("disabled",true);console.log("Saving result...");console.log(taskRun_);pybossa.saveTask(task.id,taskRun_).done(function(){deferred.resolve();$button.prop("disabled",false);$("#questionnaire-summary-details .show-on-expanded").click();$("#questionnaire-submit").hide();$("#questionnaire-conclusion").hide();});}else onAnswerSubmitted_(question,answer,$submitter);addAnswerCardEntry(question,answer);},800));}else{}});pybossa.run(project);};geotagx.task=task_;})(window.geotagx=window.geotagx||{},jQuery);
 </script>
 <script type="text/javascript">
 // Run the application.
 geotagx.task.run("geotagx_project_template", function(question, answer, $submitter){
     geotagx.task.saveAnswer(answer); 
     switch (question){
-        case 8: //Final Question
+        case 6: //Final Question
             geotagx.task.finish();
             break;
         default:

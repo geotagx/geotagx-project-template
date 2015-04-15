@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import jinja2
 from slimit import minify
-from rcssmin import cssmin
+# from rcssmin import cssmin
 
 
 import codecs, locale, sys
@@ -85,7 +85,8 @@ def geotagx_collect_js_css():
 				CSS_raw += open(os.path.join(root, name),"r").read()
 			if name.split(".")[-1] == "js":
 				JS_raw += open(os.path.join(root, name),"r").read()
-	CSS_minified = cssmin(CSS_raw, keep_bang_comments=False)
+	#CSS_minified = cssmin(CSS_raw, keep_bang_comments=False)
+	CSS_minified = CSS_raw ##Removing minification of CSS because of dependency issues in rcssmin
 	JS_minified = minify(JS_raw)
 
 """
