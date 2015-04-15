@@ -9,7 +9,9 @@
 			"type":"binary",
 			"answer":{
 				"saved_as":"water"
-			}
+			},
+			"branch_yes":2,
+			"branch_no":"finish"
 		},
 		{
 			"id":2,
@@ -17,7 +19,9 @@
 			"type":"binary",
 			"answer":{
 				"saved_as":"waterSmall"
-			}
+			},
+			"branch_yes":3,
+			"branch_no":4
 		},
 		{
 			"id":3,
@@ -25,7 +29,8 @@
 			"type":"binary",
 			"answer":{
 				"saved_as":"waterSmallShelter"
-			}
+			},
+			"branch":7,
 		},
 		{
 			"id":4,
@@ -33,7 +38,8 @@
 			"type":"binary",
 			"answer":{
 				"saved_as":"waterLarge"
-			}
+			},
+			"branch_no":6
 		},
 		{
 			"id":5,
@@ -68,7 +74,8 @@
 			"type":"binary",
 			"answer":{
 				"saved_as":"waterDrinking"
-			}
+			},
+			"branch_no":"finish"
 		},
 		{
 			"id":8,
