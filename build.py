@@ -38,6 +38,19 @@ def get_project_json(filename):
 		return json.loads(data)
 
 """
+Collects CSS files from the template static folder, optionally minifies them,
+and then embeds them directly into the rendered output
+"""
+def get_template_css(compress):
+	import os
+	css_raw = ""
+	for root, dirs, files in os.walk(LAYOUT_DIR+"/static", topdown=False):
+		for name in files:
+			if name.split(".")[-1] == "css":
+				css_raw += open(os.path.join(root, name),"r").read()
+	return css_raw if not compress else cssmin(css_raw, keep_bang_comments=False)
+
+"""
 Collects JS files from the template static folder, optionally minifies them,
 and then embeds them directly into the rendered output
 """
@@ -48,7 +61,7 @@ def get_template_js(compress):
 		for name in files:
 			if name.split(".")[-1] == "js":
 				js_raw += open(os.path.join(root, name),"r").read()
-	return js_raw if not compress else minify(js_raw)
+	return js_raw if not compress else minify(js_raw)	
 
 def get_project_css(filename, compress):
 	"""Returns the project's custom stylesheet, minified."""
@@ -80,7 +93,7 @@ def get_project_help(directory):
 	return help
 
 
-def build(path, compress=False):
+def build(path, compress=True):
 	"""Builds the task presenter for the project located at the specified path."""
 	project_dir = os.path.realpath(path)
 
@@ -106,8 +119,9 @@ def build(path, compress=False):
 
 		# Build the template.
 		with open(os.path.join(project_dir, "template.html"), "w") as output:
-			js_ = get_template_js(compress)#Collects JS common to the whole template
-			css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
+			js_ = get_template_js(compress) # Collects JS common to the whole template
+			css_ = get_template_css(compress) # Collects CSS common to the whole template
+			css_ += get_project_css(os.path.join(project_dir, "project.css"), compress)
 			js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
 			html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
 

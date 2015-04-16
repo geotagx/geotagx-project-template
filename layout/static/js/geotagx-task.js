@@ -288,11 +288,9 @@
                 console.log("Showing answer card...");
 				console.log(taskRun_);
 
-                
                 if (percentageComplete_ >= 100){
                     $("#questionnaire-submit").show()
                     $("#questionnaire-conclusion").show();
-                    $("#questionnaire-summary-details .show-on-expanded").click() //Show the Questionnaire summary
                 }
                 else {
                     $("#questionnaire-submit").hide();
@@ -437,8 +435,6 @@
                             deferred.resolve();
 							$button.prop("disabled", false);
 
-                            //Collapse the Questionnaire summary again by faking another click
-                            $("#questionnaire-summary-details .show-on-expanded").click();
                             $("#questionnaire-submit").hide(); //Hide the Submit Button
                             $("#questionnaire-conclusion").hide(); //hide the conclusion
                         });

@@ -1,6 +1,6 @@
 {
 	"name":"GeoTag-X Project Sample",
-	"short_name":"sample",
+	"short_name":"geotagx_project_template",
 	"description":"A sample GeoTag-X project.",
 	"why":"By contributing to the sample project, you're helping ... [Remind the user why their contribution is important]",
 	"questions":[
