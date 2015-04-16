@@ -1,3 +1,18 @@
+{% macro modal(id, title) -%}
+<div id="{{id}}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            {% if title %}<header class="modal-header"><h4 class="modal-title">{{title}}</h4></header>{% endif %}
+            <main class="modal-body">
+				{{caller()}}
+            </main>
+            <footer class="modal-footer"><button type="button" class="btn btn-primary btn-xs" data-dismiss="modal">Close</button></footer>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+
 {% macro help_modal(title) -%}
 <section class="help">
     If you do not know how to answer this question, get some <button class="help-toggle btn-link" rel="nofollow" data-toggle="modal"><strong>help.</strong></button>
@@ -16,7 +31,7 @@
 {%- endmacro %}
 
 
-{% macro binary_answer(answer, has_help) -%}
+{% macro binary_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
 	<button class="btn btn-answer btn-success btn-sm" value="Yes">Yes</button>
 	<button class="btn btn-answer btn-danger  btn-sm" value="No">No</button>
@@ -26,19 +41,50 @@
 {%- endmacro %}
 
 
-{% macro multiple_choice_answer(answer, has_help) -%}
+{% macro multiple_choice_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
-	{% for choice in answer.choices -%}
-	<input type="checkbox" value="{{choice.value}}">{{choice.label}}<br>
+    {% for choice in answer.choices -%}
+	<label><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label><br>
 	{%- endfor %}
-	<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
 </div>
 {%- endmacro %}
 
 
-{% macro geotagging_answer(answer, has_help) -%}
+{% macro illustrated_multiple_choice_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    <div class="row illustrations">
+        {% for choice in answer.choices -%}
+        {% set illustration = choice.illustration %}
+        {% set source = illustration.source %}
+        {% set modal_id = ["question-", question_id, "-illustration-", loop.index]|join() %}
+        <div class="col-xs-4 illustration">
+            <a href="#" data-target="#{{modal_id}}" data-toggle="modal"><img src="{{illustration.image}}" class="img-responsive"></a>
+            <label><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label><br>
+            {% call modal(modal_id) %}
+            <div><img src="{{illustration.image}}" class="img-responsive"></div>
+
+            <p>The image can be found <a rel="nofollow" target="_blank" href="{{source.url}}">here</a> [{{source.name}}].</p>
+            {% if choice.more_examples %}<p>If this image is not descriptive enough, you can find some more examples <a rel="nofollow" target="_blank" href="{{choice.more_examples}}">here</a>.</p>{% endif %}
+            {% endcall %}
+        </div>
+        {%- endfor %}
+        <div class="col-xs-4 illustration">
+            <input type="text"><button>Other</button>
+        </div>
+    </div>
+    <div>
+    	<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+    	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{% macro geotagging_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
 
 

@@ -97,6 +97,29 @@
 			"answer":{
 				"saved_as":"waterDrinkingSourcesAffected"
 			}
+		},
+		{
+			"id":10,
+			"title":"What more can you see?",
+			"type":"multiple_choice",
+			"answer":{
+				"saved_as":"whatCanYouSee",
+				"illustrations":true,
+				"choices":[
+					{
+						"label":"Cattle",
+						"value":"Cattle",
+						"illustration":{
+							"image":"http://www.interservicos.com/media/uploads/3n.png",
+							"source":{
+								"name":"Interservicos",
+								"url":"http://www.interservicos.com/index.php/en/projectos/detail/306/"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=cattle+africa"
+					}
+				]
+			}
 		}
 	]
 }
