@@ -14,10 +14,6 @@ The following is a list of OPTIONS you can use to modify the script's behavior:\
 \r    -h, --help        prints this help message.\n"""
 
 
-LAYOUT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
-TEMPLATE = "base.html"
-
-
 def has_valid_project(path):
 	"""Returns true if the directory with the specified path is writable, and contains a valid GeoTag-X project, false otherwise."""
 	return  os.path.isdir(path) \
@@ -76,32 +72,33 @@ def build(path, compress=False):
 	if not is_valid_project_json(json):
 		print "Error! The 'project.json' file is not valid."
 		sys.exit(1)
-	else:
-		template   = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template(TEMPLATE)
-		short_name = json["short_name"].strip()
-		why_       = json["why"].strip()
-		questions_ = json["questions"]
 
-		# Assign the help to its corresponding question.
-		help = get_project_help(os.path.join(project_dir, "help"))
-		if len(help) > 0:
-			for question in questions_:
-				key = str(question["id"])
-				try:
-					question[u"help"] = help[key]
-				except:
-					pass
+	layout_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
+	template   = Environment(loader=FileSystemLoader(searchpath=layout_dir)).get_template("base.html")
+	short_name = json["short_name"].strip()
+	why_       = json["why"].strip()
+	questions_ = json["questions"]
 
-		# Build the template.
-		with open(os.path.join(project_dir, "template.html"), "w") as output:
-			css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
-			js_  = get_project_js(os.path.join(project_dir, "project.js"), compress)
-			html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
+	# Assign the help to its corresponding question.
+	help = get_project_help(os.path.join(project_dir, "help"))
+	if len(help) > 0:
+		for question in questions_:
+			key = str(question["id"])
+			try:
+				question[u"help"] = help[key]
+			except:
+				pass
 
-			if compress:
-				html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+	# Build the template.
+	with open(os.path.join(project_dir, "template.html"), "w") as output:
+		css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
+		js_  = get_project_js(os.path.join(project_dir, "project.js"), compress)
+		html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
 
-			output.write(html.encode("UTF-8"))
+		if compress:
+			html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+
+		output.write(html.encode("UTF-8"))
 
 
 def main(argv):
