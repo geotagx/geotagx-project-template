@@ -92,7 +92,7 @@ def get_project_help(directory):
 	return help
 
 
-def build(path, compress=True):
+def build(path, compress=False):
 	"""Builds the task presenter for the project located at the specified path."""
 	project_dir = os.path.realpath(path)
 
@@ -124,8 +124,8 @@ def build(path, compress=True):
 		js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
 		html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
 
-		if compress:
-			html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+		#if compress:
+		#	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
 
 		output.write(html.encode("UTF-8"))
 
