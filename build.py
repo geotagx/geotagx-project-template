@@ -14,6 +14,9 @@ The following is a list of OPTIONS you can use to modify the script's behavior:\
 \r    -h, --help        prints this help message.\n"""
 
 
+LAYOUT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
+
+
 def has_valid_project(path):
 	"""Returns true if the directory with the specified path is writable, and contains a valid GeoTag-X project, false otherwise."""
 	return  os.path.isdir(path) \
@@ -33,6 +36,31 @@ def get_project_json(filename):
 		data = file.read()
 		return json.loads(data)
 
+"""
+Collects CSS files from the template static folder, optionally minifies them,
+and then embeds them directly into the rendered output
+"""
+def get_template_css(compress):
+	import os
+	css_raw = ""
+	for root, dirs, files in os.walk(LAYOUT_DIR+"/static", topdown=False):
+		for name in files:
+			if name.split(".")[-1] == "css":
+				css_raw += open(os.path.join(root, name),"r").read()
+	return css_raw if not compress else cssmin(css_raw, keep_bang_comments=False)
+
+"""
+Collects JS files from the template static folder, optionally minifies them,
+and then embeds them directly into the rendered output
+"""
+def get_template_js(compress):
+	import os
+	js_raw = ""
+	for root, dirs, files in os.walk(LAYOUT_DIR+"/static", topdown=False):
+		for name in files:
+			if name.split(".")[-1] == "js":
+				js_raw += open(os.path.join(root, name),"r").read()
+	return js_raw if not compress else minify(js_raw)
 
 def get_project_css(filename, compress):
 	"""Returns the project's custom stylesheet, minified."""
@@ -64,7 +92,7 @@ def get_project_help(directory):
 	return help
 
 
-def build(path, compress=False):
+def build(path, compress=True):
 	"""Builds the task presenter for the project located at the specified path."""
 	project_dir = os.path.realpath(path)
 
@@ -73,8 +101,7 @@ def build(path, compress=False):
 		print "Error! The 'project.json' file is not valid."
 		sys.exit(1)
 
-	layout_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
-	template   = Environment(loader=FileSystemLoader(searchpath=layout_dir)).get_template("base.html")
+	template   = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template("base.html")
 	short_name = json["short_name"].strip()
 	why_       = json["why"].strip()
 	questions_ = json["questions"]
@@ -91,8 +118,10 @@ def build(path, compress=False):
 
 	# Build the template.
 	with open(os.path.join(project_dir, "template.html"), "w") as output:
-		css_ = get_project_css(os.path.join(project_dir, "project.css"), compress)
-		js_  = get_project_js(os.path.join(project_dir, "project.js"), compress)
+		js_  = get_template_js(compress) # Collects JS common to the whole template
+		css_ = get_template_css(compress) # Collects CSS common to the whole template
+		css_ += get_project_css(os.path.join(project_dir, "project.css"), compress)
+		js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
 		html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
 
 		if compress:

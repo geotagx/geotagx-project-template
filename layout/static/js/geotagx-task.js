@@ -1,6 +1,3 @@
-/* Define a custom script for your project here. */
-
-
 /*
  * The GeoTag-X task helper.
  * TODO Add license.
@@ -21,8 +18,7 @@
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout a task. More specifically, it allows a user to rewind to a previous question.
-    var onShowNextQuestion_ = function(){}; // A user-defined function that determines the next question presented to the user.
-
+    var onAnswerSubmitted_ = function(){}; // A function that's called each time the user submits an answer to a question.
 
 	$(document).ready(function(){
 		numberOfQuestions_ = $(".question").length;
@@ -77,29 +73,6 @@
 		});
 	});
 	/**
-	 * Returns the answer submitted by the specified submitter.
-	 */
-	function getAnswer(questionType, $submitter){
-		var answer = $submitter.attr("value");
-		if (questionType === "multiple-choice" && answer === "Done"){
-			// When the question is multiple-choice, the actual answer is contained in the
-			// set of selected input elements. A non-empty set is converted into a string
-			// containing each input value, while an empty set is converted into the string 'None'.
-			var $input = $submitter.siblings("input:checked");
-			if ($input.length === 0)
-				answer = "None";
-			else {
-				answer = "";
-				$input.each(function(){
-					answer += ", " + $(this).val();
-				});
-				answer = answer.substring(2); // Remove the leading comma and space.
-			}
-		}
-
-		return answer;
-	}
-	/**
 	 * Returns the current question.
 	 */
 	function getCurrentQuestion(){
@@ -120,21 +93,15 @@
 	/*
      * Returns the specified question's HTML node.
      */
-    function getQuestionElement(question){
+    function getQuestionHtml(question){
         return $(getQuestionNodeId(question));
     }
 	/*
      * Returns the current question's HTML node.
      */
-    function getCurrentQuestionElement(){
-        return getQuestionElement(getCurrentQuestion());
+    function getCurrentQuestionHtml(){
+        return getQuestionHtml(getCurrentQuestion());
     }
-	/**
-	 * Returns the type of the specified question.
-	 */
-	function getQuestionType(question){
-		return getQuestionElement(question).data("type");
-	}
 	/**
 	 *
 	 */
@@ -209,6 +176,60 @@
 
 		task_.showQuestion(0); // Note: 0 is the spam filter.
 	};
+	/*
+     * A slightly modified version of the throttle function taken from the Underscore.js 1.8.2 library (http://underscorejs.org).
+     * (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+     *
+     * Returns a function, that, when invoked, will only be triggered at most once
+     * during a given window of time. Normally, the throttled function will run
+     * as much as it can, without ever going more than once per `wait` duration;
+     * but if you'd like to disable the execution on the leading edge, pass
+     * `{leading: false}`. To disable execution on the trailing edge, ditto.
+     */
+    function throttle(func, wait, options){
+        var context,
+            args,
+            result,
+            timeout = null,
+            previous = 0,
+            _now = Date.now || function(){ return new Date().getTime(); }; // A (possibly faster) way to get the current timestamp as an integer.
+
+        if (!options)
+            options = {};
+
+        var later = function(){
+            previous = options.leading === false ? 0 : _now();
+            timeout = null;
+            result = func.apply(context, args);
+            if (!timeout)
+                context = args = null;
+        };
+
+        return function(){
+            var now = _now();
+            if (!previous && options.leading === false)
+                previous = now;
+
+            var remaining = wait - (now - previous);
+            context = this;
+            args = arguments;
+
+            if (remaining <= 0 || remaining > wait){
+                if (timeout){
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+                previous = now;
+                result = func.apply(context, args);
+                if (!timeout)
+                    context = args = null;
+            }
+            else if (!timeout && options.trailing !== false){
+                timeout = setTimeout(later, remaining);
+            }
+            return result;
+        };
+    };
 	/**
 	 * Saves the current question's answer.
 	 * @param answer the answer to save.
@@ -218,8 +239,26 @@
 		var htmlNodeId = getCurrentQuestionNodeId();
 		if (htmlNodeId){
 			var property = $(htmlNodeId + " > div.answer").data("saved-as");
-			if (property)
-				taskRun_[property] = $.type(answer) === "undefined" ? null : answer;
+			if (property){
+				var typeofAnswer = $.type(answer);
+
+				if (typeofAnswer === "undefined")
+					answer = null;
+				else if (typeofAnswer === "object"){
+					// When the answer is an object, it is assumed to be a collection of input elements. A non-empty collection is
+					// converted into a string containing each input values, while an empty collection is converted into the string 'None'.
+					if (answer.length > 0){
+						var tmp = "";
+						answer.each(function(){
+							tmp += "," + $(this).val();
+						});
+						answer = tmp.substring(1); // Remove the leading comma.
+					}
+					else
+						answer = "None";
+				}
+				taskRun_[property] = answer;
+			}
 			else
 				console.log("[geotagx::task::saveAnswer] Could not find a 'saved-as' data attribute. Discarding answer...");
 		}
@@ -236,7 +275,7 @@
 
         // Hide the current question since we'll be moving onto the next.
         if (hasAnsweredQuestion)
-			getCurrentQuestionElement().addClass("hide");
+			getCurrentQuestionHtml().addClass("hide");
 
         // If we have a valid question id ...
         if (question >= 0 && question <= numberOfQuestions_){
@@ -248,39 +287,19 @@
             if (isSubmissionForm(question)){
                 console.log("Showing answer card...");
 				console.log(taskRun_);
-        /*
-                var $currentQuestionHtml = getCurrentQuestionElement();
-                var $rewindButton = $("#questionnaire-rewind");
-                // var $summary = $("#questionnaire-summary");
 
-                // Hide the current question and enable the rewind button.
-                $currentQuestionHtml.addClass("hide");
-                $rewindButton.prop("disabled", false);
-
-                // $summary.collapse("show");
-
-
-                // $answerCard.addClass("expanded");
-                // $answerCard.removeClass("collapsed");
-        */
-
-        // $("#questionnaire-answers").collapse("show");
-        // setTimeout(function(){ $("#questionnaire-answers").collapse("hide") }, 1000);
-
-        /*
-        if (percentageComplete_ >= 100){
-            $("#questionnaire-submit").removeClass("hide");
-            $("#questionnaire-conclusion").removeClass("hide");
-            $("#questionnaire-answers").collapse();
-        }
-        else {
-            $("#questionnaire-submit").addClass("hide");
-            $("#questionnaire-conclusion").addClass("hide");
-        }
-        */
+                if (percentageComplete_ >= 100){
+                    $("#questionnaire-submit").show()
+                    $("#questionnaire-conclusion").show();
+                }
+                else {
+                    $("#questionnaire-submit").hide();
+                    $("#questionnaire-conclusion").hide();
+                }
+                
             }
             else {
-				getCurrentQuestionElement().removeClass("hide").hide().fadeIn(300);
+				getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);
             }
         }
         else
@@ -317,8 +336,8 @@
                 $("#questionnaire-rewind").prop("disabled", true);
 
             // Hide the current question and show the previous.
-            getQuestionElement(previous).removeClass("hide");
-			getQuestionElement(current).addClass("hide");
+            getQuestionHtml(previous).removeClass("hide");
+			getQuestionHtml(current).addClass("hide");
         }
         else
             console.log("[geotagx::task::showPrevQuestion] Error! Could not load the previous question!");
@@ -333,16 +352,16 @@
 	};
 	/**
 	 * Runs the project's initial task.
-	 * @param slug the project's short name.
-	 * @param onShowNextQuestion a user-defined function that returns the id of the next question to present to the user.
+	 * @param project the project's name.
+	 * @param onAnswerSubmitted a function object that's called each time the user submits an answer to a question.
 	 */
-	task_.run = function(slug, onShowNextQuestion){
-		if ($.type(slug) !== "string" || $.type(onShowNextQuestion) !== "function"){
+	task_.run = function(project, onAnswerSubmitted){
+		if ($.type(project) !== "string" || $.type(onAnswerSubmitted) !== "function"){
             console.log("[geotagx::task::run] Error! Invalid function parameter.");
             return;
         }
 
-		onShowNextQuestion_ = onShowNextQuestion;
+		onAnswerSubmitted_ = onAnswerSubmitted;
 
         pybossa.taskLoaded(function(task, deferred){
             if (!$.isEmptyObject(task)){
@@ -388,42 +407,46 @@
 
                 $("#questionnaire-show-comments").prop("disabled", false);
 
-				// Set the submission button's handler. Note that off().on() resets the
-				// click event handler every time a new task is loaded.
-				$("#questionnaire-submit").off("click").on("click", function(){
-					console.log("Saving result...");
-					console.log(taskRun_);
+                // Reset user input and the task run when a new task is presented.
+                beginTask();
 
-					// var $button = $(this);
-					//
-					// pybossa.saveTask(taskRun_.id, taskRun_).done(function(){
-					// 	deferred.resolve();
-					// 	$button.prop("disabled", false);
-					// });
-				});
-
-                $(".btn-answer").off("click").on("click", function(){
-					var $submitter = $(this);
-					var question = getCurrentQuestion();
-					var questionType = getQuestionType(question);
-					var answer = getAnswer(questionType, $submitter);
+                // Set the answer button event handlers.
+                // $(".btn-answer").off("click").on("click", function(){                            // TODO Make sure this was not a better solution.
+                $(".btn-answer").click(throttle(function(){
+                    var $submitter = $(this);
+                    var answer = $submitter.attr("value");
+                    var question = getCurrentQuestion();
+                    var questionHtml = getQuestionHtml(question);
 
                     if (isSpamFilter(question)){
                         if (answer === "No")
-                            task_.showNextQuestion(); // The image is not spam, proceed to the first question.
+                            geotagx.task.showNextQuestion(); // The image is not spam, proceed to the first question.
                         else
-							task_.finish();
+                            geotagx.task.finish();
+                    }
+                    else if ($submitter.attr("id") === "questionnaire-submit"){
+						var $button = $(this);
+						$button.prop("disabled", true);
+
+                        console.log("Saving result...");
+                        console.log(taskRun_);
+
+                        pybossa.saveTask(task.id, taskRun_).done(function(){
+                            deferred.resolve();
+							$button.prop("disabled", false);
+
+                            $("#questionnaire-submit").hide(); //Hide the Submit Button
+                            $("#questionnaire-conclusion").hide(); //hide the conclusion
+                        });
+
                     }
                     else {
-						task_.saveAnswer(answer);
-						onShowNextQuestion_(question, answer);
+                        //TO-DO :: Preprocess stuff here based on question class
+                        onAnswerSubmitted_(question, answer, $submitter);
                     }
-
                     addAnswerCardEntry(question, answer);
-                });
+                }, 800));
 
-				// Reset user input and the task run when a new task is presented.
-				beginTask();
 
                 // $("#loading").hide();
             }
@@ -435,210 +458,8 @@
         });
 
         // Run the task.
-        pybossa.run(slug);
+        pybossa.run(project);
 	};
 
 	geotagx.task = task_;
 })(window.geotagx = window.geotagx || {}, jQuery);
-
-
-/*!
-	Wheelzoom 3.0.0
-	license: MIT
-	http://www.jacklmoore.com/wheelzoom
-*/
-window.wheelzoom = (function(){
-	var defaults = {
-		zoom: 0.10
-	};
-	var canvas = document.createElement('canvas');
-
-	function setSrcToBackground(img) {
-		img.style.backgroundImage = "url('"+img.src+"')";
-		img.style.backgroundRepeat = 'no-repeat';
-		canvas.width = img.naturalWidth;
-		canvas.height = img.naturalHeight;
-		img.src = canvas.toDataURL();
-	}
-
-	main = function(img, options){
-		if (!img || !img.nodeName || img.nodeName !== 'IMG') { return; }
-
-		var settings = {};
-		var width;
-		var height;
-		var bgWidth;
-		var bgHeight;
-		var bgPosX;
-		var bgPosY;
-		var previousEvent;
-
-		function updateBgStyle() {
-			if (bgPosX > 0) {
-				bgPosX = 0;
-			} else if (bgPosX < width - bgWidth) {
-				bgPosX = width - bgWidth;
-			}
-
-			if (bgPosY > 0) {
-				bgPosY = 0;
-			} else if (bgPosY < height - bgHeight) {
-				bgPosY = height - bgHeight;
-			}
-
-			img.style.backgroundSize = bgWidth+'px '+bgHeight+'px';
-			img.style.backgroundPosition = bgPosX+'px '+bgPosY+'px';
-		}
-
-		function reset() {
-			bgWidth = width;
-			bgHeight = height;
-			bgPosX = bgPosY = 0;
-			updateBgStyle();
-		}
-
-		function onwheel(e) {
-			var deltaY = 0;
-
-			e.preventDefault();
-
-			if (e.deltaY) { // FireFox 17+ (IE9+, Chrome 31+?)
-				deltaY = e.deltaY;
-			} else if (e.wheelDelta) {
-				deltaY = -e.wheelDelta;
-			}
-
-			// As far as I know, there is no good cross-browser way to get the cursor position relative to the event target.
-			// We have to calculate the target element's position relative to the document, and subtrack that from the
-			// cursor's position relative to the document.
-			var rect = img.getBoundingClientRect();
-			var offsetX = e.pageX - rect.left - document.body.scrollLeft;
-			var offsetY = e.pageY - rect.top - document.body.scrollTop;
-
-			// Record the offset between the bg edge and cursor:
-			var bgCursorX = offsetX - bgPosX;
-			var bgCursorY = offsetY - bgPosY;
-
-			// Use the previous offset to get the percent offset between the bg edge and cursor:
-			var bgRatioX = bgCursorX/bgWidth;
-			var bgRatioY = bgCursorY/bgHeight;
-
-			// Update the bg size:
-			if (deltaY < 0) {
-				bgWidth += bgWidth*settings.zoom;
-				bgHeight += bgHeight*settings.zoom;
-			} else {
-				bgWidth -= bgWidth*settings.zoom;
-				bgHeight -= bgHeight*settings.zoom;
-			}
-
-			// Take the percent offset and apply it to the new size:
-			bgPosX = offsetX - (bgWidth * bgRatioX);
-			bgPosY = offsetY - (bgHeight * bgRatioY);
-
-			// Prevent zooming out beyond the starting size
-			if (bgWidth <= width || bgHeight <= height) {
-				reset();
-			} else {
-				updateBgStyle();
-			}
-		}
-
-		function drag(e) {
-			e.preventDefault();
-			bgPosX += (e.pageX - previousEvent.pageX);
-			bgPosY += (e.pageY - previousEvent.pageY);
-			previousEvent = e;
-			updateBgStyle();
-		}
-
-		function removeDrag() {
-			document.removeEventListener('mouseup', removeDrag);
-			document.removeEventListener('mousemove', drag);
-		}
-
-		// Make the background draggable
-		function draggable(e) {
-			e.preventDefault();
-			previousEvent = e;
-			document.addEventListener('mousemove', drag);
-			document.addEventListener('mouseup', removeDrag);
-		}
-
-		function loaded() {
-			var computedStyle = window.getComputedStyle(img, null);
-
-			width = parseInt(computedStyle.width, 10);
-			height = parseInt(computedStyle.height, 10);
-			bgWidth = width;
-			bgHeight = height;
-			bgPosX = 0;
-			bgPosY = 0;
-
-			setSrcToBackground(img);
-
-			img.style.backgroundSize =  width+'px '+height+'px';
-			img.style.backgroundPosition = '0 0';
-			img.addEventListener('wheelzoom.reset', reset);
-
-			img.addEventListener('wheel', onwheel);
-			img.addEventListener('mousedown', draggable);
-		}
-
-		img.addEventListener('wheelzoom.destroy', function (originalProperties) {
-			console.log(originalProperties);
-			img.removeEventListener('wheelzoom.destroy');
-			img.removeEventListener('wheelzoom.reset', reset);
-			img.removeEventListener('load', onload);
-			img.removeEventListener('mouseup', removeDrag);
-			img.removeEventListener('mousemove', drag);
-			img.removeEventListener('mousedown', draggable);
-			img.removeEventListener('wheel', onwheel);
-
-			img.style.backgroundImage = originalProperties.backgroundImage;
-			img.style.backgroundRepeat = originalProperties.backgroundRepeat;
-			img.src = originalProperties.src;
-		}.bind(null, {
-			backgroundImage: img.style.backgroundImage,
-			backgroundRepeat: img.style.backgroundRepeat,
-			src: img.src
-		}));
-
-		options = options || {};
-
-		Object.keys(defaults).forEach(function(key){
-			settings[key] = options[key] !== undefined ? options[key] : defaults[key];
-		});
-
-		if (img.complete) {
-			loaded();
-		} else {
-			function onload() {
-				img.removeEventListener('load', onload);
-				loaded();
-			}
-			img.addEventListener('load', onload);
-		}
-	};
-
-	// Do nothing in IE8
-	if (typeof window.getComputedStyle !== 'function') {
-		return function(elements) {
-			return elements;
-		}
-	} else {
-		return function(elements, options) {
-			if (elements && elements.length) {
-				Array.prototype.forEach.call(elements, main, options);
-			} else if (elements && elements.nodeName) {
-				main(elements, options);
-			}
-			return elements;
-		}
-	}
-}());
-
-// Run the application.
-geotagx.task.run(window.geotagx_project_short_name, function(question, answer){
-    geotagx.task.showNextQuestion();
-});
