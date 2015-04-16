@@ -101,10 +101,9 @@
 		{
 			"id":10,
 			"title":"What more can you see?",
-			"type":"multiple_choice",
+			"type":"illustrated_multiple_choice",
 			"answer":{
 				"saved_as":"whatCanYouSee",
-				"illustrations":true,
 				"choices":[
 					{
 						"label":"Cattle",
@@ -117,6 +116,78 @@
 							}
 						},
 						"more_examples":"https://www.google.com/#q=cattle+africa"
+					},
+					{
+						"label":"Camel",
+						"value":"Camel",
+						"illustration":{
+							"image":"http://www.animalcorner.co.uk/wildlife/camels/graphics/cameldrom.jpg",
+							"source":{
+								"name":"Animal Corner",
+								"url":"http://www.animalcorner.co.uk/wildlife/camels/camel_dromedary.html"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=camel"
+					},
+					{
+						"label":"Horse",
+						"value":"Horse",
+						"illustration":{
+							"image":"http://40.media.tumblr.com/cf2d20197662f0a7f92bab14eb172f5e/tumblr_muk62bEGmk1r34z06o1_1280.jpg",
+							"source":{
+								"name":"Our Africa Blog",
+								"url":"http://www.ourafricablog.com/post/63820121729/nomadamsterdam-somali-horses-having-fun-at"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=horse"
+					},
+					{
+						"label":"Sheep",
+						"value":"Sheep",
+						"illustration":{
+							"image":"http://media-cache-ec0.pinimg.com/236x/cd/44/16/cd44162bd06893707689624f33314daf.jpg",
+							"source":{
+								"name":"colouredsheep.org.nz",
+								"url":"http://www.colouredsheep.org.nz/"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=sheep+africa"
+					},
+					{
+						"label":"Donkey",
+						"value":"Donkey",
+						"illustration":{
+							"image":"http://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Innocence_%283426318415%29.jpg/301px-Innocence_%283426318415%29.jpg",
+							"source":{
+								"name":"Innocence",
+								"url":"http://www.flickr.com/photos/adavey/3426318415/"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=donkey"
+					},
+					{
+						"label":"Goat",
+						"value":"Goat",
+						"illustration":{
+							"image":"http://capda.org.au/wp-content/uploads/2013/10/DSC09840-960x640.jpg",
+							"source":{
+								"name":"CAPDA",
+								"url":"http://capda.org.au/goat-and-chicken-raising-projects/"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=goat"
+					},
+					{
+						"label":"Oxen",
+						"value":"Oxen",
+						"illustration":{
+							"image":"http://markwatkinson.zenfolio.com/img/s3/v40/p357350409-3.jpg",
+							"source":{
+								"name":"Mark W. Atkinson",
+								"url":"http://markwatkinson.zenfolio.com/p709151464/h154CBC09#h154cbc09"
+							}
+						},
+						"more_examples":"https://www.google.com/#q=ox"
 					}
 				]
 			}
