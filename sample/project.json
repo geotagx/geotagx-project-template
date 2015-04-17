@@ -49,9 +49,9 @@
 			"answer":{
 				"saved_as":"waterLargeFast",
 				"choices":[
-					{"label":"White peaks in the water",      "value":"Peaks"},
-					{"label":"Rough water surface",           "value":"Rough"},
-					{"label":"Water swirling around objects", "value":"Swirling"}
+					{"Peaks":"White peaks in the water"},
+					{"Rough":"Rough water surface"},
+					{"Swirling":"Water swirling around objects"}
 				]
 			}
 		},
@@ -62,10 +62,10 @@
 			"answer":{
 				"saved_as":"waterLargeProtection",
 				"choices":[
-					{"label":"Sandbags",           "value":"Sandbags"},
-					{"label":"Makeshift barriers", "value":"Barriers"},
-					{"label":"Embankments",        "value":"Embankments"},
-					{"label":"Other",              "value":"Other"}
+					{"Sandbags":"Sandbags"},
+					{"Barriers":"Makeshift barriers"},
+					{"Embankments":"Embankments"},
+					{"Other":"Other"}
 				]
 			}
 		},
@@ -85,8 +85,8 @@
 			"answer":{
 				"saved_as":"waterDrinkingSources",
 				"choices":[
-					{"label":"Water pipes and access taps", "value":"Pipes"},
-					{"label":"Water tankers",               "value":"Tankers"}
+					{"Pipes":"Water pipes and access taps"},
+					{"Tankers":"Water tankers"}
 				]
 			}
 		},
