@@ -44,7 +44,9 @@
 {% macro multiple_choice_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     {% for choice in answer.choices -%}
-	<label><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label><br>
+    {% for key in choice -%}
+    <label><input type="checkbox" value="{{key}}">{{choice[key]}}</label><br>
+    {%- endfor %}
 	{%- endfor %}
     <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
