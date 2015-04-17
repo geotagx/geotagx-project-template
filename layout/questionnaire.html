@@ -44,7 +44,7 @@
 		{%   if question.type == "binary"                      %}{{questions_helper.binary_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "multiple_choice"             %}{{questions_helper.multiple_choice_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "illustrated_multiple_choice" %}{{questions_helper.illustrated_multiple_choice_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_choice_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, has_help)}}
 		{% endif %}
 	</div>
 	{%- endfor %}

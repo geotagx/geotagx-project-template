@@ -86,15 +86,17 @@ def get_project_js(filename, compress):
 def get_project_help(directory):
 	"""Returns a dictionary that contains the help provided for a specific question."""
 	help = {}
-	filenames = filter(lambda file: file.endswith(".html"), os.listdir(directory))
 
-	for filename in filenames:
-		with open(os.path.join(directory, filename)) as file:
-			filedata = file.read().strip()
-			if filedata:
-				# Associate the file's content with a question identifier.
-				id = os.path.splitext(os.path.basename(filename))[0]
-				help[id] = filedata
+	if os.path.isdir(directory):
+		filenames = filter(lambda file: file.endswith(".html"), os.listdir(directory))
+
+		for filename in filenames:
+			with open(os.path.join(directory, filename)) as file:
+				filedata = file.read().strip()
+				if filedata:
+					# Associate the file's content with a question identifier.
+					id = os.path.splitext(os.path.basename(filename))[0]
+					help[id] = filedata
 
 	return help
 
