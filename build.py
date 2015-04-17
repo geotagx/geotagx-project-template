@@ -62,18 +62,25 @@ def get_template_js(compress):
 				js_raw += open(os.path.join(root, name),"r").read()
 	return js_raw if not compress else minify(js_raw)
 
+
 def get_project_css(filename, compress):
-	"""Returns the project's custom stylesheet, minified."""
-	with open(filename, "r") as f:
-		css = f.read()
-		return css if not compress else cssmin(css, keep_bang_comments=False)
+	"""Returns the project's custom stylesheet, possibly minified, if it exists."""
+	try:
+		with open(filename, "r") as f:
+			css = f.read()
+			return css if not compress else cssmin(css, keep_bang_comments=False)
+	except:
+		return ""
 
 
 def get_project_js(filename, compress):
-	"""Returns the project's custom script, minified."""
-	with open(filename, "r") as f:
-		js = f.read()
-		return js if not compress else minify(js)
+	"""Returns the project's custom script, possibly minified, if it exists."""
+	try:
+		with open(filename, "r") as f:
+			js = f.read()
+			return js if not compress else minify(js)
+	except:
+		return ""
 
 
 def get_project_help(directory):
