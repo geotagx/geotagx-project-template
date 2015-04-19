@@ -9,9 +9,11 @@ sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 USAGE = """Usage: """ + __file__ + """ directory [OPTIONS]
 Build the task presenter for the GeoTag-X project located in the specified directory.
 The following is a list of OPTIONS you can use to modify the script's behavior:\n
-\r    -f, --force       overwrites the file 'template.html' in the specified directory.
-\r    -c, --compress    compresses the generated task presenter.
-\r    -h, --help        prints this help message.\n"""
+\r    -f, --force             overwrites the file 'template.html' in the specified directory.
+\r    -c, --compress          compresses the generated task presenter.
+\r    -s, --no-static-inline  disables inlining GeoTag-X's common CSS and JS files, adding external links to them instead.
+\r    -p, --no-pybossa-run    disables automatic generation of the pybossa launcher. In this case, the launcher must be implemented in project.js.
+\r    -h, --help              prints this help message.\n"""
 
 
 LAYOUT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
