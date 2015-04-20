@@ -218,7 +218,8 @@
 	 * results from later tasks.
 	 */
 	function beginTask(){
-		$("input:checkbox").removeAttr("checked"); // Reset all input fields.
+		$("input:checkbox").removeAttr("checked");
+		$("input:text").val("");
         $(".question").addClass("hide");
         progress_ = [];
 
