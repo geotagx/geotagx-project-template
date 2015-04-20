@@ -222,6 +222,9 @@
         $(".question").addClass("hide");
         progress_ = [];
 
+		// Reset the answer card.
+		$("#questionnaire-answer-card").empty();
+
         // Reset the current task run.
         for (var property in taskRun_)
 			taskRun_[property] = null;
@@ -336,22 +339,8 @@
 		onShowNextQuestion_ = onShowNextQuestion;
 
         pybossa.taskLoaded(function(task, deferred){
-            if (!$.isEmptyObject(task)){
-                var $image = $("<img/>");
-                $image.load(function(){
-                    deferred.resolve(task);
-                });
-                $image.attr('src', task.info.url);
-                $image.attr('id', 'anno_' + task.id);
-                $image.addClass('img-polaroid');
-                $image.addClass('annotable');
-
-                task.info.image = $image;
-
-                // Append PyBossa-related properties to the task result.
-                taskRun_.task_id = task.id;
-                taskRun_.img = task.info.url;
-            }
+            if (!$.isEmptyObject(task))
+				$("<img/>").load(function(){ deferred.resolve(task); }).attr("src", task.info.url);
             else
                 deferred.resolve(task);
         });
@@ -366,10 +355,8 @@
                 var $image = $("#image");
                 if ($image.length > 0){
                     $image.attr("src", task.info.url);
-                    $image.addClass("highlight");
-                    $image.addClass("wheelzoom");
 
-                    $("#image-source").attr("href", task.info.uri); // Note URI and not URL.
+                    $("#image-source").attr("href", task.info.uri); // URI (identifier) and not URL (locator).
                     $("#image-loading").addClass("hide");
 
                     wheelzoom($image);
@@ -384,6 +371,11 @@
 				$("#questionnaire-submit").off("click").on("click", function(){
 					var $button = $(this);
 					$button.prop("disabled", true);
+
+					// Add the task ID and image URL to the saved result.
+					taskRun_.id = task.id;
+					taskRun_.img = task.info.url;
+
 					pybossa.saveTask(taskRun_.id, taskRun_).done(function(){
 						showFullQuestionnaireSummary(false);
 						$button.prop("disabled", false);
@@ -412,13 +404,6 @@
 
 				// Reset user input and the task run when a new task is presented.
 				beginTask();
-
-                // $("#loading").hide();
-            }
-            else {
-                // $(".skeleton").hide();
-                // $("#loading").hide();
-                // $("#finish").fadeIn(500);
             }
         });
 
