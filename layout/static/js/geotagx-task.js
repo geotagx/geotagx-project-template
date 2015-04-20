@@ -76,23 +76,33 @@
 	 * Returns the answer submitted by the specified submitter.
 	 */
 	function getAnswer(questionType, $submitter){
-		var answer = $submitter.attr("value");
-		if (questionType === "multiple_choice" && answer === "Done"){
-			// When the question is multiple_choice, the actual answer is contained in the
-			// set of selected input elements. A non-empty set is converted into a string
-			// containing each input value, while an empty set is converted into the string 'None'.
-			var $input = $submitter.siblings("input:checked");
-			if ($input.length === 0)
-				answer = "None";
-			else {
-				answer = "";
-				$input.each(function(){
-					answer += ", " + $(this).val();
-				});
-				answer = answer.substring(2); // Remove the leading comma and space.
-			}
+		function inputToString($input){
+			var output = "";
+			$input.each(function(){
+				output += ", " + $(this).val();
+			});
+			return output.substring(2); // Remove the leading comma and space.
 		}
 
+		var answer = $submitter.attr("value");
+		if ((questionType === "multiple_choice" || questionType === "illustrated_multiple_choice") && answer === "Done"){
+			// When the question is multiple_choice or illustrated_multiple_choice, the actual answer is contained in the
+			// set of selected input elements. A non-empty set of selected input items is converted into a string
+			// containing each input value, while an empty set is converted into the string 'None'.
+			if (questionType === "multiple_choice"){
+				var $input = $submitter.siblings("input:checked");
+				answer = $input.length > 0 ? inputToString($input) : "None";
+			}
+			else {
+				var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
+				var $input = $("input[type='checkbox']:checked", $illustrations);
+
+				answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
+				answer =
+				answer ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
+				       : ($input.length === 0 ? "None" : inputToString($input));
+			}
+		}
 		return answer;
 	}
 	/**
