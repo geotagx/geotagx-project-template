@@ -54,7 +54,6 @@
 			var siblings = $(this).siblings("div.modal");
 			if (siblings.length > 0)
 				$(siblings[0]).modal(); // The first (and most likely only) sibling should be a modal div; toggle its visibility.
-
 		});
 
 		// Set the summary details button handler.
@@ -213,13 +212,20 @@
 		if (show) console.log(taskRun_); /*TODO: Remove when done debugging.*/
 	}
 	/**
+	 * Resets all user input.
+	 */
+	function resetInput(){
+		$("input:checkbox").removeAttr("checked");
+		$("input:text").val("");
+	}
+	/**
 	 * Begins a new task.
 	 * This function also resets the progress stack as well as all input to prevent corrupting
 	 * results from later tasks.
 	 */
 	function beginTask(){
-		$("input:checkbox").removeAttr("checked");
-		$("input:text").val("");
+		resetInput();
+
         $(".question").addClass("hide");
         progress_ = [];
 
