@@ -236,7 +236,8 @@
         for (var property in taskRun_)
 			taskRun_[property] = null;
 
-		task_.showQuestion(0); // Note: 0 is the spam filter.
+		// task_.showQuestion(0); // Note: question 0 is the spam filter.
+		task_.showQuestion(1);
 	};
 	/**
 	 * Saves the current question's answer.
