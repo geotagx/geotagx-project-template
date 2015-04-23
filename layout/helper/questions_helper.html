@@ -63,18 +63,17 @@
         {% set source = illustration.source %}
         {% set modal_id = ["question-", question_id, "-illustration-", loop.index]|join() %}
         <div class="col-xs-4 illustration">
-            <a href="#" data-target="#{{modal_id}}" data-toggle="modal"><img src="{{illustration.image}}" class="img-responsive"></a>
-            <label><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label><br>
+            <a href="#" data-target="#{{modal_id}}" data-toggle="modal"><img src="{{illustration.image}}" class="illustration-img img-responsive"></a>
+            <label class="illustration-label"><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label>
             {% call modal(modal_id) %}
             <div><img src="{{illustration.image}}" class="img-responsive"></div>
-
-            <p>The image can be found <a rel="nofollow" target="_blank" href="{{source.url}}">here</a> [{{source.name}}].</p>
-            {% if choice.more_examples %}<p>If this image is not descriptive enough, you can find some more examples <a rel="nofollow" target="_blank" href="{{choice.more_examples}}">here</a>.</p>{% endif %}
+            <p>The original image and its context can be found <a rel="nofollow" target="_blank" href="{{source.url}}">here</a>, courtesy of <strong>{{source.name}}</strong>. {% if choice.more_examples %}If this image is not descriptive enough, you can find some more examples <a rel="nofollow" target="_blank" href="{{choice.more_examples}}">here</a>.{% endif %}</p>
             {% endcall %}
         </div>
         {%- endfor %}
+        <div class="clearfix visible-xs-block"></div>
         <div class="col-xs-12 illustration">
-            <input class="form-control" type="text" placeholder="Enter any suggestions that do not appear above."><br>
+            <input class="form-control illustration-input" type="text" placeholder="Enter any suggestions that do not appear above.">
         </div>
     </div>
     <div>
