@@ -144,7 +144,7 @@
 	 * Updates the progress bar and percentage.
 	 */
 	function updateProgress(){
-		percentageComplete_ = progress_.length > 0 ? ((getCurrentQuestion() / numberOfQuestions_) * 100).toFixed(0) : 0;
+		percentageComplete_ = progress_.length > 0 ? (((getCurrentQuestion() - 1) / (numberOfQuestions_ - 1)) * 100).toFixed(0) : 0;
 
         $("#questionnaire-percentage-complete").html(percentageComplete_);
         $("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
