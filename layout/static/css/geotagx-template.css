@@ -204,12 +204,6 @@ input[type="checkbox"]
         margin:0.5em 0;
         font:400 1.1em Open Sans, Lato;
     }
-        #image-source > .fa-external-link
-        {
-            position:absolute;
-            font-size:0.7em;
-            margin:0.15em 0 0 0.05em;
-        }
     #image-zoomtip
     {
         font:900 1em Lato, Open Sans;
