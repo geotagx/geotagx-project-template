@@ -19,7 +19,7 @@
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout a task. More specifically, it allows a user to rewind to a previous question.
     var onShowNextQuestion_ = function(){}; // A user-defined function that determines the next question presented to the user.
-
+	var olMap_ = null; // The OpenLayers 3 map instance.
 
 	$(document).ready(function(){
 		numberOfQuestions_ = $(".question").length;
@@ -70,7 +70,134 @@
 			if (property)
 				taskRun_[property] = null;
 		});
+
+		// Create an OpenLayers map iff the container for it exists.
+		if (!$.isEmptyObject($("#ol-map"))){
+			olMap_ = createOpenLayersMap();
+
+			// Initialize the map's search function.
+			var $olMapSearchInput = $("#ol-map-search-input");
+	        var $olMapSearchButton = $("#ol-map-search-button");
+
+	        $olMapSearchInput.on("keypress", function(e){
+	            var keycode = (e.keyCode ? e.keyCode : e.which);
+	            if (keycode === 13 && $.trim($olMapSearchInput.val())){ // Code 13 corresponds to the 'Enter' key.
+	                e.preventDefault();
+					$olMapSearchButton.trigger("click");
+	            }
+	        }).on("input", function(){ //TODO Throttle/debounce this.
+				// Disable the search button if there's no user input, enable it otherwise.
+	            $olMapSearchButton.prop("disabled", !$(this).val());
+	        });
+
+	        $olMapSearchButton.on("click", function(){
+				var location = $.trim($olMapSearchInput.val());
+				if (location){
+					$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
+	                    if (results.length > 0){
+							var result = results[0];
+
+							// Replace the search string with the result's display name, i.e. the city name, then center the map.
+							$olMapSearchInput.val(result.display_name);
+
+							var view = olMap_.getView();
+							view.setCenter(ol.proj.transform([result.lon, result.lat], "EPSG:4326", "EPSG:900913"));
+							view.setZoom(4);
+
+							console.log(result);
+
+
+
+/*
+	                        var result         = results[0];
+	                        var fromProjection = new OpenLayers.Projection("EPSG:4326"); // Transform from WGS 1984 ...
+	                        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // ... to Spherical Mercator.
+	                        var coordinates    = new OpenLayers.LonLat(result.lon, result.lat).transform(fromProjection, toProjection);
+	                        var zoomFactor     = 10;
+*/
+	                    }
+	                    else
+	                        console.log("Location not found!"); // e.g. xyxyxyxyxyxyx
+					});
+	            }
+	        });
+		}
 	});
+	/**
+	 * Creates an OpenLayers map.
+	 */
+	function createOpenLayersMap(){
+	    var source = new ol.source.Vector();
+		var vector = new ol.layer.Vector({
+			source:source,
+			style: new ol.style.Style({
+				fill:new ol.style.Fill({
+					color:"rgba(255, 255, 255, 0.2)"
+				}),
+				stroke:new ol.style.Stroke({
+					color:"#ffcc33",
+					width:2
+				}),
+				image:new ol.style.Circle({
+					radius:7,
+					fill:new ol.style.Fill({
+						color:"#ffcc33"
+					})
+				})
+			})
+		});
+	    var map = new ol.Map({
+			target:"ol-map",
+	    	layers:[
+				new ol.layer.Tile({source:new ol.source.MapQuest({layer:"osm"})}),
+				vector
+			],
+			view:new ol.View({
+				center:[0, 0],
+				zoom:1
+			})
+	    });
+		var interaction = new ol.interaction.Draw({source:source, type:"Polygon"});
+		interaction.on("drawstart", function(){
+			// If a new polygon is being drawn and a previous one exists, delete the old one.
+			resetMap(false);
+		});
+		map.addInteraction(interaction);
+
+		return map;
+	}
+	/**
+	 * Returns the user's map selection.
+	 */
+	function getMapSelection(){
+		var selection = null;
+		if (olMap_){
+			// If a polygon (feature) has been drawn, return its vertices in the form of an array of <X, Y> pairs.
+			var features = olMap_.getLayers().item(1).getSource().getFeatures();
+			if (features.length > 0){
+				selection = [];
+				var vertices = features[0].getGeometry().getCoordinates()[0];
+				$(vertices).each(function(){ selection.push(this); });
+			}
+		}
+		return selection;
+	}
+	/**
+	 * Removes the plotted polygon from the map, and if center is set to true, the map is centered at the origin.
+	 */
+	function resetMap(center){
+		if (olMap_){
+			// Remove all features from the vector layer.
+			olMap_.getLayers().item(1).getSource().clear();
+
+			// Center the map at the origin and reset the zoom level.
+			if (center){
+				var view = olMap_.getView();
+				view.setCenter([0, 0]);
+				view.setZoom(1);
+			}
+		}
+	}
 	/**
 	 * Returns the answer submitted by the specified submitter.
 	 */
@@ -102,6 +229,9 @@
 				       : ($input.length === 0 ? "None" : inputToString($input));
 			}
 		}
+		else if (questionType === "geotagging" && answer === "Done")
+			answer = getMapSelection();
+
 		return answer;
 	}
 	/**
@@ -217,6 +347,8 @@
 	function resetInput(){
 		$("input:checkbox").removeAttr("checked");
 		$("input:text").val("");
+
+		resetMap(true);
 	}
 	/**
 	 * Begins a new task.
@@ -278,8 +410,15 @@
             // If it hasn't, show the next question.
             if (isQuestionnaireCompleted(question))
 				showFullQuestionnaireSummary(true);
-            else
-				getQuestionElement(question).removeClass("hide").hide().fadeIn(300);
+            else {
+				var $element = getQuestionElement(question);
+				$element.removeClass("hide").hide().fadeIn(300, function(){
+					// If the question type is geotagging, then we need to resize the map only when the question is
+					// made visible, so that the OpenLayers API uses the correct dimensions.
+					if ($element.data("type") === "geotagging" && olMap_ != null)
+						olMap_.updateSize();
+				});
+			}
         }
         else
             console.log("[geotagx::task::showQuestion] Error! Invalid question identifier '" + question + "'.");
