@@ -189,6 +189,7 @@ input[type="checkbox"]
 }
     #image-loading
     {
+        position:absolute;
         font:900 3em Montserrat;
         text-transform:uppercase;
         cursor:wait;

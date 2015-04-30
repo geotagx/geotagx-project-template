@@ -487,7 +487,7 @@
 
         pybossa.taskLoaded(function(task, deferred){
             if (!$.isEmptyObject(task))
-				$("<img/>").load(function(){ deferred.resolve(task); }).attr("src", task.info.url);
+				$("<img/>").load(function(){ deferred.resolve(task); }).attr("src", task.info.image_url);
             else
                 deferred.resolve(task);
         });
@@ -501,10 +501,9 @@
                 // Initialize the image to analyze.
                 var $image = $("#image");
                 if ($image.length > 0){
-                    $image.attr("src", task.info.url);
+                    $image.attr("src", task.info.image_url);
 
-                    $("#image-source").attr("href", task.info.uri); // URI (identifier) and not URL (locator).
-                    $("#image-loading").addClass("hide");
+                    $("#image-source").attr("href", task.info.source_uri);
 
                     wheelzoom($image);
                 }
@@ -521,7 +520,7 @@
 
 					// Add the task ID and image URL to the saved result.
 					taskRun_.id = task.id;
-					taskRun_.img = task.info.url;
+					taskRun_.img = task.info.image_url;
 
 					pybossa.saveTask(taskRun_.id, taskRun_).done(function(){
 						showFullQuestionnaireSummary(false);
