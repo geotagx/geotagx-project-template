@@ -43,7 +43,7 @@ pip install -r requirements.txt
 ```
 
 If you are not installing the requirements in an isolated environment, you will
-need run the previous command as a super-user
+need to run the previous command as a super-user
 ```
 sudo pip install -r requirements.txt
 ```
@@ -74,4 +74,5 @@ python build.py sample/
 ```
 
 The `build.py` script should produce a `template.html` file, i.e. the
-project's task presenter, in the project's folder.
+project's task presenter, in the project's folder. You can now setup the
+project via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface) or [command line interface](http://pybossa.readthedocs.org/en/latest/user/pbs.html).
