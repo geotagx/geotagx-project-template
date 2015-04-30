@@ -518,11 +518,10 @@
 					var $button = $(this);
 					$button.prop("disabled", true);
 
-					// Add the task ID and image URL to the saved result.
-					taskRun_.id = task.id;
+					// Append the image URL to the saved result.
 					taskRun_.img = task.info.image_url;
 
-					pybossa.saveTask(taskRun_.id, taskRun_).done(function(){
+					pybossa.saveTask(task.id, taskRun_).done(function(){
 						showFullQuestionnaireSummary(false);
 						$button.prop("disabled", false);
 						deferred.resolve();
