@@ -199,6 +199,14 @@
 					}
 				]
 			}
+		},
+		{
+			"id":11,
+			"title":"Can you geo-localize the photo?",
+			"type":"geotagging",
+			"answer":{
+				"saved_as":"geolocation"
+			}
 		}
 	]
 }
