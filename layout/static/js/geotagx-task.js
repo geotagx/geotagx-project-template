@@ -216,7 +216,7 @@
 			// set of selected input elements. A non-empty set of selected input items is converted into a string
 			// containing each input value, while an empty set is converted into the string 'None'.
 			if (questionType === "multiple_choice"){
-				var $input = $submitter.siblings("input:checked");
+				var $input = $("input:checked", $submitter.siblings("label"));
 				answer = $input.length > 0 ? inputToString($input) : "None";
 			}
 			else {
