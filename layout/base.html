@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+{% if css %}<style type="text/css">{{css}}</style>{% endif %}
+{% include 'messages.html' %}
+<div class="row skeleton">
+    {% include "questionnaire.html" %}
+    {% include "image.html" %}
+</div>
+<!-- Inititate Project Short Name as a globally accessible variable-->
+<script type="text/javascript">
+	window.geotagx_project_short_name = "{{slug}}";
+</script>
+{% if js %}<script type="text/javascript">{{js}}</script>{% endif %}

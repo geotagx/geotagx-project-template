@@ -1,0 +1,113 @@
+{% macro modal(id, title) -%}
+<div id="{{id}}" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            {% if title %}<header class="modal-header"><h4 class="modal-title">{{title}}</h4></header>{% endif %}
+            <main class="modal-body">
+				{{caller()}}
+            </main>
+            <footer class="modal-footer"><button type="button" class="btn btn-primary btn-xs" data-dismiss="modal">Close</button></footer>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{% macro help_modal(title) -%}
+<section class="help">
+    If you do not know how to answer this question, get some <button class="help-toggle btn-link" rel="nofollow" data-toggle="modal"><strong>help.</strong></button>
+    <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <header class="modal-header"><h4 class="modal-title">{{title}}</h4></header>
+                <main class="modal-body">
+					{{caller()}}
+                </main>
+                <footer class="modal-footer"><button type="button" class="btn btn-primary btn-xs" data-dismiss="modal">Close</button></footer>
+            </div>
+        </div>
+    </div>
+</section>
+{%- endmacro %}
+
+
+{% macro binary_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+	<button class="btn btn-answer btn-success btn-sm" value="Yes">Yes</button>
+	<button class="btn btn-answer btn-danger  btn-sm" value="No">No</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+</div>
+{%- endmacro %}
+
+
+{% macro single_choice_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    {% for choice in answer.choices -%}
+    {% for key in choice -%}
+    <label><input type="radio" value="{{key}}" name="{{answer.saved_as}}">{{choice[key]}}</label><br>
+    {%- endfor %}
+	{%- endfor %}
+    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+</div>
+{%- endmacro %}
+
+
+{% macro multiple_choice_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    {% for choice in answer.choices -%}
+    {% for key in choice -%}
+    <label><input type="checkbox" value="{{key}}">{{choice[key]}}</label><br>
+    {%- endfor %}
+	{%- endfor %}
+    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+</div>
+{%- endmacro %}
+
+
+{% macro illustrated_multiple_choice_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    <div class="row illustrations">
+        {% for choice in answer.choices -%}
+        {% set illustration = choice.illustration %}
+        {% set source = illustration.source %}
+        {% set modal_id = ["question-", question_id, "-illustration-", loop.index]|join() %}
+        <div class="col-xs-4 illustration">
+            <a href="#" data-target="#{{modal_id}}" data-toggle="modal"><img src="{{illustration.image}}" class="illustration-img img-responsive"></a>
+            <label class="illustration-label"><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label>
+            {% call modal(modal_id) %}
+            <div><img src="{{illustration.image}}" class="img-responsive"></div>
+            <p>The original image and its context can be found <a rel="nofollow" target="_blank" href="{{source.url}}">here</a>, courtesy of <strong>{{source.name}}</strong>. {% if choice.more_examples %}If this image is not descriptive enough, you can find some more examples <a rel="nofollow" target="_blank" href="{{choice.more_examples}}">here</a>.{% endif %}</p>
+            {% endcall %}
+        </div>
+        {%- endfor %}
+        <div class="clearfix visible-xs-block"></div>
+        <div class="col-xs-12 illustration">
+            <input class="form-control illustration-input" type="text" placeholder="Enter any suggestions that do not appear above.">
+        </div>
+    </div>
+    <div>
+    	<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+    	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{% macro geotagging_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    <p>Select a region on the map within which you think this image comes from.<span class="hide">You can also quickly zoom in on a location by searching for it.</span></p>
+    <div id="ol-map-search" class="hide"><input id="ol-map-search-input" type="text" class="form-control" placeholder="Search for a location by name"><button id="ol-map-search-button" class="btn btn-xs" disabled><i class="fa fa-fw fa-search"></i></button></div>
+    <div id="ol-map" class="ol-map"></div>
+    <div class="answer">
+        <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+        <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+        <button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
+    </div>
+</div>
+{%- endmacro %}

@@ -18,7 +18,8 @@
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout a task. More specifically, it allows a user to rewind to a previous question.
-    var onAnswerSubmitted_ = function(){}; // A function that's called each time the user submits an answer to a question.
+    var onShowNextQuestion_ = function(){}; // A user-defined function that determines the next question presented to the user.
+	var olMap_ = null; // The OpenLayers 3 map instance.
 
 	$(document).ready(function(){
 		numberOfQuestions_ = $(".question").length;
@@ -53,7 +54,6 @@
 			var siblings = $(this).siblings("div.modal");
 			if (siblings.length > 0)
 				$(siblings[0]).modal(); // The first (and most likely only) sibling should be a modal div; toggle its visibility.
-
 		});
 
 		// Set the summary details button handler.
@@ -67,11 +67,175 @@
 		// element with the 'answer' class, that has a non-empty 'saved-as' data attribute.
 		$(".answer").each(function(){
 			var property = $.trim($(this).data("saved-as"));
-			if (property){
+			if (property)
 				taskRun_[property] = null;
-			}
 		});
+
+		// Create an OpenLayers map iff the container for it exists.
+		if (!$.isEmptyObject($("#ol-map"))){
+			olMap_ = createOpenLayersMap();
+
+			// Initialize the map's search function.
+			var $olMapSearchInput = $("#ol-map-search-input");
+	        var $olMapSearchButton = $("#ol-map-search-button");
+
+	        $olMapSearchInput.on("keypress", function(e){
+	            var keycode = (e.keyCode ? e.keyCode : e.which);
+	            if (keycode === 13 && $.trim($olMapSearchInput.val())){ // Code 13 corresponds to the 'Enter' key.
+	                e.preventDefault();
+					$olMapSearchButton.trigger("click");
+	            }
+	        }).on("input", function(){ //TODO Throttle/debounce this.
+				// Disable the search button if there's no user input, enable it otherwise.
+	            $olMapSearchButton.prop("disabled", !$(this).val());
+	        });
+
+	        $olMapSearchButton.on("click", function(){
+				var location = $.trim($olMapSearchInput.val());
+				if (location){
+					$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
+	                    if (results.length > 0){
+							var result = results[0];
+
+							// Replace the search string with the result's display name, i.e. the city name, then center the map.
+							$olMapSearchInput.val(result.display_name);
+
+							var view = olMap_.getView();
+							view.setCenter(ol.proj.transform([result.lon, result.lat], "EPSG:4326", "EPSG:900913"));
+							view.setZoom(4);
+
+							console.log(result);
+
+
+
+/*
+	                        var result         = results[0];
+	                        var fromProjection = new OpenLayers.Projection("EPSG:4326"); // Transform from WGS 1984 ...
+	                        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // ... to Spherical Mercator.
+	                        var coordinates    = new OpenLayers.LonLat(result.lon, result.lat).transform(fromProjection, toProjection);
+	                        var zoomFactor     = 10;
+*/
+	                    }
+	                    else
+	                        console.log("Location not found!"); // e.g. xyxyxyxyxyxyx
+					});
+	            }
+	        });
+		}
 	});
+	/**
+	 * Creates an OpenLayers map.
+	 */
+	function createOpenLayersMap(){
+	    var source = new ol.source.Vector();
+		var vector = new ol.layer.Vector({
+			source:source,
+			style: new ol.style.Style({
+				fill:new ol.style.Fill({
+					color:"rgba(255, 255, 255, 0.2)"
+				}),
+				stroke:new ol.style.Stroke({
+					color:"#ffcc33",
+					width:2
+				}),
+				image:new ol.style.Circle({
+					radius:7,
+					fill:new ol.style.Fill({
+						color:"#ffcc33"
+					})
+				})
+			})
+		});
+	    var map = new ol.Map({
+			target:"ol-map",
+	    	layers:[
+				new ol.layer.Tile({source:new ol.source.MapQuest({layer:"osm"})}),
+				vector
+			],
+			view:new ol.View({
+				center:[0, 0],
+				zoom:1
+			})
+	    });
+		var interaction = new ol.interaction.Draw({source:source, type:"Polygon"});
+		interaction.on("drawstart", function(){
+			// If a new polygon is being drawn and a previous one exists, delete the old one.
+			resetMap(false);
+		});
+		map.addInteraction(interaction);
+
+		return map;
+	}
+	/**
+	 * Returns the user's map selection.
+	 */
+	function getMapSelection(){
+		var selection = null;
+		if (olMap_){
+			// If a polygon (feature) has been drawn, return its vertices in the form of an array of <X, Y> pairs.
+			var features = olMap_.getLayers().item(1).getSource().getFeatures();
+			if (features.length > 0){
+				selection = [];
+				var vertices = features[0].getGeometry().getCoordinates()[0];
+				$(vertices).each(function(){ selection.push(this); });
+			}
+		}
+		return selection;
+	}
+	/**
+	 * Removes the plotted polygon from the map, and if center is set to true, the map is centered at the origin.
+	 */
+	function resetMap(center){
+		if (olMap_){
+			// Remove all features from the vector layer.
+			olMap_.getLayers().item(1).getSource().clear();
+
+			// Center the map at the origin and reset the zoom level.
+			if (center){
+				var view = olMap_.getView();
+				view.setCenter([0, 0]);
+				view.setZoom(1);
+			}
+		}
+	}
+	/**
+	 * Returns the answer submitted by the specified submitter.
+	 */
+	function getAnswer(questionType, $submitter){
+		function inputToString($input){
+			var output = "";
+			$input.each(function(){
+				output += ", " + $(this).val();
+			});
+			return output.substring(2); // Remove the leading comma and space.
+		}
+
+		var answer = $submitter.attr("value");
+		if (answer === "Done"){
+			switch (questionType){
+				case "single_choice":
+					var $input = $("input:checked", $submitter.siblings("label"));
+					return $input.length > 0 ? $input.val() : "None";
+				case "multiple_choice":
+					var $input = $("input:checked", $submitter.siblings("label"));
+					return $input.length > 0 ? inputToString($input) : "None";
+				case "illustrated_multiple_choice":
+					var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
+					var $input = $("input[type='checkbox']:checked", $illustrations);
+
+					answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
+					answer =
+					answer ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
+					       : ($input.length === 0 ? "None" : inputToString($input));
+
+					return answer;
+				case "geotagging":
+					return getMapSelection();
+			}
+		}
+		else
+			return answer;
+	}
 	/**
 	 * Returns the current question.
 	 */
@@ -90,40 +254,47 @@
 	function getCurrentQuestionNodeId(){
 		return getQuestionNodeId(getCurrentQuestion());
 	}
-	/*
+	/**
      * Returns the specified question's HTML node.
      */
-    function getQuestionHtml(question){
+    function getQuestionElement(question){
         return $(getQuestionNodeId(question));
     }
-	/*
+	/**
      * Returns the current question's HTML node.
      */
-    function getCurrentQuestionHtml(){
-        return getQuestionHtml(getCurrentQuestion());
+    function getCurrentQuestionElement(){
+        return getQuestionElement(getCurrentQuestion());
     }
 	/**
-	 *
+	 * Returns the type of the specified question.
+	 */
+	function getQuestionType(question){
+		return getQuestionElement(question).data("type");
+	}
+	/**
+	 * Updates the progress bar and percentage.
 	 */
 	function updateProgress(){
-		percentageComplete_ = progress_.length > 0 ? ((getCurrentQuestion() / numberOfQuestions_) * 100).toFixed(0) : 0;
+		percentageComplete_ = progress_.length > 0 ? (((getCurrentQuestion() - 1) / (numberOfQuestions_ - 1)) * 100).toFixed(0) : 0;
 
         $("#questionnaire-percentage-complete").html(percentageComplete_);
         $("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
 	};
-	/*
+	/**
      * Returns true if the question identifier refers to the spam filter, false otherwise.
      */
     function isSpamFilter(question){
         return question === 0;
     }
-    /*
-     * Returns true if the question identifier refers to the submission form, false otherwise.
+    /**
+     * Returns true if the questionnaire has been completed, false otherwise.
+     * A questionnaire is considered complete if the question identifier is equal to the total number of questions.
      */
-    function isSubmissionForm(question){
+    function isQuestionnaireCompleted(question){
         return question === numberOfQuestions_;
     }
-	/*
+	/**
      * Adds an entry to the user's answer card.
      */
     function addAnswerCardEntry(questionId, answer){
@@ -144,7 +315,7 @@
 				$("#questionnaire-summary-details").removeClass("hide").hide().fadeIn();
 		}
     }
-    /*
+    /**
      * Removes the specified question's entry from the user's answer card.
      */
     function removeAnswerCardEntry(question){
@@ -160,76 +331,48 @@
             });
         }, 150);
     }
+    /**
+     * Displays the complete questionnaire summary if show is set to true, otherwise shows the compact version.
+     */
+    function showFullQuestionnaireSummary(show){
+		if (show)
+			$("#questionnaire-summary").removeClass("minimized");
+		else
+			$("#questionnaire-summary").addClass("minimized");
+
+
+		if (show) console.log(taskRun_); /*TODO: Remove when done debugging.*/
+	}
+	/**
+	 * Resets all user input.
+	 */
+	function resetInput(){
+		$("input").removeAttr("checked");
+		$("input:text").val("");
+
+		resetMap(true);
+	}
 	/**
 	 * Begins a new task.
 	 * This function also resets the progress stack as well as all input to prevent corrupting
 	 * results from later tasks.
 	 */
 	function beginTask(){
-		$("input:checkbox").removeAttr("checked"); // Reset all input fields.
+		resetInput();
+
         $(".question").addClass("hide");
         progress_ = [];
+
+		// Reset the answer card.
+		$("#questionnaire-answer-card").empty();
 
         // Reset the current task run.
         for (var property in taskRun_)
 			taskRun_[property] = null;
 
-		task_.showQuestion(0); // Note: 0 is the spam filter.
+		// task_.showQuestion(0); // Note: question 0 is the spam filter.
+		task_.showQuestion(1);
 	};
-	/*
-     * A slightly modified version of the throttle function taken from the Underscore.js 1.8.2 library (http://underscorejs.org).
-     * (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-     *
-     * Returns a function, that, when invoked, will only be triggered at most once
-     * during a given window of time. Normally, the throttled function will run
-     * as much as it can, without ever going more than once per `wait` duration;
-     * but if you'd like to disable the execution on the leading edge, pass
-     * `{leading: false}`. To disable execution on the trailing edge, ditto.
-     */
-    function throttle(func, wait, options){
-        var context,
-            args,
-            result,
-            timeout = null,
-            previous = 0,
-            _now = Date.now || function(){ return new Date().getTime(); }; // A (possibly faster) way to get the current timestamp as an integer.
-
-        if (!options)
-            options = {};
-
-        var later = function(){
-            previous = options.leading === false ? 0 : _now();
-            timeout = null;
-            result = func.apply(context, args);
-            if (!timeout)
-                context = args = null;
-        };
-
-        return function(){
-            var now = _now();
-            if (!previous && options.leading === false)
-                previous = now;
-
-            var remaining = wait - (now - previous);
-            context = this;
-            args = arguments;
-
-            if (remaining <= 0 || remaining > wait){
-                if (timeout){
-                    clearTimeout(timeout);
-                    timeout = null;
-                }
-                previous = now;
-                result = func.apply(context, args);
-                if (!timeout)
-                    context = args = null;
-            }
-            else if (!timeout && options.trailing !== false){
-                timeout = setTimeout(later, remaining);
-            }
-            return result;
-        };
-    };
 	/**
 	 * Saves the current question's answer.
 	 * @param answer the answer to save.
@@ -239,26 +382,8 @@
 		var htmlNodeId = getCurrentQuestionNodeId();
 		if (htmlNodeId){
 			var property = $(htmlNodeId + " > div.answer").data("saved-as");
-			if (property){
-				var typeofAnswer = $.type(answer);
-
-				if (typeofAnswer === "undefined")
-					answer = null;
-				else if (typeofAnswer === "object"){
-					// When the answer is an object, it is assumed to be a collection of input elements. A non-empty collection is
-					// converted into a string containing each input values, while an empty collection is converted into the string 'None'.
-					if (answer.length > 0){
-						var tmp = "";
-						answer.each(function(){
-							tmp += "," + $(this).val();
-						});
-						answer = tmp.substring(1); // Remove the leading comma.
-					}
-					else
-						answer = "None";
-				}
-				taskRun_[property] = answer;
-			}
+			if (property)
+				taskRun_[property] = $.type(answer) === "undefined" ? null : answer;
 			else
 				console.log("[geotagx::task::saveAnswer] Could not find a 'saved-as' data attribute. Discarding answer...");
 		}
@@ -275,7 +400,7 @@
 
         // Hide the current question since we'll be moving onto the next.
         if (hasAnsweredQuestion)
-			getCurrentQuestionHtml().addClass("hide");
+			getCurrentQuestionElement().addClass("hide");
 
         // If we have a valid question id ...
         if (question >= 0 && question <= numberOfQuestions_){
@@ -283,26 +408,19 @@
             progress_.push(question);
             updateProgress();
 
-            // If the question identifier is equal to the total number of questions, then display the user's answer card.
-            if (isSubmissionForm(question)){
-                console.log("Showing answer card...");
-				console.log(taskRun_);
-
-                
-                if (percentageComplete_ >= 100){
-                    $("#questionnaire-submit").show()
-                    $("#questionnaire-conclusion").show();
-                    $("#questionnaire-summary-details .show-on-expanded").click() //Show the Questionnaire summary
-                }
-                else {
-                    $("#questionnaire-submit").hide();
-                    $("#questionnaire-conclusion").hide();
-                }
-                
-            }
+            // If the questionnaire has been completed, display the full questionnaire summary.
+            // If it hasn't, show the next question.
+            if (isQuestionnaireCompleted(question))
+				showFullQuestionnaireSummary(true);
             else {
-				getCurrentQuestionHtml().removeClass("hide").hide().fadeIn(300);
-            }
+				var $element = getQuestionElement(question);
+				$element.removeClass("hide").hide().fadeIn(300, function(){
+					// If the question type is geotagging, then we need to resize the map only when the question is
+					// made visible, so that the OpenLayers API uses the correct dimensions.
+					if ($element.data("type") === "geotagging" && olMap_ != null)
+						olMap_.updateSize();
+				});
+			}
         }
         else
             console.log("[geotagx::task::showQuestion] Error! Invalid question identifier '" + question + "'.");
@@ -326,6 +444,10 @@
             // Destroy the current result before loading the previous question.
             task_.saveAnswer(null);
 
+            // Minimize the information displayed on the questionnaire summary.
+            if (isQuestionnaireCompleted(current))
+				showFullQuestionnaireSummary(false);
+
             // Remove the previous entry from the answer card.
             removeAnswerCardEntry(previous);
 
@@ -338,8 +460,8 @@
                 $("#questionnaire-rewind").prop("disabled", true);
 
             // Hide the current question and show the previous.
-            getQuestionHtml(previous).removeClass("hide");
-			getQuestionHtml(current).addClass("hide");
+            getQuestionElement(previous).removeClass("hide");
+			getQuestionElement(current).addClass("hide");
         }
         else
             console.log("[geotagx::task::showPrevQuestion] Error! Could not load the previous question!");
@@ -354,34 +476,20 @@
 	};
 	/**
 	 * Runs the project's initial task.
-	 * @param project the project's name.
-	 * @param onAnswerSubmitted a function object that's called each time the user submits an answer to a question.
+	 * @param slug the project's short name.
+	 * @param onShowNextQuestion a user-defined function that returns the id of the next question to present to the user.
 	 */
-	task_.run = function(project, onAnswerSubmitted){
-		if ($.type(project) !== "string" || $.type(onAnswerSubmitted) !== "function"){
+	task_.run = function(slug, onShowNextQuestion){
+		if ($.type(slug) !== "string" || $.type(onShowNextQuestion) !== "function"){
             console.log("[geotagx::task::run] Error! Invalid function parameter.");
             return;
         }
 
-		onAnswerSubmitted_ = onAnswerSubmitted;
+		onShowNextQuestion_ = onShowNextQuestion;
 
         pybossa.taskLoaded(function(task, deferred){
-            if (!$.isEmptyObject(task)){
-                var $image = $("<img/>");
-                $image.load(function(){
-                    deferred.resolve(task);
-                });
-                $image.attr('src', task.info.url);
-                $image.attr('id', 'anno_' + task.id);
-                $image.addClass('img-polaroid');
-                $image.addClass('annotable');
-
-                task.info.image = $image;
-
-                // Append PyBossa-related properties to the task result.
-                taskRun_.task_id = task.id;
-                taskRun_.img = task.info.url;
-            }
+            if (!$.isEmptyObject(task))
+				$("<img/>").load(function(){ deferred.resolve(task); }).attr("src", task.info.image_url);
             else
                 deferred.resolve(task);
         });
@@ -395,12 +503,9 @@
                 // Initialize the image to analyze.
                 var $image = $("#image");
                 if ($image.length > 0){
-                    $image.attr("src", task.info.url);
-                    $image.addClass("highlight");
-                    $image.addClass("wheelzoom");
+                    $image.attr("src", task.info.image_url);
 
-                    $("#image-source").attr("href", task.info.uri); // Note URI and not URL.
-                    $("#image-loading").addClass("hide");
+                    $("#image-source").attr("href", task.info.source_uri);
 
                     wheelzoom($image);
                 }
@@ -409,60 +514,48 @@
 
                 $("#questionnaire-show-comments").prop("disabled", false);
 
-                // Reset user input and the task run when a new task is presented.
-                beginTask();
+				// Set the submission button's handler. Note that off().on() removes the previous handler
+				// and sets a new one, every time a new task is loaded.
+				$("#questionnaire-submit").off("click").on("click", function(){
+					var $button = $(this);
+					$button.prop("disabled", true);
 
-                // Set the answer button event handlers.
-                // $(".btn-answer").off("click").on("click", function(){                            // TODO Make sure this was not a better solution.
-                $(".btn-answer").click(throttle(function(){
-                    var $submitter = $(this);
-                    var answer = $submitter.attr("value");
-                    var question = getCurrentQuestion();
-                    var questionHtml = getQuestionHtml(question);
+					// Append the image URL to the saved result.
+					taskRun_.img = task.info.image_url;
+
+					pybossa.saveTask(task.id, taskRun_).done(function(){
+						showFullQuestionnaireSummary(false);
+						$button.prop("disabled", false);
+						deferred.resolve();
+					});
+				});
+
+                $(".btn-answer").off("click").on("click", function(){
+					var $submitter = $(this);
+					var question = getCurrentQuestion();
+					var answer = getAnswer(getQuestionType(question), $submitter);
 
                     if (isSpamFilter(question)){
                         if (answer === "No")
-                            geotagx.task.showNextQuestion(); // The image is not spam, proceed to the first question.
+                            task_.showNextQuestion(); // The image is not spam, proceed to the first question.
                         else
-                            geotagx.task.finish();
-                    }
-                    else if ($submitter.attr("id") === "questionnaire-submit"){
-						var $button = $(this);
-						$button.prop("disabled", true);
-
-                        console.log("Saving result...");
-                        console.log(taskRun_);
-
-                        pybossa.saveTask(task.id, taskRun_).done(function(){
-                            deferred.resolve();
-							$button.prop("disabled", false);
-
-                            //Collapse the Questionnaire summary again by faking another click
-                            $("#questionnaire-summary-details .show-on-expanded").click();
-                            $("#questionnaire-submit").hide(); //Hide the Submit Button
-                            $("#questionnaire-conclusion").hide(); //hide the conclusion
-                        });
-
+							task_.finish();
                     }
                     else {
-                        //TO-DO :: Preprocess stuff here based on question class
-                        onAnswerSubmitted_(question, answer, $submitter);
+						task_.saveAnswer(answer);
+						onShowNextQuestion_(question, answer);
                     }
+
                     addAnswerCardEntry(question, answer);
-                }, 800));
+                });
 
-
-                // $("#loading").hide();
-            }
-            else {
-                // $(".skeleton").hide();
-                // $("#loading").hide();
-                // $("#finish").fadeIn(500);
+				// Reset user input and the task run when a new task is presented.
+				beginTask();
             }
         });
 
         // Run the task.
-        pybossa.run(project);
+        pybossa.run(slug);
 	};
 
 	geotagx.task = task_;

@@ -1,0 +1,60 @@
+{%  import 'helper/questions_helper.html' as questions_helper %}
+<section id="questionnaire-section" class="col-xs-6">
+	<div id="questionnaire-summary" class="well minimized">
+	    <header><strong>Your analysis is <span id="questionnaire-percentage-complete">0</span>% complete</strong><button id="questionnaire-summary-details" class="pull-right btn btn-link hide" data-toggle="collapse" data-target="#questionnaire-answer-card" aria-expanded="false"><span class="hide-on-expanded"><i class="fa fa-fw fa-lg fa-info-circle"></i></span><span class="show-on-expanded"><i class="fa fa-fw fa-lg fa-times"></i></span></button></header>
+	    <div><ul id="questionnaire-answer-card" class="list-unstyled collapse"></ul></div>
+	    <div><button id="questionnaire-submit" class="btn btn-block btn-success">Submit<span class="hidden-xs hidden-sm"> it and load another one</span></button></div>
+	    <div id="questionnaire-conclusion">
+	        <hr>
+	        Thank you very much for your analysis! We appreciate any feedback you may have for us so get on <a target="_blank" href="https://github.com/geotagx/pybossa/issues"><strong>GitHub</strong></a> or <a href="mailto:eleanor.rusack@unitar.org?Subject=GeoTag-X feedback" target="_top"><strong>send us an email</strong></a>.
+	    </div>
+	    <div id="questionnaire-progress-bar"></div>
+	</div>
+	<button id="questionnaire-rewind" class="btn btn-sm btn-default btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
+	<div id="questionnaire-filter" class="question hide">
+	    <header>Is this photo spam?</header>
+	    <p>Sometimes, people collecting photos might accidentally send something that is not useful like an advertisement. If this photo is an advertisement or similar, you should choose <button class="btn btn-danger btn-xs" disabled>Yes</button> and it will be skipped.</p>
+	    <p>If you are not sure whether the photo is spam, selecting <button class="btn btn-xs btn-warning" disabled>I don't know</button> will also skip the image.</p>
+	    <p>If you do not see an image, notify us by selecting <button class="btn btn-xs btn-default" disabled>No Photo</button> and we will fix it as soon as possible.</p>
+	    <p>Selecting <button class="btn btn-success btn-xs" disabled>No</button> will allow you to proceed with the analysis.</p>
+	    <div class="answer">
+	        <button class="btn btn-answer btn-success btn-sm" value="No">No</button>
+	        <button class="btn btn-answer btn-danger  btn-sm" value="Yes">Yes</button>
+	        <button class="btn btn-answer btn-warning btn-sm" value="Unknown">I don't know</button>
+	        <button class="btn btn-answer btn-default btn-sm" value="NoPhoto">No photo</button>
+	    </div>
+	</div>
+
+	{% if questions %}
+	{% for question in questions -%}
+	<div id="questionnaire-question-{{question.id}}" class="question hide" data-type="{{question.type}}">
+		<header>{{question.title}}</header>
+
+		{% if question.hint %}
+		<p>{{question.hint}}</p>
+		{% endif %}
+
+		{% set has_help = True if question.help else False %}
+		{% if has_help %}
+		{% call questions_helper.help_modal(question.title) %}
+		{{question.help}}
+		{% endcall %}
+		{% endif %}
+
+		{%   if question.type == "binary"                      %}{{questions_helper.binary_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "single_choice"               %}{{questions_helper.single_choice_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "illustrated_multiple_choice" %}{{questions_helper.illustrated_multiple_choice_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "multiple_choice"             %}{{questions_helper.multiple_choice_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, has_help)}}
+		{% endif %}
+	</div>
+	{%- endfor %}
+	{% endif %}
+
+	<div class="show-on-task-loaded">
+	    <hr>
+	    <div><button id="questionnaire-show-comments" class="btn btn-block btn-default btn-sm" disabled>Show comments</button></div>
+	    <div><button id="questionnaire-hide-comments" class="btn btn-block btn-default btn-sm hide"    >Hide comments</button></div>
+	    <div id="disqus_thread" class="hide"></div>
+	</div>
+</section>
