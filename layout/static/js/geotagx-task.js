@@ -211,28 +211,30 @@
 		}
 
 		var answer = $submitter.attr("value");
-		if ((questionType === "multiple_choice" || questionType === "illustrated_multiple_choice") && answer === "Done"){
-			// When the question is multiple_choice or illustrated_multiple_choice, the actual answer is contained in the
-			// set of selected input elements. A non-empty set of selected input items is converted into a string
-			// containing each input value, while an empty set is converted into the string 'None'.
-			if (questionType === "multiple_choice"){
-				var $input = $("input:checked", $submitter.siblings("label"));
-				answer = $input.length > 0 ? inputToString($input) : "None";
-			}
-			else {
-				var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
-				var $input = $("input[type='checkbox']:checked", $illustrations);
+		if (answer === "Done"){
+			switch (questionType){
+				case "single_choice":
+					var $input = $("input:checked", $submitter.siblings("label"));
+					return $input.length > 0 ? $input.val() : "None";
+				case "multiple_choice":
+					var $input = $("input:checked", $submitter.siblings("label"));
+					return $input.length > 0 ? inputToString($input) : "None";
+				case "illustrated_multiple_choice":
+					var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
+					var $input = $("input[type='checkbox']:checked", $illustrations);
 
-				answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
-				answer =
-				answer ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
-				       : ($input.length === 0 ? "None" : inputToString($input));
+					answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
+					answer =
+					answer ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
+					       : ($input.length === 0 ? "None" : inputToString($input));
+
+					return answer;
+				case "geotagging":
+					return getMapSelection();
 			}
 		}
-		else if (questionType === "geotagging" && answer === "Done")
-			answer = getMapSelection();
-
-		return answer;
+		else
+			return answer;
 	}
 	/**
 	 * Returns the current question.
@@ -345,7 +347,7 @@
 	 * Resets all user input.
 	 */
 	function resetInput(){
-		$("input:checkbox").removeAttr("checked");
+		$("input").removeAttr("checked");
 		$("input:text").val("");
 
 		resetMap(true);
