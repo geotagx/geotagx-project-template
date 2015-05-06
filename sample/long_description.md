@@ -1,2 +1,0 @@
-GeoTag-X project sample
-=======================
