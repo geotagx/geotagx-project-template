@@ -515,8 +515,9 @@
                 $("#questionnaire-show-comments").prop("disabled", false);
 
 				// Set the submission button's handler. Note that off().on() removes the previous handler
-				// and sets a new one, every time a new task is loaded.
-				$("#questionnaire-submit").off("click").on("click", function(){
+				// and sets a new one, every time a new task is loaded. This prevents a chain of events
+				// being called when a button is pushed once.
+				$("#questionnaire-submit").off("click.task").on("click.task", function(){
 					var $button = $(this);
 					$button.prop("disabled", true);
 
@@ -530,7 +531,7 @@
 					});
 				});
 
-                $(".btn-answer").off("click").on("click", function(){
+                $(".btn-answer").off("click.task").on("click.task", function(){
 					var $submitter = $(this);
 					var question = getCurrentQuestion();
 					var answer = getAnswer(getQuestionType(question), $submitter);
