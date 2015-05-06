@@ -420,6 +420,9 @@
 					if ($element.data("type") === "geotagging" && olMap_ != null)
 						olMap_.updateSize();
 				});
+
+				// Update analytics parameters.
+				geotagx.analytics.onQuestionChanged(question);
 			}
         }
         else
@@ -462,6 +465,9 @@
             // Hide the current question and show the previous.
             getQuestionElement(previous).removeClass("hide");
 			getQuestionElement(current).addClass("hide");
+
+			// Update analytics parameters.
+			geotagx.analytics.onQuestionChanged(previous);
         }
         else
             console.log("[geotagx::task::showPrevQuestion] Error! Could not load the previous question!");
@@ -551,12 +557,15 @@
                 });
 
 				// Reset user input and the task run when a new task is presented.
+				// Also update the analytics parameters.
 				beginTask();
+				geotagx.analytics.onTaskChanged(task.id);
             }
         });
 
-        // Run the task.
-        pybossa.run(slug);
+		// Run the task and start the analytics for the current project.
+		pybossa.run(slug);
+		geotagx.analytics.start(slug);
 	};
 
 	geotagx.task = task_;
