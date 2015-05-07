@@ -103,6 +103,55 @@ def get_project_help(directory):
 	return help
 
 
+def get_questionnaire_flow_handler(questions):
+	"""Generates an anonymous javascript function that determines the next question based on the current question and it's anwer."""
+	def decode_question_id(id):
+		if isinstance(id, int) and id >= 0:
+			return id
+		elif isinstance(id, unicode) and id == "finish":
+			return len(questions) + 1
+		else:
+			return 0
+
+	def get_statements(branch, question_type):
+		if isinstance(branch, list):
+			statements = ""
+			for entry in branch:
+				for key in entry:
+					answer = key.lower()
+					next_question = decode_question_id(entry.get(key))
+
+					if question_type == "binary" and answer == "no":
+						statements += "else if (answer !== \"yes\"){{ return {}; }} ".format(next_question)
+					else:
+						statements += "else if (answer === \"{0}\"){{ return {1}; }} ".format(answer, next_question)
+
+			# Append default action.
+			statements += "else { return question + 1; }"
+
+			return statements.lstrip("else ") # Remember to remove the leading "else".
+		else:
+			return "return {};".format(decode_question_id(branch))
+
+	cases = ""
+	for question in questions:
+		branch = question.get("branch")
+		if branch is not None:
+			condition  = "case {}: ".format(question.get("id"))
+			statements = get_statements(branch, question.get("type"))
+			cases     += "{0}{1}\n\t\t\t".format(condition, statements)
+
+	return """
+	function(question, answer){{
+		answer = answer.toLowerCase();
+		switch(question){{
+			{}
+			default: return question + 1;
+		}}
+	}}
+	""".strip().format(cases.rstrip("\n\t\t\t"))
+
+
 def build(path, compress=False):
 	"""Builds the task presenter for the project located at the specified path."""
 	project_dir = os.path.realpath(path)
@@ -112,10 +161,11 @@ def build(path, compress=False):
 		print "Error! The 'project.json' file is not valid."
 		sys.exit(1)
 
-	template   = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template("base.html")
-	short_name = json["short_name"].strip()
-	why_       = json["why"].strip()
-	questions_ = json["questions"]
+	template           = Environment(loader=FileSystemLoader(searchpath=LAYOUT_DIR)).get_template("base.html")
+	short_name         = json["short_name"].strip()
+	why_               = json["why"].strip()
+	questions_         = json["questions"]
+	get_next_question_ = get_questionnaire_flow_handler(questions_)
 
 	# Assign the help to its corresponding question.
 	help = get_project_help(os.path.join(project_dir, "help"))
@@ -127,16 +177,26 @@ def build(path, compress=False):
 			except:
 				pass
 
-	# Build the template.
-	with open(os.path.join(project_dir, "template.html"), "w") as output:
-		js_  = get_template_js(compress) # Collects JS common to the whole template
-		css_ = get_template_css(compress) # Collects CSS common to the whole template
-		css_ += get_project_css(os.path.join(project_dir, "project.css"), compress)
-		js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
-		html = template.render(questions=questions_, css=css_, js=js_, slug=short_name, why=why_)
+	# Build the template and tutorial.
+	js_   = get_template_js(compress) # Collects JS common to the whole template
+	css_  = get_template_css(compress) # Collects CSS common to the whole template
+	js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
+	css_ += get_project_css(os.path.join(project_dir, "project.css"), compress)
 
-		#if compress:
-		#	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+	with open(os.path.join(project_dir, "template.html"), "w") as output:
+		html = template.render(is_tutorial=False, questions=questions_, css=css_, js=js_, slug=short_name, why=why_, get_next_question=get_next_question_)
+
+		# if compress:
+		# 	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+
+		output.write(html.encode("UTF-8"))
+
+	# Build the tutorial.
+	with open(os.path.join(project_dir, "tutorial.html"), "w") as output:
+		html = template.render(is_tutorial=True, questions=questions_, css=css_, js=js_, slug=short_name, why=why_, get_next_question=get_next_question_)
+
+		# if compress:
+		# 	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
 
 		output.write(html.encode("UTF-8"))
 

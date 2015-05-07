@@ -5,8 +5,13 @@
     {% include "questionnaire.html" %}
     {% include "image.html" %}
 </div>
-<!-- Inititate Project Short Name as a globally accessible variable-->
-<script type="text/javascript">
-	window.geotagx_project_short_name = "{{slug}}";
-</script>
 {% if js %}<script type="text/javascript">{{js}}</script>{% endif %}
+<script>
+$(document).ready(function(){
+{% if is_tutorial %}
+    geotagx.tutorial.start("{{slug}}"{% if get_next_question %}, {{get_next_question}}{% endif %});
+{% else %}
+    geotagx.project.start("{{slug}}"{% if get_next_question %}, {{get_next_question}}{% endif %});
+{% endif %}
+});
+</script>
