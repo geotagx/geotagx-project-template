@@ -50,7 +50,15 @@
 	</div>
 	{%- endfor %}
 	{% endif %}
-
+	{% if is_tutorial -%}
+	<div class="col-xs-12">
+		<div id="tutorial-message-box" class="row hide">
+			<div id="tutorial-failure-message" class="col-xs-12 hide-on-expected">This is one helluva failure. Lorem ipsum. Let the lights dim sum.</div>
+			<div id="tutorial-success-message" class="col-xs-10 show-on-expected">This is one helluva success. Lorem ipsum. Let the lights dim sum.</div>
+			<div class="show-on-expected pull-right"><center><button id="tutorial-next" class="btn btn-primary">Next</button></center></div>
+		</div>
+	</div>
+	{%- endif %}
 	<div class="show-on-task-loaded">
 	    <hr>
 	    <div><button id="questionnaire-show-comments" class="btn btn-block btn-default btn-sm" disabled>Show comments</button></div>

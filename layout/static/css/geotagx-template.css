@@ -248,3 +248,31 @@ input[type="checkbox"]
         {
             font-size:1.3em;
         }
+#tutorial-message-box
+{
+    font-size:1.1em;
+    padding:1em;
+    color:#FFF;
+    background:#C00000;
+    word-wrap:break-word;
+    border-radius:2px;
+}
+#tutorial-message-box.expected
+{
+    background:#005000;
+}
+    .show-on-expected,
+    #tutorial-message-box.expected > .hide-on-expected
+    {
+        display:none;
+    }
+    #tutorial-message-box.expected > .show-on-expected
+    {
+        display:inline;
+    }
+    #tutorial-failure-message,
+    #tutorial-success-message
+    {
+        margin:0;
+        padding:0;
+    }
