@@ -38,47 +38,48 @@ def get_project_json(filename):
 		data = file.read()
 		return json.loads(data)
 
-"""
-Collects CSS files from the template static folder, optionally minifies them,
-and then embeds them directly into the rendered output
-"""
+
 def get_template_css(compress):
-	import os
-	css_raw = ""
-	for root, dirs, files in os.walk(LAYOUT_DIR+"/static", topdown=False):
-		for name in files:
-			if name.split(".")[-1] == "css":
-				css_raw += open(os.path.join(root, name),"r").read()
-	return css_raw if not compress else cssmin(css_raw, keep_bang_comments=False)
+	"""Collects CSS files from the template static folder, optionally minifies them,
+	and then embeds them directly into the rendered output.
+	"""
+	CSS_DIR = os.path.join(LAYOUT_DIR, *["static","css"])
 
-"""
-Collects JS files from the template static folder, optionally minifies them,
-and then embeds them directly into the rendered output
-"""
+	css = ""
+	for root, dirs, filenames in os.walk(CSS_DIR, topdown=False):
+		for filename in filter(lambda f: f.endswith(".css"), filenames):
+			css += open(os.path.join(root, filename), "r").read()
+
+	return css if not compress else cssmin(css, keep_bang_comments=False)
+
+
 def get_template_js(compress):
-	import os
-	js_raw = ""
-	for root, dirs, files in os.walk(LAYOUT_DIR+"/static", topdown=False):
-		for name in files:
-			if name.split(".")[-1] == "js":
-				js_raw += open(os.path.join(root, name),"r").read()
-	return js_raw if not compress else minify(js_raw)
+	"""Collects JS files from the template static folder, optionally minifies them,
+	and then embeds them directly into the rendered output
+	"""
+	JS_DIR = os.path.join(LAYOUT_DIR, *["static","js"])
+	js = ""
+	for root, dirs, filenames in os.walk(JS_DIR, topdown=False):
+		for filename in filter(lambda f: f.endswith(".js"), filenames):
+			js += open(os.path.join(root, filename), "r").read()
+
+	return js if not compress else minify(js)
 
 
-def get_project_css(filename, compress):
+def get_project_css(project_dir, compress):
 	"""Returns the project's custom stylesheet, possibly minified, if it exists."""
 	try:
-		with open(filename, "r") as f:
+		with open(os.path.join(project_dir, "project.css"), "r") as f:
 			css = f.read()
 			return css if not compress else cssmin(css, keep_bang_comments=False)
 	except:
 		return ""
 
 
-def get_project_js(filename, compress):
+def get_project_js(project_dir, compress):
 	"""Returns the project's custom script, possibly minified, if it exists."""
 	try:
-		with open(filename, "r") as f:
+		with open(os.path.join(project_dir, "project.js"), "r") as f:
 			js = f.read()
 			return js if not compress else minify(js)
 	except:
@@ -90,9 +91,7 @@ def get_project_help(directory):
 	help = {}
 
 	if os.path.isdir(directory):
-		filenames = filter(lambda file: file.endswith(".html"), os.listdir(directory))
-
-		for filename in filenames:
+		for filename in filter(lambda f: f.endswith(".html"), os.listdir(directory)):
 			with open(os.path.join(directory, filename)) as file:
 				filedata = file.read().strip()
 				if filedata:
@@ -180,8 +179,8 @@ def build(path, compress=False):
 	# Build the template and tutorial.
 	js_   = get_template_js(compress) # Collects JS common to the whole template
 	css_  = get_template_css(compress) # Collects CSS common to the whole template
-	js_  += get_project_js(os.path.join(project_dir, "project.js"), compress)
-	css_ += get_project_css(os.path.join(project_dir, "project.css"), compress)
+	js_  += get_project_js(project_dir, compress)
+	css_ += get_project_css(project_dir, compress)
 
 	with open(os.path.join(project_dir, "template.html"), "w") as output:
 		html = template.render(is_tutorial=False, questions=questions_, css=css_, js=js_, slug=short_name, why=why_, get_next_question=get_next_question_)
