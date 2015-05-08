@@ -1,0 +1,13 @@
+{
+	"assertions":[
+		{
+			"id":1,
+			"expected":"Yes",
+			"default_message":"Try again. If you are not sure what to look for, check out the help for more information.",
+			"messages":{
+				"Yes":"Well done! There is an animal in this photo.",
+				"No":"Try again. Are you sure there is no animal? Check out the help for information on what you should be looking for."
+			}
+		}
+	]
+}
