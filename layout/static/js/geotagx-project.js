@@ -17,11 +17,9 @@
 	        console.log("[geotagx::project::start] Error! Invalid project slug.");
 	        return;
 	    }
-
 		shortName_ = shortName;
 
-		if (getNextQuestion)
-			geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
+		geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
 
 		pybossa.taskLoaded(onTaskLoaded);
 		pybossa.presentTask(onTaskPresented);
@@ -62,8 +60,6 @@
 			}
 			else
 				console.log("[pybossa::presentTask] Error! Could not find image to analyze.");
-
-			$("#questionnaire-show-comments").prop("disabled", false);
 
 			// Set the submission button's handler. Note that off().on() removes the previous handler
 			// and sets a new one, every time a new task is loaded. This prevents a chain of events
