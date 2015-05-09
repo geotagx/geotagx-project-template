@@ -5,7 +5,6 @@
 	"use strict";
 
 	var api_ = {}; // The tutorial API.
-	var shortName_; // The project's short name.
 
 	/**
 	 * Begins the project tutorial.
@@ -15,10 +14,9 @@
 	 */
 	api_.start = function(shortName, getNextQuestion, assertions){
 		if ($.type(shortName) !== "string"){
-	        console.log("[geotagx::project::start] Error! Invalid project slug.");
-	        return;
-	    }
-		shortName_ = shortName;
+			console.log("[geotagx::project::start] Error! Invalid project slug.");
+			return;
+		}
 
 		assertions = {
 			1:{
@@ -31,26 +29,38 @@
 			}
 		};
 
+		// The next question's identifier. This value is determined each time
+		// a correct answer is input by the user.
+		var nextQuestion = 0;
 
-		geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
-		geotagx.questionnaire.onAnswerSubmitted(function(answer, $submitter, question){
-			answer = answer.toLowerCase(); // toLowerCase for case-insensitive comparisons.
+		// Override the showNextQuestion function so that instead of automatically
+		// displaying the next question, a notification is displayed to the user.
+		// A notification may contain a "NEXT" button which allows a user to
+		// advance to the next question.
+		geotagx.questionnaire.onShowNextQuestion(function(question, answer, $submitter){
+			answer = $.type(answer) === "string" ? answer.toLowerCase() : answer; // toLowerCase for case-insensitive comparisons.
 
-			var assertion = assertions[1];
+			var assertion = assertions[1]; //TODO Replace 1 with question when you've found a way to generate assertions.
 			var message = assertion.messages[answer] ? assertion.messages[answer] : assertion.default_message;
 			var isExpectedAnswer = answer === assertion.expects;
+			if (isExpectedAnswer)
+				nextQuestion = getNextQuestion(question, answer);
 
-			showMessageBox(message, isExpectedAnswer);
+			showNotification(message, isExpectedAnswer);
 		});
 
 		$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);
 		$(".hide-on-task-loaded").hide();
+		$("#tutorial-next").on("click", function(){
+			hideNotification();
+			geotagx.questionnaire.showQuestion(nextQuestion);
+		});
 
 		geotagx.questionnaire.start(1);
+		geotagx.analytics.start(shortName);
 	};
 
-
-	function showMessageBox(message, isExpected){
+	function showNotification(message, isExpected){
 		var $box = $("#tutorial-message-box");
 
 		$box.removeClass("hide").hide();
@@ -65,60 +75,11 @@
 		$box.fadeIn(300);
 	}
 
-	function hideMessageBox(){
+	function hideNotification(){
 		$("#tutorial-message-box").fadeOut(300, function(){
 			$(this).addClass("hide");
 		})
 	}
-
-
-
-
-
-
-
-	$(document).ready(function(){
-
-
-
-		function reset_answer_popup(){
-			$(".answer_yes_popup").hide();
-			$(".answer_no_popup").hide();
-			$(".answer_unknown_popup").hide();
-		}
-
-		$(".answer_yes").click(function(){
-			reset_answer_popup();
-			$(".answer_yes_popup",$current).show();
-		});
-		$(".answer_no").click(function(){
-			reset_answer_popup();
-			$(".answer_no_popup",$current).show();
-		});
-		$(".answer_unknown").click(function(){
-			reset_answer_popup();
-			$(".answer_unknown_popup",$current).show();
-		});
-
-		reset_answer_popup();
-	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	// Expose the API.
 	geotagx.tutorial = api_;
