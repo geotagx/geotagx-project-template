@@ -14,9 +14,9 @@
 	 */
 	api_.start = function(shortName, getNextQuestion){
 		if ($.type(shortName) !== "string"){
-	        console.log("[geotagx::project::start] Error! Invalid project slug.");
-	        return;
-	    }
+			console.log("[geotagx::project::start] Error! Invalid project slug.");
+			return;
+		}
 		shortName_ = shortName;
 
 		geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
@@ -59,7 +59,7 @@
 				$("#image-source").attr("href", task.info.source_uri);
 			}
 			else
-				console.log("[pybossa::presentTask] Error! Could not find image to analyze.");
+				console.log("[geotagx::project::onTaskPresented] Error! Could not find image to analyze.");
 
 			// Set the submission button's handler. Note that off().on() removes the previous handler
 			// and sets a new one, every time a new task is loaded. This prevents a chain of events
@@ -80,8 +80,8 @@
 				});
 			});
 
-			geotagx.questionnaire.start(1);
 			geotagx.analytics.onTaskChanged(task.id);
+			geotagx.questionnaire.start(1);
 		}
 	}
 	// Expose the API.
