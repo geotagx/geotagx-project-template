@@ -10,26 +10,25 @@
 	var initialQuestion_ = 0; // The questionnaire's initial question.
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout the questionnaire. It also allows a user to rewind to a previous question.
-    var getNextQuestion_ = function(question){ return question + 1; }; // A user-defined function that determines the next question presented to the user.
 	var olMap_ = null; // The OpenLayers 3 map instance.
 
 	$(document).ready(function(){
 		numberOfQuestions_ = $(".question").length;
 
 		$("*[data-toggle=tooltip]").tooltip();
-		$("#questionnaire-rewind").on("click", api_.showPreviousQuestion);
+		$("#questionnaire-rewind").on("click", showPreviousQuestion);
 
 		// Set the 'Show Comments' button handlers. One event handler loads the Disqus thread once and is disabled.
 		// The next handler simply makes the #disqus_thread div visible.
 		$("#questionnaire-show-comments").on("click.loadDisqus", function(){
 			var disqus_shortname = 'geotagx'; (function(){var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();
-            $(this).off("click.loadDisqus");
+			$(this).off("click.loadDisqus");
 		}).click(function(){
 			$(this).fadeOut(100, function(){
-                $(this).addClass("hide");
-                $("#questionnaire-hide-comments").removeClass("hide").hide().fadeIn();
-                $("#disqus_thread").removeClass("hide").hide().fadeIn(100);
-            });
+				$(this).addClass("hide");
+				$("#questionnaire-hide-comments").removeClass("hide").hide().fadeIn();
+				$("#disqus_thread").removeClass("hide").hide().fadeIn(100);
+			});
 		});
 
 		// Set the 'Hide Comments' button handler.
@@ -61,7 +60,12 @@
 			var question = api_.getCurrentQuestion();
 			var answer = parseAnswer(getQuestionType(question), $submitter);
 
-			answerSubmitted(answer, $submitter, question);
+			// Save the answer.
+			var storageKey = getStorageKey(question);
+			if (storageKey)
+				saveAnswer(storageKey, answer);
+
+			showNextQuestion(question, answer, $submitter);
 		});
 
 		// Initialize the answers_ object's properties. A property is located in each
@@ -78,24 +82,24 @@
 
 			// Initialize the map's search function.
 			var $olMapSearchInput = $("#ol-map-search-input");
-	        var $olMapSearchButton = $("#ol-map-search-button");
+			var $olMapSearchButton = $("#ol-map-search-button");
 
-	        $olMapSearchInput.on("keypress", function(e){
-	            var keycode = (e.keyCode ? e.keyCode : e.which);
-	            if (keycode === 13 && $.trim($olMapSearchInput.val())){ // Code 13 corresponds to the 'Enter' key.
-	                e.preventDefault();
+			$olMapSearchInput.on("keypress", function(e){
+				var keycode = (e.keyCode ? e.keyCode : e.which);
+				if (keycode === 13 && $.trim($olMapSearchInput.val())){ // Code 13 corresponds to the 'Enter' key.
+					e.preventDefault();
 					$olMapSearchButton.trigger("click");
-	            }
-	        }).on("input", function(){ //TODO Throttle/debounce this.
+				}
+			}).on("input", function(){ //TODO Throttle/debounce this.
 				// Disable the search button if there's no user input, enable it otherwise.
-	            $olMapSearchButton.prop("disabled", !$(this).val());
-	        });
+				$olMapSearchButton.prop("disabled", !$(this).val());
+			});
 
-	        $olMapSearchButton.on("click", function(){
+			$olMapSearchButton.on("click", function(){
 				var location = $.trim($olMapSearchInput.val());
 				if (location){
 					$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
-	                    if (results.length > 0){
+						if (results.length > 0){
 							var result = results[0];
 
 							// Replace the search string with the result's display name, i.e. the city name, then center the map.
@@ -200,21 +204,73 @@
 		}
 	}
 	/**
-	 * A user-defined function that is called each time an answer is submitted.
+	 * Returns the identifier of the next question to display. This function
+	 * can be overwritten by a user-defined implementation via the
+	 * onGetNextQuestion API call.
+	 * @param question the current question identifier.
 	 */
-	function answerSubmitted(answer, $submitter, question){
+	function getNextQuestion(question){
+		return question + 1;
+	}
+	/**
+	 * A function that determines the next question based on the current question
+	 * and its answer. This function can be overwritten by a user-defined
+	 * implementation via the onShowNextQuestion API call.
+	 * @param question the current question identifier.
+	 * @param answer the current question's answer.
+	 * @param $submitter the HTML element that submitted the answer to the specified question.
+	 */
+	function showNextQuestion(question, answer, $submitter){
 		if (isSpamFilter(question)){
-			if (answer === "No")
-				api_.showQuestion(question + 1); // The image is not spam, proceed to the first question.
+			if (answer === "no")
+				api_.showQuestion(question + 1); // The content to analyze is not spam, proceed to the first question.
 			else
 				api_.finish();
 		}
-		else {
-			api_.saveAnswer(answer);
-			api_.showQuestion(getNextQuestion_(question, answer));
-		}
-		addAnswerCardEntry(question, answer);
+		else
+			api_.showQuestion(getNextQuestion(question, answer));
+
+		//addAnswerCardEntry(question, answer);									/*FIXME Fix answer card. */
 	}
+	/**
+	 * Displays the previous question, iff it exists.
+	 */
+	function showPreviousQuestion(){
+		// We can only rewind if we've completed at least two questions.
+        if (progress_.length >= 2){
+            var current  = progress_[progress_.length - 1];
+            var previous = progress_[progress_.length - 2];
+
+            // Destroy the current result before loading the previous question.
+            saveAnswer(getStorageKey(current), null);
+
+            // Minimize the information displayed on the questionnaire summary.
+            if (isCompleted(current))
+				api_.showFullSummary(false);
+
+            // Remove the previous entry from the answer card.
+            removeAnswerCardEntry(previous);
+
+            // Update the progress stack and progress bar.
+            progress_.pop();
+            updateProgress();
+
+            // Disable the rewind button if there're no more previous questions.
+            if (progress_.length === 1)
+                $("#questionnaire-rewind").prop("disabled", true);
+
+            // Hide the current question and show the previous.
+            getQuestionElement(previous).removeClass("hide");
+			getQuestionElement(current).addClass("hide");
+
+			// Update analytics parameters.
+			geotagx.analytics.onQuestionChanged(previous);
+        }
+        else
+            console.log("[geotagx::questionnaire::showPrevQuestion] Error! Could not load the previous question!");
+	};
+
+
 	/**
 	 * Returns the answer submitted by the specified submitter.
 	 */
@@ -254,6 +310,18 @@
 			return answer;
 	}
 	/**
+	 * Saves the specified answer.
+	 * @param storageKey the name of the key used to store the answer.
+	 * @param answer the answer to save.
+	 */
+	function saveAnswer(storageKey, answer){
+		if (storageKey){
+			answers_[storageKey] = $.type(answer) === "undefined" ? null : answer;
+		}
+		else
+			console.log("[geotagx::questionnaire::saveAnswer] Error! Invalid storage key. Answer discarded...");
+	};
+	/**
 	 * Returns the specified question's HTML node identifier.
 	 */
 	function getQuestionNodeId(question){
@@ -266,17 +334,17 @@
 		return getQuestionNodeId(api_.getCurrentQuestion());
 	}
 	/**
-     * Returns the specified question's HTML node.
-     */
-    function getQuestionElement(question){
-        return $(getQuestionNodeId(question));
-    }
+	 * Returns the specified question's HTML node.
+	 */
+	function getQuestionElement(question){
+		return $(getQuestionNodeId(question));
+	}
 	/**
-     * Returns the current question's HTML node.
-     */
-    function getCurrentQuestionElement(){
-        return getQuestionElement(api_.getCurrentQuestion());
-    }
+	 * Returns the current question's HTML node.
+	 */
+	function getCurrentQuestionElement(){
+		return getQuestionElement(api_.getCurrentQuestion());
+	}
 	/**
 	 * Returns the type of the specified question.
 	 */
@@ -289,59 +357,59 @@
 	function updateProgress(){
 		percentageComplete_ = progress_.length > 0 ? (((api_.getCurrentQuestion() - initialQuestion_) / (numberOfQuestions_ - initialQuestion_)) * 100).toFixed(0) : 0;
 
-        $("#questionnaire-percentage-complete").html(percentageComplete_);
-        $("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
+		$("#questionnaire-percentage-complete").html(percentageComplete_);
+		$("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
 	};
 	/**
-     * Returns true if the question identifier refers to the spam filter, false otherwise.
-     */
-    function isSpamFilter(question){
-        return question === 0;
-    }
-    /**
-     * Returns true if the questionnaire has been completed, false otherwise.
-     * A questionnaire is considered complete if the question identifier is equal to the total number of questions.
-     */
-    function isCompleted(question){
-        return question === numberOfQuestions_;
-    }
+	 * Returns true if the question identifier refers to the spam filter, false otherwise.
+	 */
+	function isSpamFilter(question){
+		return question === 0;
+	}
 	/**
-     * Adds an entry to the user's answer card.
-     */
-    function addAnswerCardEntry(questionId, answer){
+	 * Returns true if the questionnaire has been completed, false otherwise.
+	 * A questionnaire is considered complete if the question identifier is equal to the total number of questions.
+	 */
+	function isCompleted(question){
+		return question === numberOfQuestions_;
+	}
+	/**
+	 * Adds an entry to the user's answer card.
+	 */
+	function addAnswerCardEntry(questionId, answer){
 		var $answerCard = $("#questionnaire-answer-card");
 		if ($answerCard.length > 0){
 			var nodeId = getQuestionNodeId(questionId);
-	        if (nodeId){
-	            var question = $(nodeId + " > header").html();
-	            if (question){
-	                var entry = '<li id="questionnaire-answer-card-entry-' + questionId + '">' + question + ' ' + answer + '</li>';
-	                $(entry).hide().appendTo("#questionnaire-answer-card").fadeIn(200);
-	            }
-	        }
+			if (nodeId){
+				var question = $(nodeId + " > header").html();
+				if (question){
+					var entry = '<li id="questionnaire-answer-card-entry-' + questionId + '">' + question + ' ' + answer + '</li>';
+					$(entry).hide().appendTo("#questionnaire-answer-card").fadeIn(200);
+				}
+			}
 
 			// Enable the summary details button.
 			var numberOfEntries = $("li", $answerCard).length;
 			if ($("#questionnaire-summary-details").hasClass("hide") && numberOfEntries > 0)
 				$("#questionnaire-summary-details").removeClass("hide").hide().fadeIn();
 		}
-    }
-    /**
-     * Removes the specified question's entry from the user's answer card.
-     */
-    function removeAnswerCardEntry(question){
-        setTimeout(function(){
+	}
+	/**
+	 * Removes the specified question's entry from the user's answer card.
+	 */
+	function removeAnswerCardEntry(question){
+		setTimeout(function(){
 			var $answerCard = $("#questionnaire-answer-card");
 
 			$("#questionnaire-answer-card-entry-" + question).fadeOut(200, function(){
-                $(this).remove();
+				$(this).remove();
 
 				var numberOfEntries = $("li", $answerCard).length;
 				if (!$("#questionnaire-summary-details").hasClass("hide") && numberOfEntries == 0)
 					$("#questionnaire-summary-details").fadeOut(80, function(){ $(this).addClass("hide"); });
-            });
-        }, 150);
-    }
+			});
+		}, 150);
+	}
 	/**
 	 * Resets all user input.
 	 */
@@ -368,17 +436,17 @@
 	 * Starts the questionnaire from the specified question.
 	 */
 	api_.start = function(question){
-        $(".question").addClass("hide");
+		$(".question").addClass("hide");
 
 		resetInput();
-        progress_ = [];
+		progress_ = [];
 
 		// Reset the answer card and enable comments.
 		$("#questionnaire-answer-card").empty();
 		$("#questionnaire-show-comments").prop("disabled", false);
 
-        // Reset the current task run.
-        for (var property in answers_)
+		// Reset the current task run.
+		for (var property in answers_)
 			answers_[property] = null;
 
 		// Toggle wheelzoom on the image.
@@ -392,7 +460,7 @@
 	/**
 	 * Returns the number of questions.
 	 */
-	api_.numberOfQuestions = function(){
+	api_.getNumberOfQuestions = function(){
 		return numberOfQuestions_;
 	};
 	/**
@@ -407,18 +475,6 @@
 			console.log("[geotagx::questionnaire::getAnswer] Warning! Could not find a storage key for question #" + question + ".");
 
 		return answer;
-	};
-	/**
-	 * Saves the current question's answer.
-	 * @param answer the answer to save.
-	 */
-	api_.saveAnswer = function(answer){
-		var question = api_.getCurrentQuestion();
-		var key = getStorageKey(question);
-		if (key)
-			answers_[key] = $.type(answer) === "undefined" ? null : answer;
-		else
-			console.log("[geotagx::questionnaire::saveAnswer] Warning! Could not find a storage key for question #" + question + ". Answer discarded...");
 	};
 	/**
 	 * Returns the current set of answers.
@@ -441,9 +497,9 @@
 		return progress_[progress_.length - 1];
 	};
 	/**
-     * Displays the complete questionnaire summary if show is set to true, otherwise shows the compact version.
-     */
-    api_.showFullSummary = function(show){
+	 * Displays the complete questionnaire summary if show is set to true, otherwise shows the compact version.
+	 */
+	api_.showFullSummary = function(show){
 		if (show)
 			$("#questionnaire-summary").removeClass("minimized");
 		else
@@ -451,40 +507,48 @@
 																					if (show) console.log(answers_); /*TODO: Remove when done debugging.*/
 	};
 	/**
-	 * Set the user-defined function that determines the question flow.
-	 * @param hanlder a user-defined function that determines the question flow.
+	 * Set a user-defined function that returns the identifier of the next question to present.
+	 * @param hanlder a user-defined function that determines the questionnaire flow.
 	 */
 	api_.onGetNextQuestion = function(handler){
 		if (handler && $.type(handler) === "function")
-			getNextQuestion_ = handler;
-		else
-			getNextQuestion_ = function(question){ return question + 1; };
+			getNextQuestion = handler;
+	};
+	/**
+	 * Set a user-defined function that displays the next question.
+	 * @param hanlder a user-defined function that displays the next question.
+	 */
+	api_.onShowNextQuestion = function(handler){
+		if (handler && $.type(handler) === "function")
+			showNextQuestion = handler;
 	};
 	/**
 	 * Displays the specified question.
 	 * @param question a positive integer used to identify a question.
 	 */
 	api_.showQuestion = function(question){
+		console.log("Showing question " + question);
+
 		var hasAnsweredQuestion = progress_.length > 0;
 
-        // Enable the rewind button if the user has at least one answered question, disable it otherwise.
-        $("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
+		// Enable the rewind button if the user has at least one answered question, disable it otherwise.
+		$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
 
-        // Hide the current question since we'll be moving onto the next.
-        if (hasAnsweredQuestion)
+		// Hide the current question since we'll be moving onto the next.
+		if (hasAnsweredQuestion)
 			getCurrentQuestionElement().addClass("hide");
 
-        // If we have a valid question id ...
-        if (question >= 0 && question <= numberOfQuestions_){
-            // Update the progress stack and progress bar.
-            progress_.push(question);
-            updateProgress();
+		// If we have a valid question id ...
+		if (question >= 0 && question <= numberOfQuestions_){
+			// Update the progress stack and progress bar.
+			progress_.push(question);
+			updateProgress();
 
-            // If the questionnaire has been completed, display the full questionnaire summary.
-            // If it hasn't, show the next question.
-            if (isCompleted(question))
+			// If the questionnaire has been completed, display the full questionnaire summary.
+			// If it hasn't, show the next question.
+			if (isCompleted(question))
 				api_.showFullSummary(true);
-            else {
+			else {
 				var $element = getQuestionElement(question);
 				$element.removeClass("hide").hide().fadeIn(300, function(){
 					// If the question type is geotagging, then we need to resize the map only when the question is
@@ -496,53 +560,9 @@
 				// Update analytics parameters.
 				geotagx.analytics.onQuestionChanged(question);
 			}
-        }
-        else
-            console.log("[geotagx::questionnaire::showQuestion] Error! Invalid question identifier '" + question + "'.");
-	};
-	/**
-	 * Displays the next question.
-	 * If no more questions are left, the user's input summary and a submit button are displayed instead.
-	 */
-	api_.showNextQuestion = function(){
-		api_.showQuestion(api_.getCurrentQuestion() + 1);
-	};
-	/**
-	 * Displays the previous question, iff it exists.
-	 */
-	api_.showPreviousQuestion = function(){
-		// We can only rewind if we've completed at least two questions.
-        if (progress_.length >= 2){
-            var current  = progress_[progress_.length - 1];
-            var previous = progress_[progress_.length - 2];
-
-            // Destroy the current result before loading the previous question.
-            api_.saveAnswer(null);
-
-            // Minimize the information displayed on the questionnaire summary.
-            if (isCompleted(current))
-				api_.showFullSummary(false);
-
-            // Remove the previous entry from the answer card.
-            removeAnswerCardEntry(previous);
-
-            // Update the progress stack and progress bar.
-            progress_.pop();
-            updateProgress();
-
-            // Disable the rewind button if there're no more previous questions.
-            if (progress_.length === 1)
-                $("#questionnaire-rewind").prop("disabled", true);
-
-            // Hide the current question and show the previous.
-            getQuestionElement(previous).removeClass("hide");
-			getQuestionElement(current).addClass("hide");
-
-			// Update analytics parameters.
-			geotagx.analytics.onQuestionChanged(previous);
-        }
-        else
-            console.log("[geotagx::questionnaire::showPrevQuestion] Error! Could not load the previous question!");
+		}
+		else
+			console.log("[geotagx::questionnaire::showQuestion] Error! Invalid question identifier '" + question + "'.");
 	};
 	/**
 	 * Finishes a project task.
