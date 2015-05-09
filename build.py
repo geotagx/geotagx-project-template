@@ -142,7 +142,7 @@ def get_questionnaire_flow_handler(questions):
 
 	return """
 	function(question, answer){{
-		answer = answer.toLowerCase();
+		answer = $.type(answer) === "string" ? answer.toLowerCase() : answer; // toLowerCase for case-insensitive string comparisons.
 		switch(question){{
 			{}
 			default: return question + 1;
