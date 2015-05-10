@@ -527,8 +527,6 @@
 	 * @param question a positive integer used to identify a question.
 	 */
 	api_.showQuestion = function(question){
-		console.log("Showing question " + question);
-
 		var hasAnsweredQuestion = progress_.length > 0;
 
 		// Enable the rewind button if the user has at least one answered question, disable it otherwise.
