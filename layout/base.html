@@ -2,7 +2,7 @@
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 {% if css %}<style type="text/css">{{css}}</style>{% endif %}
 {% include 'messages.html' %}
-<div class="row skeleton">
+<div class="row skeleton {% if is_tutorial %}dry-run{% else %}wet-run{% endif %}">
     {% include "questionnaire.html" %}
     {% include "image.html" %}
 </div>

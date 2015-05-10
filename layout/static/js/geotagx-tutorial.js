@@ -43,8 +43,12 @@
 			var assertion = assertions[1]; //TODO Replace 1 with question when you've found a way to generate assertions.
 			var message = assertion.messages[answer] ? assertion.messages[answer] : assertion.default_message;
 			var isExpectedAnswer = answer === assertion.expects;
-			if (isExpectedAnswer)
+			if (isExpectedAnswer){
 				nextQuestion = getNextQuestion(question, answer);
+				geotagx.analytics.onCorrectTutorialAnswer();
+			}
+			else
+				geotagx.analytics.onWrongTutorialAnswer();
 
 			showNotification(message, isExpectedAnswer);
 		});
