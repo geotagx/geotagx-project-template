@@ -28,6 +28,10 @@ input[type="checkbox"]
     text-transform:uppercase;
     border-radius:2px;
 }
+.btn-link
+{
+    padding:0;
+}
 .answer
 {
     margin-top:1em;
@@ -116,6 +120,7 @@ input[type="checkbox"]
             text-transform:uppercase;
         }
             #questionnaire-summary.minimized #questionnaire-submit,
+            #questionnaire-summary.minimized #questionnaire-tutorial-complete,
             #questionnaire-summary.minimized #questionnaire-conclusion
             {
                 display:none;
