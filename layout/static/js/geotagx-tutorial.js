@@ -21,37 +21,6 @@
 			return;
 		}
 
-		tutorial = [
-			{
-				"image":"http://i.imgur.com/yZrJpI3.jpg",
-				"image_source":"http://imgur.com/r/earthporn/yZrJpI3",
-				"assertions":{
-					1:{
-						expects:"no",
-						default_message:"Try again. If you are not sure what to look for, check out the help for more information.",
-						messages:{
-							"no":"Well done! There is an animal in this photo.",
-							"yes":"Try again. Are you sure there is no animal? Check out the help for information on what you should be looking for."
-						}
-					}
-				}
-			},
-			{
-				"image":"http://resources3.news.com.au/images/2013/05/24/1226650/215811-130525-luke-mcnevin.jpg",
-				"image_source":"http://www.theaustralian.com.au/news/nation/spared-slaughter-overseas-only-to-meet-cruel-death-in-a-parched-land/story-e6frg6nf-1226650217008#",
-				"assertions":{
-					1:{
-						expects:"yes",
-						default_message:"Try again. If you are not sure what to look for, check out the help for more information.",
-						messages:{
-							"yes":"Well done! There is an animal in this photo.",
-							"no":"Try again. Are you sure there is no animal? Check out the help for information on what you should be looking for."
-						}
-					}
-				}
-			}
-		];
-
 		numberOfTutorials_ = tutorial.length;
 		currentTutorial_ = Math.floor((Math.random() * numberOfTutorials_)); // Select a random tutorial out of all available ones.
 		setTutorial(tutorial[currentTutorial_]);
@@ -82,9 +51,11 @@
 
 		$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);
 		$(".hide-on-task-loaded").hide();
-		$("#tutorial-next-question").on("click.tutorial", function(){
+		$("#questionnaire-rewind").on("click.tutorial", function(){
 			hideNotification();
-			geotagx.questionnaire.showQuestion(nextQuestion);
+		});
+		$("#tutorial-next-question").on("click.tutorial", function(){
+			hideNotification(function(){ geotagx.questionnaire.showQuestion(nextQuestion) });
 		});
 		$("#tutorial-another").on("click.tutorial", function(){
 			currentTutorial_ = (currentTutorial_ + 1) % numberOfTutorials_;
@@ -121,12 +92,15 @@
 			$box.removeClass("expected");
 			$("#tutorial-failure-message").html(message);
 		}
-		$box.fadeIn(300);
+		$box.fadeIn(250);
 	}
 
-	function hideNotification(){
-		$("#tutorial-message-box").fadeOut(300, function(){
+	function hideNotification(onNotificationHidden){
+		$("#tutorial-message-box").fadeOut(150, function(){
 			$(this).addClass("hide");
+
+			if (onNotificationHidden && $.type(onNotificationHidden) === "function")
+				onNotificationHidden();
 		})
 	}
 
