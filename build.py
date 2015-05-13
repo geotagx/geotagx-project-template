@@ -181,26 +181,28 @@ def get_project_tutorial(project_dir):
 
 		return output.rstrip(",")
 
-	tutorial = ""
-	with open(os.path.join(project_dir, "tutorial.json")) as file:
-		data = file.read()
-		for entry in json.loads(data)["tutorial"]:
-			image = entry["image"]
-			image_source = entry["image_source"]
-			assertions = parse_assertions(entry["assertions"])
+	try:
+		tutorial = ""
+		with open(os.path.join(project_dir, "tutorial.json")) as file:
+			data = file.read()
+			for entry in json.loads(data)["tutorial"]:
+				image = entry["image"]
+				image_source = entry["image_source"]
+				assertions = parse_assertions(entry["assertions"])
 
-			tutorial += "\n\t\t"
-			tutorial += """
-			{{
-			"image":"{0}",
-			"image_source":"{1}",
-			"assertions":{{
-				{2}
-			}}\r\t\t}},
-			""".format(image, image_source, assertions).strip()
+				tutorial += "\n\t\t"
+				tutorial += """
+				{{
+				"image":"{0}",
+				"image_source":"{1}",
+				"assertions":{{
+					{2}
+				}}\r\t\t}},
+				""".format(image, image_source, assertions).strip()
 
-
-	return "[{}\n\t]".format(tutorial.strip().rstrip(",")) # "[{}]".format(tutorial)
+		return "[{}\n\t]".format(tutorial.strip().rstrip(",")) # "[{}]".format(tutorial)
+	except:
+		return None
 
 
 def build(path, compress=False):
@@ -245,12 +247,14 @@ def build(path, compress=False):
 	# Build the tutorial.
 	with open(os.path.join(project_dir, "tutorial.html"), "w") as output:
 		tutorial_ = get_project_tutorial(project_dir)
-		html = template.render(is_tutorial=True, questions=questions_, css=css_, js=js_, slug=short_name, why=why_, get_next_question=get_next_question_, tutorial=tutorial_)
 
-		# if compress:
-		# 	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
+		if tutorial_ is not None:
+			html = ""
+			html = template.render(is_tutorial=True, questions=questions_, css=css_, js=js_, slug=short_name, why=why_, get_next_question=get_next_question_, tutorial=tutorial_)
+			# if compress:
+			# 	html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
 
-		output.write(html.encode("UTF-8"))
+			output.write(html.encode("UTF-8"))
 
 
 def main(argv):
