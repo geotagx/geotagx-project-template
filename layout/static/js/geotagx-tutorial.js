@@ -1,7 +1,7 @@
 /*
  * The GeoTag-X tutorial helper.
  */
-(function(geotagx, $, undefined){
+;(function(geotagx, $, undefined){
 	"use strict";
 
 	var api_ = {}; // The tutorial API.

@@ -1,7 +1,7 @@
 /*
  * The GeoTag-X questionnaire helper.
  */
-(function(geotagx, $, undefined){
+;(function(geotagx, $, undefined){
 	"use strict";
 
 	var api_ = {}; // The questionnaire API.
@@ -456,6 +456,10 @@
 		initialQuestion_ = question && $.type(question) === "number" ? question : 0;
 
 		api_.showQuestion(initialQuestion_);
+
+		// Start a questionnaire tour.
+		if (!geotagx.tour.questionnaireTourEnded())
+			setTimeout(geotagx.tour.startQuestionnaireTour, 1000);
 	};
 	/**
 	 * Returns the number of questions.
