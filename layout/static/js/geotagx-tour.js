@@ -11,7 +11,7 @@
 	 * Returns true if the questionnaire tour ended, false otherwise.
 	 */
 	api_.questionnaireTourEnded = function(){
-		return questionnaireTour_ && questionnaireTour_.ended();
+		return localStorage.getItem("geotagx_questionnaire_tour_end") === "yes";
 	};
 	/**
 	 * Starts a questionnaire tour.
