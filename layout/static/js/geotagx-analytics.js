@@ -8,8 +8,6 @@
 	var taskId_ = 0; // The current task's identifier.
 
 	$(document).ready(function(){
-		window.analyticsListener = true; // Enable the CCL analytics tracker library.
-
 		// $(".external-link").on("click.analytics", onClickedExternalLink);
 		// $(".social-media-link").on("click.analytics", onSharedProject);
 
