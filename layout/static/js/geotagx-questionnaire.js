@@ -15,7 +15,6 @@
 	$(document).ready(function(){
 		numberOfQuestions_ = $(".question").length;
 
-		$("*[data-toggle=tooltip]").tooltip();
 		$("#questionnaire-rewind").on("click", showPreviousQuestion);
 
 		// Set the 'Show Comments' button handlers. One event handler loads the Disqus thread once and is disabled.
