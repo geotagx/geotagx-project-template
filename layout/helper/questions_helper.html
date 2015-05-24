@@ -35,7 +35,7 @@
 <div class="answer" data-saved-as="{{answer.saved_as}}">
 	<button class="btn btn-answer btn-success btn-sm" value="Yes">Yes</button>
 	<button class="btn btn-answer btn-danger  btn-sm" value="No">No</button>
-	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
 </div>
 {%- endmacro %}
@@ -49,7 +49,7 @@
     {%- endfor %}
 	{%- endfor %}
     <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
 </div>
 {%- endmacro %}
@@ -63,7 +63,7 @@
     {%- endfor %}
 	{%- endfor %}
     <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
 </div>
 {%- endmacro %}
@@ -92,7 +92,7 @@
     </div>
     <div>
     	<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-    	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+    	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
     	<button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
     </div>
 </div>
@@ -106,7 +106,7 @@
     <div id="ol-map" class="ol-map"></div>
     <div class="answer">
         <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-        <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" data-original-title="Did you read the help?"{% endif %}>I don't know</button>
+        <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
         <button class="btn btn-answer btn-default btn-sm" value="NotClear">It's not clear</button>
     </div>
 </div>
