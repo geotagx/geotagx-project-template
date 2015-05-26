@@ -4,12 +4,15 @@
 ;(function(geotagx, $, undefined){
 	"use strict";
 
-	var api_ = {}; // The analytics API.
+	var api_ = {}; // The project-specific analytics API.
 	var taskId_ = 0; // The current task's identifier.
+	var projectId_ = null; // The current project's short name.
+	var questionId_ = 0; // The current question number.
 
 	$(document).ready(function(){
-		// $(".external-link").on("click.analytics", onClickedExternalLink);
-		// $(".social-media-link").on("click.analytics", onSharedProject);
+		// If analytics is not enabled, do nothing.
+		if (!window.analyticsListener)
+			return;
 
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
@@ -30,107 +33,162 @@
 		$("#project-task-presenter.analysis .help-toggle").on("click.analytics", onShowHelp);
 	});
 	/**
-	 * Starts tracking analytics for the project with the specified identifier,
-	 * and the user with the given identifier.
-	 * @param projectId the project's identifier, i.e. its short_name.
-	 * @param userId the current user's identifier, which is either a username, or an IP address for anonymous users.
+	 * Updates the tracking parameters when a new project is started.
+	 * @param projectId the project's short name.
 	 */
-	api_.start = function(projectId, userId){
-		analytics.setGlobal("userId", userId ? userId : "anonymous");
-		analytics.setGlobal("projectId", projectId);
-		analytics.fireEvent("action.startProject", {"url":window.location.href});
-	}
+	api_.onProjectChanged = function(projectId){
+		projectId_ = projectId;
+	};
 	/**
 	 * Updates the tracking parameters when a new task is presented to the user.
 	 * @param taskId the task's identifier.
 	 */
 	api_.onTaskChanged = function(taskId){
 		taskId_ = taskId;
-	}
+	};
 	/**
 	 * Updates the tracking parameters when a new question is presented to the user.
 	 * @param questionId the current question identifier.
 	 */
 	api_.onQuestionChanged = function(questionId){
-		analytics.setGlobal("questionId", questionId);
-	}
+		questionId_ = questionId;
+	};
 	/**
 	 * Fires an event when a user selects the correct answer in a tutorial.
 	 */
 	api_.onCorrectTutorialAnswer = function(){
-		analytics.fireEvent("action.correctTutorialAnswer");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.correctTutorialAnswer", data);
 	};
 	/**
 	 * Fires an event when a user selects the wrong answer in a tutorial.
 	 */
 	api_.onWrongTutorialAnswer = function(){
-		analytics.fireEvent("action.wrongTutorialAnswer");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.wrongTutorialAnswer", data);
 	};
 	/**
 	 * Fires an event when a user answers a question during an analysis.
 	 */
 	function onAnswerQuestion(){
-		analytics.fireEvent("action.answerQuestion", {"taskId":taskId_, "buttonValue":$(this).val()});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_,
+			"buttonValue":$(this).val()
+		};
+		analytics.fireEvent("action.answerQuestion", data);
 	}
 	/**
 	 * Fires an event when a user zooms in on an image during a tutorial.
 	 */
 	function onTutorialImageZoom(){
-		analytics.fireEvent("action.tutorialImageZoom");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.tutorialImageZoom", data);
 	}
 	/**
 	 * Fires an event when a user zooms in on an image during an analysis.
 	 */
 	function onImageZoom(){
-		analytics.fireEvent("action.imageZoom", {"taskId":taskId_});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.imageZoom", data);
 	}
 	/**
 	 * Fires an event when a user visits an image's source during a tutorial.
 	 */
 	function onShowTutorialImageSource(){
-		analytics.fireEvent("action.showTutorialImageSource");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.showTutorialImageSource", data);
 	}
 	/**
 	 * Fires an event when a user visits an image's source during an analysis.
 	 */
 	function onShowImageSource(){
-		analytics.fireEvent("action.showImageSource", {"taskId":taskId_});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.showImageSource", data);
 	}
 	/**
 	 * Fires an event when a user goes back to a previous question during a tutorial.
 	 */
 	function onShowPreviousTutorialQuestion(){
-		analytics.fireEvent("action.showPreviousTutorialQuestion");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.showPreviousTutorialQuestion", data);
 	}
 	/**
 	 * Fires an event when a user goes back to a previous question during an analysis.
 	 */
 	function onShowPreviousQuestion(){
-		analytics.fireEvent("action.showPreviousQuestion", {"taskId":taskId_});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.showPreviousQuestion", data);
 	}
 	/**
 	 * Fires an event when a user clicks the 'Show Comments' button during a tutorial.
 	 */
 	function onShowTutorialComments(){
-		analytics.fireEvent("action.showTutorialComments");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.showTutorialComments", data);
 	}
 	/**
 	 * Fires an event when a user clicks the 'Show Comments' button during an analysis.
 	 */
 	function onShowComments(){
-		analytics.fireEvent("action.showComments", {"taskId":taskId_});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.showComments", data);
 	}
 	/**
 	 * Fires an event when a user clicks a question's help toggle during a tutorial.
 	 */
 	function onShowTutorialHelp(){
-		analytics.fireEvent("action.showTutorialHelp");
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_
+		};
+		analytics.fireEvent("action.showTutorialHelp", data);
 	}
 	/**
 	 * Fires an event when a user clicks a question's help toggle during an analysis.
 	 */
 	function onShowHelp(){
-		analytics.fireEvent("action.showHelp", {"taskId":taskId_});
+		var data = {
+			"projectId":projectId_,
+			"questionId":questionId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.showHelp", data);
 	}
 
 	// Expose the API.

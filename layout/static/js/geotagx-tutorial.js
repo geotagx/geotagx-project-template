@@ -65,7 +65,6 @@
 		});
 
 		geotagx.questionnaire.start(1);
-		geotagx.analytics.start(shortName);
 	};
 
 	function setTutorial(tutorial){
