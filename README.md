@@ -79,8 +79,8 @@ project via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/u
 
 ## Configuration files
 `geotagx-project-template` currently supports two types of configuration files   
-	* JSON : https://github.com/geotagx/geotagx-project-sample/blob/master/project.json
-	* YAML : https://github.com/geotagx/geotagx-project-sample/blob/master/project.yaml.sample
+* JSON : https://github.com/geotagx/geotagx-project-sample/blob/master/project.json
+* YAML : https://github.com/geotagx/geotagx-project-sample/blob/master/project.yaml.sample
 
 It first looks for a `project.json` file in the project directory, and if it doesnt find one, then it also looks for 
 a `project.yaml` file.
