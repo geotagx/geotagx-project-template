@@ -76,3 +76,11 @@ python build.py sample/
 The `build.py` script should produce a `template.html` file, i.e. the
 project's task presenter, in the project's folder. You can now setup the
 project via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface) or [command line interface](http://pybossa.readthedocs.org/en/latest/user/pbs.html).
+
+## Configuration files
+`geotagx-project-template` currently supports two types of configuration files   
+	* JSON : https://github.com/geotagx/geotagx-project-sample/blob/master/project.json
+	* YAML : https://github.com/geotagx/geotagx-project-sample/blob/master/project.yaml.sample
+
+It first looks for a `project.json` file in the project directory, and if it doesnt find one, then it also looks for 
+a `project.yaml` file.

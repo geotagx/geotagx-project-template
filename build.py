@@ -23,7 +23,7 @@ def has_valid_project(path):
 	"""Returns true if the directory with the specified path is writable, and contains a valid GeoTag-X project, false otherwise."""
 	return  os.path.isdir(path) \
 		and os.access(path, os.W_OK) \
-		and os.access(os.path.join(path, "project.json"), os.F_OK | os.R_OK)
+		and (os.access(os.path.join(path, "project.json"), os.F_OK | os.R_OK) or os.access(os.path.join(path, "project.yaml"), os.F_OK | os.R_OK))
 
 
 def is_valid_project_json(json):
@@ -32,11 +32,18 @@ def is_valid_project_json(json):
 	return True
 
 
-def get_project_json(filename):
+def get_project_json(project_dir):
 	"""Converts the project.json file into a JSON object and returns it."""
-	with open(filename) as file:
-		data = file.read()
-		return json.loads(data)
+	if os.access(os.path.join(project_dir, "project.json"), os.F_OK | os.R_OK):
+		filename = os.path.join(project_dir, "project.json")
+		with open(filename) as file:
+			data = file.read()
+			return json.loads(data)
+	elif os.access(os.path.join(project_dir, "project.yaml"), os.F_OK | os.R_OK):
+		import yaml
+		filename = os.path.join(project_dir, "project.yaml")
+		with open(filename) as file:
+			return yaml.load(file)
 
 
 def get_template_css(compress):
@@ -118,6 +125,7 @@ def get_questionnaire_flow_handler(questions):
 			for entry in branch:
 				for key in entry:
 					answer = key.lower()
+					answer = answer.replace("'","") #Handle quoted versions of Yes and No in YAML
 					next_question = decode_question_id(entry.get(key))
 
 					if question_type == "binary" and answer == "no":
@@ -209,7 +217,7 @@ def build(path, compress=False):
 	"""Builds the task presenter for the project located at the specified path."""
 	project_dir = os.path.realpath(path)
 
-	json = get_project_json(os.path.join(project_dir, "project.json"))
+	json = get_project_json(project_dir)
 	if not is_valid_project_json(json):
 		print "Error! The 'project.json' file is not valid."
 		sys.exit(1)
