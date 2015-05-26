@@ -8,10 +8,6 @@
 {% if js %}<script type="text/javascript">{{js}}</script>{% endif %}
 <script>
 $(document).ready(function(){
-{% if is_tutorial %}
-    geotagx.tutorial.start("{{slug}}", {{get_next_question}}, {{tutorial}});
-{% else %}
-    geotagx.project.start("{{slug}}", {{get_next_question}});
-{% endif %}
+    geotagx.project.start("{{slug}}", {{get_next_question}}{% if is_tutorial %}, true, {{tutorial}}{% endif %});
 });
 </script>

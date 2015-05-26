@@ -12,20 +12,24 @@
 	 * @param shortName the project's short name.
 	 * @param getNextQuestion a user-defined function that returns the id of the next question to present to the user.
 	 */
-	api_.start = function(shortName, getNextQuestion){
+	api_.start = function(shortName, getNextQuestion, isTutorial, tutorial){
 		if ($.type(shortName) !== "string"){
 			console.log("[geotagx::project::start] Error! Invalid project slug.");
 			return;
 		}
 		shortName_ = shortName;
 
-		geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
+		if (isTutorial)
+			geotagx.tutorial.start(shortName, getNextQuestion, tutorial);
+		else {
+			geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
 
-		pybossa.taskLoaded(onTaskLoaded);
-		pybossa.presentTask(onTaskPresented);
-		pybossa.run(shortName_);
+			pybossa.taskLoaded(onTaskLoaded);
+			pybossa.presentTask(onTaskPresented);
+			pybossa.run(shortName_);
+		}
 
-		geotagx.analytics.start(shortName_);
+		geotagx.analytics.onProjectChanged(shortName_);
 	};
 	/**
 	 * Returns the project's short name.
