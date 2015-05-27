@@ -9,11 +9,7 @@
 	var projectId_ = null; // The current project's short name.
 	var questionId_ = 0; // The current question number.
 
-	$(document).ready(function(){
-		// If analytics is not enabled, do nothing.
-		if (!window.analyticsListener)
-			return;
-
+	$(document).on("gtmready", function(){
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
 		//FIXME Image scrolling (zooming) events aren't generated...
