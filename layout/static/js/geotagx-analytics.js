@@ -13,8 +13,8 @@
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
 		//FIXME Image scrolling (zooming) events aren't generated...
-		$("#project-task-presenter.tutorial #image").on("zoom.analytics", onTutorialImageZoom);
-		$("#project-task-presenter.analysis #image").on("zoom.analytics", onImageZoom);
+		$("#project-task-presenter.tutorial #image").on("scroll.analytics", _debounce(onTutorialImageZoom, 350));
+		$("#project-task-presenter.analysis #image").on("scroll.analytics", _debounce(onImageZoom, 350));
 
 		$("#project-task-presenter.tutorial #image-source").on("click.analytics", onShowTutorialImageSource);
 		$("#project-task-presenter.analysis #image-source").on("click.analytics", onShowImageSource);
