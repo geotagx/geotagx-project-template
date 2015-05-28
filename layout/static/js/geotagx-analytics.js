@@ -8,6 +8,7 @@
 	var taskId_ = 0; // The current task's identifier.
 	var projectId_ = null; // The current project's short name.
 	var questionId_ = 0; // The current question number.
+	var previousQuestionId_ = 0; // The previous question number.
 
 	$(document).on("gtmready", function(){
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
@@ -46,6 +47,7 @@
 	 * @param questionId the current question identifier.
 	 */
 	api_.onQuestionChanged = function(questionId){
+		previousQuestionId_ = questionId_;
 		questionId_ = questionId;
 	};
 	/**
@@ -72,9 +74,13 @@
 	 * Fires an event when a user answers a question during an analysis.
 	 */
 	function onAnswerQuestion(){
+		// Note that we use the previousQuestionId_ because the onQuestionChanged
+		// function is called before this event handler, effectively changing the
+		// value of questionId_ before we have the chance to read it.
+		// However, previousQuestionId_ holds the value we are looking for.
 		var data = {
 			"projectId":projectId_,
-			"questionId":questionId_,
+			"questionId":previousQuestionId_,
 			"taskId":taskId_,
 			"buttonValue":$(this).val()
 		};
@@ -126,9 +132,13 @@
 	 * Fires an event when a user goes back to a previous question during a tutorial.
 	 */
 	function onShowPreviousTutorialQuestion(){
+		// Note that we use the previousQuestionId_ because the onQuestionChanged
+		// function is called before this event handler, effectively changing the
+		// value of questionId_ before we have the chance to read it.
+		// However, previousQuestionId_ holds the value we are looking for.
 		var data = {
 			"projectId":projectId_,
-			"questionId":questionId_
+			"questionId":previousQuestionId_
 		};
 		analytics.fireEvent("action.showPreviousTutorialQuestion", data);
 	}
@@ -136,9 +146,13 @@
 	 * Fires an event when a user goes back to a previous question during an analysis.
 	 */
 	function onShowPreviousQuestion(){
+		// Note that we use the previousQuestionId_ because the onQuestionChanged
+		// function is called before this event handler, effectively changing the
+		// value of questionId_ before we have the chance to read it.
+		// However, previousQuestionId_ holds the value we are looking for.
 		var data = {
 			"projectId":projectId_,
-			"questionId":questionId_,
+			"questionId":previousQuestionId_,
 			"taskId":taskId_
 		};
 		analytics.fireEvent("action.showPreviousQuestion", data);
