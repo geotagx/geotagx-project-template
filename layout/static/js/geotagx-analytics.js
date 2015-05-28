@@ -12,7 +12,6 @@
 	$(document).on("gtmready", function(){
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
-		//FIXME Image scrolling (zooming) events aren't generated...
 		$("#project-task-presenter.tutorial #image").on("scroll.analytics", _debounce(onTutorialImageZoom, 350));
 		$("#project-task-presenter.analysis #image").on("scroll.analytics", _debounce(onImageZoom, 350));
 
