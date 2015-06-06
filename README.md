@@ -4,8 +4,8 @@ GeoTag-X project template
 This is the template off which all projects for the [GeoTag-X](http://geotagx.org) platform are based. To build and
 use it, you'll need to download it first
 ```
-git clone https://github.com/spMohanty/geotagx_project_template.git
-cd geotagx_project_template/
+git clone https://github.com/geotagx/geotagx-project-template.git
+cd geotagx-project-template/
 ```
 
 
@@ -73,9 +73,8 @@ The sample `sample` directory should now contain the entire sample project. To b
 python build.py sample/
 ```
 
-The `build.py` script should produce a `template.html` file, i.e. the
-project's task presenter, in the project's folder. You can now setup the
-project via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface) or [command line interface](http://pybossa.readthedocs.org/en/latest/user/pbs.html).
+The `build.py` script should produce a project's task presenter `template.html`, and its tutorial if a valid `tutorial.json` or `tutorial.yaml` file exists,
+in the project's folder. You can now upload the project to your server via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface) or [command line interface](http://pybossa.readthedocs.org/en/latest/user/pbs.html).
 
 ## Configuration files
 `geotagx-project-template` currently supports two types of configuration files   
