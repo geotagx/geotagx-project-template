@@ -40,6 +40,12 @@
 						content:"You will be tasked with analysing an image. When you complete an analysis, a new image will be presented to you."
 					},
 					{
+						element: "#questionnaire-question-1 > .answer button[value='NotClear']",
+						placement:"bottom",
+						title:"Image not clear",
+						content:"If the image is not clear, blurry or its quality is too poor, you can skip it by selecting this."
+					},
+					{
 						element: "#questionnaire-question-1 > .title",
 						placement:"bottom",
 						title:"The Question",
@@ -55,8 +61,15 @@
 						element: "#image-source",
 						placement:"bottom",
 						title:"Image source",
-						content:"... and the image source. More often than not, the source will give you a context as well as additional information that may prove to be invaluable."
+						content:"... and the image source. More often than not, the source will give you contextual information that may prove to be invaluable."
+					},
+					{
+						element: "#questionnaire-question-1 > .answer button[value='Unknown']",
+						placement:"bottom",
+						title:"You're only human",
+						content:"Sometimes a question may prove challenging. If you can not answer it, your best bet is to select this answer."
 					}
+
 				]
 			});
 			questionnaireTour_.init();
