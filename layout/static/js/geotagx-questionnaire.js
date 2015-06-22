@@ -105,20 +105,8 @@
 							$olMapSearchInput.val(result.display_name);
 
 							var view = olMap_.getView();
-							view.setCenter(ol.proj.transform([result.lon, result.lat], "EPSG:4326", "EPSG:900913"));
-							view.setZoom(4);
-
-							console.log(result);
-
-
-
-/*
-	                        var result         = results[0];
-	                        var fromProjection = new OpenLayers.Projection("EPSG:4326"); // Transform from WGS 1984 ...
-	                        var toProjection   = new OpenLayers.Projection("EPSG:900913"); // ... to Spherical Mercator.
-	                        var coordinates    = new OpenLayers.LonLat(result.lon, result.lat).transform(fromProjection, toProjection);
-	                        var zoomFactor     = 10;
-*/
+							view.setCenter(ol.proj.transform([parseFloat(result.lon), parseFloat(result.lat)], "EPSG:4326", "EPSG:3857"));
+							view.setZoom(7);
 	                    }
 	                    else
 	                        console.log("Location not found!"); // e.g. xyxyxyxyxyxyx
