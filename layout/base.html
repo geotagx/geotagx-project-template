@@ -2,6 +2,9 @@
 {% if css %}<style type="text/css">{{css}}</style>{% endif %}
 {% include 'messages.html' %}
 <div id="project-task-presenter" class="row {% if is_tutorial %}tutorial{% else %}analysis{% endif %}">
+    <section id="participation-appreciation-section" class="col-xs-12 hide">
+        <p>Thank you very much for participating! You have completed all available tasks for this project but it still needs more volunteers, so please spread the word!
+    </section>
     {% include "questionnaire.html" %}
     {% include "image.html" %}
 </div>

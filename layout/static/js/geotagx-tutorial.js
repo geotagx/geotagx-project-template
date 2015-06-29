@@ -57,10 +57,9 @@
 		$("#tutorial-next-question").on("click.tutorial", function(){
 			hideNotification(function(){ geotagx.questionnaire.showQuestion(nextQuestion) });
 		});
-		$("#tutorial-another").on("click.tutorial", function(){
+		$("#take-another-tutorial").on("click.tutorial", function(){
 			currentTutorial_ = (currentTutorial_ + 1) % numberOfTutorials_;
 			setTutorial(tutorial[currentTutorial_]);
-			geotagx.questionnaire.showFullSummary(false);
 			geotagx.questionnaire.start(1);
 		});
 

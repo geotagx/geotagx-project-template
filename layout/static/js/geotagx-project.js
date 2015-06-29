@@ -68,24 +68,64 @@
 			// Set the submission button's handler. Note that off().on() removes the previous handler
 			// and sets a new one, every time a new task is loaded. This prevents a chain of events
 			// being called when a button is pushed once.
-			$("#questionnaire-submit").off("click.task").on("click.task", function(){
-				var $button = $(this);
-				$button.prop("disabled", true);
+			$("#submit-analysis").off("click.task").on("click.task", function(){
+				var $busyIcon = $("#questionnaire-busy-icon");
+
+				// Disable the submit button and display the busy icon.
+				$busyIcon.removeClass("hide").hide().fadeIn(300);
+
+				var $submitButton = $(this);
+				$submitButton.toggleClass("busy btn-success");
+				$submitButton.prop("disabled", true);
 
 				// Append the image URL to the questionnaire results.
 				var taskRun_ = geotagx.questionnaire.getAnswers();
 				taskRun_.img = task.info.image_url;
 
 				pybossa.saveTask(task.id, taskRun_).done(function(){
-					geotagx.questionnaire.showFullSummary(false);
+					$busyIcon.fadeOut(300, function(){ $(this).addClass("hide"); });
 
-					$button.prop("disabled", false);
-					deferred.resolve();
+					// Display the status message.
+					var $message = $("#submit-message-success");
+					$message.removeClass("hide");
+					setTimeout(function(){
+						deferred.resolve();
+						$message.addClass("hide");
+						$submitButton.toggleClass("busy btn-success");
+						$submitButton.prop("disabled", false);
+					}, 1500);
+				}).fail(function(response){
+					$busyIcon.fadeOut(300, function(){ $(this).addClass("hide"); });
+					$submitButton.toggleClass("busy btn-success");
+					$submitButton.prop("disabled", false);
+
+					var $message = $("#submit-message-failure");
+
+					// If the status code is 403 (FORBIDDEN), then we assume that the
+					// data was sent but the deferred object has not yet been resolved.
+					if (error.status === 403){
+						deferred.resolve();
+						$message.addClass("hide");
+					}
+					else {
+						console.log(response);
+
+						$message.removeClass("hide");
+						$submitButton.one("click", function(){
+							$message.addClass("hide");
+						});
+					}
 				});
 			});
-
 			geotagx.analytics.onTaskChanged(task.id);
 			geotagx.questionnaire.start(1);
+		}
+		else {
+			// If there're no more tasks, then hide the questionnaire and image,
+			// then display the participation appreciation message.
+			$("#participation-appreciation-section").removeClass("hide");
+			$("#questionnaire-section").addClass("hide");
+			$("#image-section").addClass("hide");
 		}
 	}
 	// Expose the API.

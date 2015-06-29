@@ -94,94 +94,10 @@ input[type="checkbox"]
 
 #questionnaire-section
 {
-
 }
-    #questionnaire-summary
-    {
-        position:relative;
-        background:#333;
-        color:#FFF;
-        border-radius:0.3em;
-        overflow:hidden;
-        margin:0 0 0.5em 0;
-        /*font:400 0.8em Open Sans, Lato;*/
-
-
-        /*padding:0 0.5em 0.5em 0.5em;*/
-        /*padding:0.75em;*/
-        /*margin-bottom:1em;*/
-        /*margin:1em 0;*/
-        /*background:red;*/
-
-    }
-        #questionnaire-summary > header
-        {
-            font:400 1em Montserrat;
-            text-transform:uppercase;
-        }
-            #questionnaire-summary.minimized #questionnaire-submit,
-            #questionnaire-summary.minimized #questionnaire-tutorial-complete,
-            #questionnaire-summary.minimized #questionnaire-conclusion
-            {
-                display:none;
-            }
-            #questionnaire-summary-details
-            {
-                color:#AAA;
-                margin:0;
-                padding:0;
-                border:none;
-                font:900 1em Montserrat;
-                text-transform:uppercase;
-                text-decoration:none;
-                transition:color 0.1s ease-in-out;
-                -o-transition:color 0.1s ease-in-out;
-                -ms-transition:color 0.1s ease-in-out;
-                -moz-transition:color 0.1s ease-in-out;
-                -webkit-transition:color 0.1s ease-in-out;
-            }
-            #questionnaire-summary-details:hover
-            {
-                color:#FFF;
-            }
-            #questionnaire-summary-details:focus
-            {
-                outline:0 none;
-            }
-            #questionnaire-summary-details[aria-expanded="true"]  .hide-on-expanded,
-            #questionnaire-summary-details[aria-expanded="false"] .show-on-expanded
-            {
-                display:none;
-            }
-        #questionnaire-summary > ul > li
-        {
-            /*font:400 1em Montserrat;*/
-            font:400 1.1em Noto Sans, Open Sans, Lato;
-        }
-        #questionnaire-submit
-        {
-            color:#000;
-            border-radius:2px;
-            margin-top:0.75em;
-        }
-        #questionnaire-progress-bar
-        {
-            position:absolute;
-            left:0;
-            bottom:0;
-            width:0;
-            height:0.25em;
-            background:#66FFCC;
-            transition:all 0.2s ease-in;
-            -o-transition:all 0.2s ease-in;
-            -ms-transition:all 0.2s ease-in;
-            -moz-transition:all 0.2s ease-in;
-            -webkit-transition:all 0.2s ease-in;
-        }
-
     #questionnaire-rewind
     {
-        margin-bottom:1em;
+        margin:1em 0;
     }
     #questionnaire-rewind:disabled
     {

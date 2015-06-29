@@ -28,10 +28,10 @@
 						content:"It seems as though you are new around here. How about we take a tour?<br><small>Note: You can navigate faster by using the <kbd>&#8592;</kbd> and <kbd>&#8594;</kbd> arrow keys.</small>"
 					},
 					{
-						element: "#questionnaire-summary",
+						element: "#questionnaire-status-panel",
 						placement:"bottom",
-						title:"The Summary",
-						content:"This section provides feedback while you progress through the questionnaire."
+						title:"The Status Panel",
+						content:"This section provides feedback as you progress through the questionnaire."
 					},
 					{
 						element: "#image-section",

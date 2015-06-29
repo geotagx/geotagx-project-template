@@ -1,18 +1,30 @@
 {% import 'helper/questions_helper.html' as questions_helper %}
 <section id="questionnaire-section" class="col-xs-6">
-	<div id="questionnaire-summary" class="well minimized">
-		<header><strong>Your analysis is <span id="questionnaire-percentage-complete">0</span>% complete</strong><button id="questionnaire-summary-details" class="pull-right btn btn-link hide" data-toggle="collapse" data-target="#questionnaire-answer-card" aria-expanded="false"><span class="hide-on-expanded"><i class="fa fa-fw fa-lg fa-info-circle"></i></span><span class="show-on-expanded"><i class="fa fa-fw fa-lg fa-times"></i></span></button></header>
-		<div><ul id="questionnaire-answer-card" class="list-unstyled collapse"></ul></div>
-		{% if is_tutorial %}
-		<div id="questionnaire-tutorial-complete"><p>You have successfully completed one of the project's tutorials.<br>If you feel like you are not quite ready, <button id="tutorial-another" class="btn-link">take another one</button>.<br> However if you think you are ready to help out, <a href="/project/{{slug}}/newtask"><strong>start contributing</strong>!</a></p></div>
-		{% else %}
-		<div><button id="questionnaire-submit" class="btn btn-block btn-success"><span class="hidden-lg hidden-md">Submit</span><span class="hidden-xs hidden-sm">Submit it and load another one</span></button></div>
-		<div id="questionnaire-conclusion">
-			<hr>
-			Thank you very much for your analysis! We appreciate any feedback you may have for us so get on <a target="_blank" href="https://github.com/geotagx/pybossa/issues"><strong>GitHub</strong></a> or <a href="mailto:eleanor.rusack@unitar.org?Subject=GeoTag-X feedback" target="_top"><strong>send us an email</strong></a>.
-		</div>
-		{% endif %}
-		<div id="questionnaire-progress-bar"></div>
+	<div id="questionnaire-status-panel">
+		<header>
+			YOUR CURRENT ANALYSIS IS <span id="current-analysis-progress">0</span>% COMPLETE
+			<div id="questionnaire-busy-icon" class="pull-right hide"><i class="fa fa-pulse fa-spinner"></i></div>
+		</header>
+		<main>
+			<div class="show-on-analysis-complete">
+				{% if is_tutorial %}
+				<p>You have successfully completed one of the project's tutorials however if you feel like you are not quite ready, we highly recommend <a id="take-another-tutorial" class="clickable">taking another</a>.</p>
+				<a class="btn btn-success btn-block" href="/project/{{slug}}/newtask"><strong>START CONTRIBUTING</strong></a>
+				{% else %}
+				<div style="position:relative">
+					<button id="submit-analysis" class="btn btn-block btn-success">
+						<span class="show-on-busy">SUBMITTING ANALYSIS ...</span>
+						<span class="hide-on-busy"><span class="hidden-lg hidden-md">SUBMIT</span><span class="hidden-xs hidden-sm">SUBMIT IT AND LOAD ANOTHER ONE</span></span>
+					</button>
+				</div>
+				<p id="submit-message-success" class="animated fadeIn hide">Your analysis has been submitted successfully!</p>
+				<p id="submit-message-failure" class="animated fadeIn hide">Hmmm, there was an error submitting your analysis. Please try again.</p>
+				<br>
+				<p>Thank you very much for your analysis! We appreciate any feedback you may have for us so get on <a target="_blank" href="https://github.com/geotagx/pybossa/issues">GitHub</a> or <a href="mailto:eleanor.rusack@unitar.org?Subject=GeoTag-X feedback" target="_top">send us an email</a>.</p>
+				{% endif %}
+			</div>
+		</main>
+		<footer><div id="questionnaire-progress"><div id="questionnaire-progress-bar"></div></div></footer>
 	</div>
 	<button id="questionnaire-rewind" class="btn btn-sm btn-default btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
 	<div id="questionnaire-filter" class="question hide">

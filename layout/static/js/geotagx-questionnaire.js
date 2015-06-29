@@ -46,13 +46,6 @@
 				$(siblings[0]).modal(); // The first (and most likely only) sibling should be a modal div; toggle its visibility.
 		});
 
-		// Set the summary details button handler.
-		$("#questionnaire-summary-details").click(function(){
-			// Toggle the expanded attribute to either 'true' or 'false' which will determine whether
-			// to display 'Show' or 'Hide' text (or the respective icons).
-			$(this).attr("aria-expanded", $(this).attr("aria-expanded") === "true" ? "false" : "true");
-		});
-
 		// Set answer button handlers.
 		$(".btn-answer").on("click.questionnaire", function(){
 			var $submitter = $(this);
@@ -216,8 +209,6 @@
 		}
 		else
 			api_.showQuestion(getNextQuestion(question, answer));
-
-		//addAnswerCardEntry(question, answer);									/*FIXME Fix answer card. */
 	}
 	/**
 	 * Displays the previous question, iff it exists.
@@ -230,13 +221,6 @@
 
             // Destroy the current result before loading the previous question.
             saveAnswer(getStorageKey(current), null);
-
-            // Minimize the information displayed on the questionnaire summary.
-            if (isCompleted(current))
-				api_.showFullSummary(false);
-
-            // Remove the previous entry from the answer card.
-            removeAnswerCardEntry(previous);
 
             // Update the progress stack and progress bar.
             progress_.pop();
@@ -344,8 +328,14 @@
 	function updateProgress(){
 		percentageComplete_ = progress_.length > 0 ? (((api_.getCurrentQuestion() - initialQuestion_) / (numberOfQuestions_ - initialQuestion_)) * 100).toFixed(0) : 0;
 
-		$("#questionnaire-percentage-complete").html(percentageComplete_);
+		$("#current-analysis-progress").html(percentageComplete_);
 		$("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
+
+		var $statusPanel = $("#questionnaire-status-panel");
+		if (percentageComplete_ == 100)
+			$statusPanel.addClass("analysis-complete");
+		else
+			$statusPanel.removeClass("analysis-complete");
 	};
 	/**
 	 * Returns true if the question identifier refers to the spam filter, false otherwise.
@@ -359,43 +349,6 @@
 	 */
 	function isCompleted(question){
 		return question === numberOfQuestions_;
-	}
-	/**
-	 * Adds an entry to the user's answer card.
-	 */
-	function addAnswerCardEntry(questionId, answer){
-		var $answerCard = $("#questionnaire-answer-card");
-		if ($answerCard.length > 0){
-			var nodeId = getQuestionNodeId(questionId);
-			if (nodeId){
-				var question = $(nodeId + " > header").html();
-				if (question){
-					var entry = '<li id="questionnaire-answer-card-entry-' + questionId + '">' + question + ' ' + answer + '</li>';
-					$(entry).hide().appendTo("#questionnaire-answer-card").fadeIn(200);
-				}
-			}
-
-			// Enable the summary details button.
-			var numberOfEntries = $("li", $answerCard).length;
-			if ($("#questionnaire-summary-details").hasClass("hide") && numberOfEntries > 0)
-				$("#questionnaire-summary-details").removeClass("hide").hide().fadeIn();
-		}
-	}
-	/**
-	 * Removes the specified question's entry from the user's answer card.
-	 */
-	function removeAnswerCardEntry(question){
-		setTimeout(function(){
-			var $answerCard = $("#questionnaire-answer-card");
-
-			$("#questionnaire-answer-card-entry-" + question).fadeOut(200, function(){
-				$(this).remove();
-
-				var numberOfEntries = $("li", $answerCard).length;
-				if (!$("#questionnaire-summary-details").hasClass("hide") && numberOfEntries == 0)
-					$("#questionnaire-summary-details").fadeOut(80, function(){ $(this).addClass("hide"); });
-			});
-		}, 150);
 	}
 	/**
 	 * Resets all user input.
@@ -428,8 +381,7 @@
 		resetInput();
 		progress_ = [];
 
-		// Reset the answer card and enable comments.
-		$("#questionnaire-answer-card").empty();
+		// Enable "Show Comments" toggle.
 		$("#questionnaire-show-comments").prop("disabled", false);
 
 		// Reset the current task run.
@@ -488,16 +440,6 @@
 		return progress_[progress_.length - 1];
 	};
 	/**
-	 * Displays the complete questionnaire summary if show is set to true, otherwise shows the compact version.
-	 */
-	api_.showFullSummary = function(show){
-		if (show)
-			$("#questionnaire-summary").removeClass("minimized");
-		else
-			$("#questionnaire-summary").addClass("minimized");
-																					if (show) console.log(answers_); /*TODO: Remove when done debugging.*/
-	};
-	/**
 	 * Set a user-defined function that returns the identifier of the next question to present.
 	 * @param hanlder a user-defined function that determines the questionnaire flow.
 	 */
@@ -533,11 +475,8 @@
 			progress_.push(question);
 			updateProgress();
 
-			// If the questionnaire has been completed, display the full questionnaire summary.
-			// If it hasn't, show the next question.
-			if (isCompleted(question))
-				api_.showFullSummary(true);
-			else {
+			// If the questionnaire has not been completed, display the next question.
+			if (!isCompleted(question)){
 				var $element = getQuestionElement(question);
 				$element.removeClass("hide").hide().fadeIn(300, function(){
 					// If the question type is geotagging, then we need to resize the map only when the question is
