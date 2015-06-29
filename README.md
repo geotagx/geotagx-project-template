@@ -35,6 +35,7 @@ Upon successful execution, the environment's directory (encased in parentheses)
 should be appended to your prompt, e.g. `(env)name@domain:~$`.
 
 
+
 ## Installing requirements
 
 To install the template requirements, run
@@ -58,28 +59,57 @@ PS. If you are using a virtual environment, you must activate it each time you
 you wish to run the `build.py` script.
 
 
+
 ## Building the sample project
 
 With the template requirements installed, it should be pretty straightforward
 building your own GeoTag-X project, provided you have the required files in place.
 
-In case you do not have a working project, a [sample project](https://github.com/geotagx/geotagx-project-sample/) is provided.
-It is included as a submodule so you will need to fetch it before it can be used
+The [sample project](https://github.com/geotagx/geotagx-project-sample/) is
+included as a submodule so you will need to fetch it before it can be used
 ```
 git submodule update --init
 ```
-The sample `sample` directory should now contain the entire sample project. To build it, run
+The `sample` directory should now contain the entire sample project. To build it, run
 ```
 python build.py sample/
 ```
 
-The `build.py` script should produce a project's task presenter `template.html`, and its tutorial if a valid `tutorial.json` or `tutorial.yaml` file exists,
-in the project's folder. You can now upload the project to your server via PyBossa's [web interface](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface) or [command line interface](http://pybossa.readthedocs.org/en/latest/user/pbs.html).
+The `build.py` script should produce a task presenter `template.html`, and
+tutorial `tutorial.html` in the project's folder. The sample project is now ready
+to be uploaded to your server via PyBossa's [web](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface)
+or [command line](http://pybossa.readthedocs.org/en/latest/user/pbs.html) interface.
 
-## Configuration files
-`geotagx-project-template` currently supports two types of configuration files   
-* JSON : https://github.com/geotagx/geotagx-project-sample/blob/master/project.json
-* YAML : https://github.com/geotagx/geotagx-project-sample/blob/master/project.yaml.sample
 
-It first looks for a `project.json` file in the project directory, and if it doesnt find one, then it also looks for 
-a `project.yaml` file.
+
+## Building your own project
+
+While it is not necessary to build your project with this template, it does
+greatly simplify the process.
+
+To build your project using this template, we have added a few more requirements
+that you will need to specify in your project structure file. We have also added
+the possibility of defining a tutorial structure file that allows you to create
+a project tutorial.
+
+The template supports both JSON and YAML formats for the structure files.
+
+#### The project structure (project.json/project.yaml)
+
+The project structure used by this template has been extended to include a
+few requirements to help create a project's task presenter. In addition to the
+`name`, `short_name` and `description` fields required by PyBossa, you will need
+to specify the following fields:
+- `why`: a reminder to volunteers about the importance of their contribution to the project.
+- `questions`: a set of questions asked to volunteers.
+
+#### The tutorial structure (tutorial.json/tutorial.yaml)
+
+Project tutorials are a great way of introducing volunteers to your project and
+while optional, it is highly recommended that you include a few in your project.
+
+The tutorial structure is comprised of one or more entries where each entry
+contains the following fields:
+- `image`: a direct link to an image to analyse.
+- `image_source`: a link to a web page that provides contextual information about `image`.
+- `assertions`: a set of assertions about `image`.
