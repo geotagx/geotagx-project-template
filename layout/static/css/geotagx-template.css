@@ -103,32 +103,6 @@ input[type="checkbox"]
     {
         display:none !important;
     }
-
-#image-section
-{
-}
-    #image-loading
-    {
-        position:absolute;
-        font:900 3em Montserrat;
-        text-transform:uppercase;
-        cursor:wait;
-    }
-    #image
-    {
-        cursor:crosshair;
-        border-radius:0.2em;
-        border:1px dashed rgba(0, 0, 0, 0.15);
-    }
-    #image-source-container
-    {
-        margin:0.5em 0;
-        font:400 1.1em Open Sans, Lato;
-    }
-    #image-zoomtip
-    {
-        font:900 1em Lato, Open Sans;
-    }
 #ol-map
 {
     position:relative;

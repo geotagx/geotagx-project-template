@@ -107,6 +107,24 @@
 	            }
 	        });
 		}
+		// Set image zoom button handler.
+		function zoom(image, delta){
+			// Create a wheel event with a pre-calculated point of interest
+			// for the zoom algorithm.
+			var e = new WheelEvent("wheel", {deltaY:delta});
+			e.zoomAt = {
+				x:image.width / 2,
+				y:image.height / 2
+			};
+
+			// Fire the event which should be picked up by the wheelzoom library.
+			if (document.dispatchEvent)
+				image.dispatchEvent(e);
+			else
+				image.fireEvent("onwheel", e);
+		}
+		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
+		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
 	});
 	/**
 	 * Creates an OpenLayers map.
