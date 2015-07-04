@@ -36,7 +36,15 @@ input[type="checkbox"]
 {
     margin-top:1em;
 }
-
+    .answer .show-on-item-selected,
+    .answer.item-selected .hide-on-item-selected
+    {
+        display:none;
+    }
+    .answer.item-selected .show-on-item-selected
+    {
+        display:inline;
+    }
 
 .help-toggle
 {

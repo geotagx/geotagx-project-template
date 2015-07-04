@@ -125,6 +125,20 @@
 		}
 		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
 		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
+
+		// Set up handlers that change "None of the above" into "Done" and
+		// vice versa, for questions with multiple answers.
+		$(".answer input").on("change.questionnaire", function(){
+			var $input = $(this);
+			var inputName = $input.attr("name");
+			var $parent = $(".answer[data-saved-as='" + inputName + "']");
+
+			// If the current input is not checked, find at least one that shares the same name.
+			if ($input.is(":checked") || $("input[name=" + inputName + "]:checked").length > 0)
+				$parent.addClass("item-selected");
+			else
+				$parent.removeClass("item-selected");
+		});
 	});
 	/**
 	 * Creates an OpenLayers map.
@@ -374,6 +388,7 @@
 	function resetInput(){
 		$("input").removeAttr("checked");
 		$("input:text").val("");
+		$(".answer").removeClass("item-selected");
 
 		resetMap(true);
 	}

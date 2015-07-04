@@ -48,7 +48,7 @@
     <label><input type="radio" value="{{key}}" name="{{answer.saved_as}}">{{choice[key]}}</label><br>
     {%- endfor %}
 	{%- endfor %}
-    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    <button class="btn btn-answer btn-primary btn-sm" value="Done"><span class="hide-on-item-selected">None of the above</span><span class="show-on-item-selected">Done</span></button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
 </div>
@@ -59,10 +59,10 @@
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     {% for choice in answer.choices -%}
     {% for key in choice -%}
-    <label><input type="checkbox" value="{{key}}">{{choice[key]}}</label><br>
+    <label><input type="checkbox" value="{{key}}" name="{{answer.saved_as}}">{{choice[key]}}</label><br>
     {%- endfor %}
 	{%- endfor %}
-    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    <button class="btn btn-answer btn-primary btn-sm" value="Done"><span class="hide-on-item-selected">None of the above</span><span class="show-on-item-selected">Done</span></button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 	<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
 </div>
@@ -78,7 +78,7 @@
         {% set modal_id = ["question-", question_id, "-illustration-", loop.index]|join() %}
         <div class="col-xs-4 illustration">
             <a href="#" data-target="#{{modal_id}}" data-toggle="modal"><img src="{{illustration.image}}" class="illustration-img img-responsive"></a>
-            <label class="illustration-label"><input type="checkbox" value="{{choice.value}}">{{choice.label}}</label>
+            <label class="illustration-label"><input type="checkbox" value="{{choice.value}}" name="{{answer.saved_as}}">{{choice.label}}</label>
             {% call modal(modal_id) %}
             <div><img src="{{illustration.image}}" class="img-responsive"></div>
             <p>The original image and its context can be found <a rel="nofollow" target="_blank" href="{{source.url}}">here</a>, courtesy of <strong>{{source.name}}</strong>. {% if choice.more_examples %}If this image is not descriptive enough, you can find some more examples <a rel="nofollow" target="_blank" href="{{choice.more_examples}}">here</a>.{% endif %}</p>
@@ -87,11 +87,11 @@
         {%- endfor %}
         <div class="clearfix visible-xs-block"></div>
         <div class="col-xs-12 illustration">
-            <input class="form-control illustration-input" type="text" placeholder="Enter any suggestions that do not appear above.">
+            <input class="form-control illustration-input" type="text" placeholder="Enter any suggestions that do not appear above." name="{{answer.saved_as}}">
         </div>
     </div>
     <div>
-    	<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+        <button class="btn btn-answer btn-primary btn-sm" value="Done"><span class="hide-on-item-selected">None of the above</span><span class="show-on-item-selected">Done</span></button>
     	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
     	<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
     </div>
