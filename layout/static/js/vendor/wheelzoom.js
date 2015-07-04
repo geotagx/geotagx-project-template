@@ -185,11 +185,10 @@
         if (img.complete){
             loaded();
         } else {
-            function onload(){
+            img.addEventListener('load', function(){
                 img.removeEventListener('load', onload);
                 loaded();
-            }
-            img.addEventListener('load', onload);
+            });
         }
     };
 
