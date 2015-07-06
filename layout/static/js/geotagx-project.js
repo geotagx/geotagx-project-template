@@ -55,6 +55,11 @@
 			$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);
 			$(".hide-on-task-loaded").hide();
 
+			// Update the user progress.
+			pybossa.userProgress(shortName_).done(function(data){
+				$("#project-task-count").text(data.done + "/" + data.total);
+			});
+
 			// Initialize the image to analyze.
 			var $image = $("#image");
 			if ($image.length > 0){
@@ -126,6 +131,7 @@
 			$("#participation-appreciation-section").removeClass("hide");
 			$("#questionnaire-section").addClass("hide");
 			$("#image-section").addClass("hide");
+			$("#project-task-presenter-header").addClass("hide");
 		}
 	}
 	// Expose the API.

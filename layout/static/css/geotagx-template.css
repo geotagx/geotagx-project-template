@@ -96,7 +96,20 @@ input[type="checkbox"]
         }
 
 
-
+#project-contribution-reminder > .header
+{
+    font:400 0.8em Montserrat !important;
+    color:#444;
+    text-transform:uppercase;
+}
+#project-task-progress
+{
+    font:400 0.8em Montserrat;
+}
+    #project-task-count
+    {
+        font-size:3em;
+    }
 
 
 
