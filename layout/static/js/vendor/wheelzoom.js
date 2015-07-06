@@ -5,8 +5,6 @@
  * Author: Jeremy Othieno.
  */
 ; window.wheelzoom = (function(){
-    "use strict";
-
     var defaults = {
         zoom: 0.10
     };
@@ -185,10 +183,11 @@
         if (img.complete){
             loaded();
         } else {
-            img.addEventListener('load', function(){
+            function onload(){
                 img.removeEventListener('load', onload);
                 loaded();
-            });
+            }
+            img.addEventListener('load', onload);
         }
     };
 
