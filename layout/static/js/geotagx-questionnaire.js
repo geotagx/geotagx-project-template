@@ -307,6 +307,12 @@
 					return answer;
 				case "geotagging":
 					return getMapSelection();
+				case "textinput":
+					var $input = $("input[type='text']", $submitter.siblings());
+					return $input.length > 0 ? inputToString($input) : "";
+				case "textarea":
+					var $input = $("textarea", $submitter.siblings());
+					return $input.length > 0 ? inputToString($input) : "";
 			}
 		}
 		else
