@@ -394,6 +394,7 @@
 	function resetInput(){
 		$("input").removeAttr("checked");
 		$("input:text").val("");
+		$("textarea").val("");
 		$(".answer").removeClass("item-selected");
 
 		resetMap(true);
