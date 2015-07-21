@@ -57,12 +57,27 @@
 		{% endif %}
 
 		{%   if question.type == "binary"                      %}{{questions_helper.binary_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "single_choice"               %}{{questions_helper.single_choice_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "illustrated_multiple_choice" %}{{questions_helper.illustrated_multiple_choice_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "multiple_choice"             %}{{questions_helper.multiple_choice_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "select"                      %}{{questions_helper.select_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "radiolist"                   %}{{questions_helper.radiolist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "checklist"                   %}{{questions_helper.checklist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "illustrative-checklist"      %}{{questions_helper.illustrative_checklist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "text"                        %}{{questions_helper.text_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "longtext"                    %}{{questions_helper.longtext_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "number"                      %}{{questions_helper.number_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "date"                        %}{{questions_helper.date_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "time"                        %}{{questions_helper.time_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "datetime"                    %}{{questions_helper.datetime_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "url"                         %}{{questions_helper.url_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "textinput"                   %}{{questions_helper.textinput_answer(question.id, question.answer, has_help)}}
-		{% elif question.type == "textarea"                    %}{{questions_helper.textarea_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "custom"                      %}{{questions_helper.custom_answer(question.id, question.answer, has_help)}}
+
+		{# Deprecated types, kept for backwards compatibility #}
+		{% elif question.type == "single_choice"               %}{{questions_helper.radiolist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "multiple_choice"             %}{{questions_helper.checklist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "illustrated_multiple_choice" %}{{questions_helper.illustrative_checklist_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "textarea"                    %}{{questions_helper.longtext_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "textinput"                   %}{{questions_helper.text_answer(question.id, question.answer, has_help)}}
+
 		{% endif %}
 	</div>
 	{%- endfor %}

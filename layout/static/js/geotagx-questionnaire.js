@@ -289,30 +289,28 @@
 		var answer = $submitter.attr("value");
 		if (answer === "Done"){
 			switch (questionType){
-				case "single_choice":
+				case "radiolist":
 					var $input = $("input:checked", $submitter.siblings("label"));
 					return $input.length > 0 ? $input.val() : "None";
-				case "multiple_choice":
+				case "checklist":
 					var $input = $("input:checked", $submitter.siblings("label"));
 					return $input.length > 0 ? inputToString($input) : "None";
-				case "illustrated_multiple_choice":
+				case "illustrative-checklist":
 					var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
 					var $input = $("input[type='checkbox']:checked", $illustrations);
 
 					answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
-					answer =
-					answer ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
-					       : ($input.length === 0 ? "None" : inputToString($input));
-
-					return answer;
+					return answer
+					     ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
+					     : ($input.length === 0 ? "None" : inputToString($input));
 				case "geotagging":
 					return getMapSelection();
-				case "textinput":
+				case "text":
 					var $input = $("input[type='text']", $submitter.siblings());
-					return $input.length > 0 ? inputToString($input) : "";
-				case "textarea":
+					return $input.length > 0 ? $.trim($input.val()) : "";
+				case "longtext":
 					var $input = $("textarea", $submitter.siblings());
-					return $input.length > 0 ? inputToString($input) : "";
+					return $input.length > 0 ? $.trim($input.val()) : "";
 			}
 		}
 		else

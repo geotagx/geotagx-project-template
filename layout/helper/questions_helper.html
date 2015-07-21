@@ -41,7 +41,13 @@
 {%- endmacro %}
 
 
-{% macro single_choice_answer(question_id, answer, has_help) -%}
+{% macro select_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
+{% macro radiolist_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     {% for choice in answer.choices -%}
     {% for key in choice -%}
@@ -55,7 +61,7 @@
 {%- endmacro %}
 
 
-{% macro multiple_choice_answer(question_id, answer, has_help) -%}
+{% macro checklist_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     {% for choice in answer.choices -%}
     {% for key in choice -%}
@@ -69,7 +75,7 @@
 {%- endmacro %}
 
 
-{% macro illustrated_multiple_choice_answer(question_id, answer, has_help) -%}
+{% macro illustrative_checklist_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     <div class="row illustrations">
         {% for choice in answer.choices -%}
@@ -99,6 +105,56 @@
 {%- endmacro %}
 
 
+{% macro text_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    <div style="margin:0.5em 0 1em 0"><input type="text" class="form-control"></div>
+    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
+    <button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
+</div>
+{%- endmacro %}
+
+
+{% macro longtext_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+    <div style="margin:0.5em 0 1em 0"><textarea class="form-control"></textarea></div>
+    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+    <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
+    <button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
+</div>
+{%- endmacro %}
+
+
+{% macro number_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
+{% macro date_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
+{% macro time_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
+{% macro datetime_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
+{% macro url_answer(question_id, answer, has_help) -%}
+<div class="answer" data-saved-as="{{answer.saved_as}}">
+</div>
+{%- endmacro %}
+
+
 {% macro geotagging_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     <p>Select a region on the map within which you think this image comes from. You can also quickly zoom in on a location by searching for it.</p>
@@ -113,21 +169,7 @@
 {%- endmacro %}
 
 
-{% macro textinput_answer(question_id, answer, has_help) -%}
+{% macro custom_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
-    <div style="margin:0.5em 0 1em 0"><input type="text" class="form-control"></div>
-    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-    <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
-    <button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
-</div>
-{%- endmacro %}
-
-
-{% macro textarea_answer(question_id, answer, has_help) -%}
-<div class="answer" data-saved-as="{{answer.saved_as}}">
-    <div style="margin:0.5em 0 1em 0"><textarea class="form-control"></textarea></div>
-    <button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
-    <button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
-    <button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
 </div>
 {%- endmacro %}
