@@ -41,13 +41,13 @@
 {%- endmacro %}
 
 
-{% macro select_answer(question_id, answer, has_help) -%}
+{% macro dropdown_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
 </div>
 {%- endmacro %}
 
 
-{% macro radiolist_answer(question_id, answer, has_help) -%}
+{% macro select_answer(question_id, answer, has_help) -%}
 <div class="answer" data-saved-as="{{answer.saved_as}}">
     {% for choice in answer.choices -%}
     {% for key in choice -%}

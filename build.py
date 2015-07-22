@@ -228,6 +228,19 @@ def build(path, compress=False):
 	questions_         = json["questions"]
 	get_next_question_ = get_questionnaire_flow_handler(questions_)
 
+	# Add backwards compatibility for old question type names.
+	question_types = {
+		"single_choice":"select",
+		"multiple_choice":"checklist",
+		"illustrated_multiple_choice":"illustrative-checklist",
+		"textinput":"text",
+		"textarea":"longtext"
+	}
+	for question in questions_:
+		new_type = question_types.get(question["type"])
+		if new_type:
+			question["type"] = new_type
+
 	# Assign the help to its corresponding question.
 	help = get_project_help(os.path.join(project_dir, "help"))
 	if len(help) > 0:

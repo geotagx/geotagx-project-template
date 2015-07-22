@@ -289,7 +289,7 @@
 		var answer = $submitter.attr("value");
 		if (answer === "Done"){
 			switch (questionType){
-				case "radiolist":
+				case "select":
 					var $input = $("input:checked", $submitter.siblings("label"));
 					return $input.length > 0 ? $input.val() : "None";
 				case "checklist":
