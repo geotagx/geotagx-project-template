@@ -108,7 +108,7 @@
 
 					// If the status code is 403 (FORBIDDEN), then we assume that the
 					// data was sent but the deferred object has not yet been resolved.
-					if (error.status === 403){
+					if (response.status === 403){
 						deferred.resolve();
 						$message.addClass("hide");
 					}
