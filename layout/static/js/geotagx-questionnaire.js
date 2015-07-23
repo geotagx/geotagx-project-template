@@ -329,22 +329,10 @@
 			console.log("[geotagx::questionnaire::saveAnswer] Error! Invalid storage key. Answer discarded...");
 	};
 	/**
-	 * Returns the specified question's HTML node identifier.
-	 */
-	function getQuestionNodeId(question){
-		return question > 0 && question < numberOfQuestions_ ? "#questionnaire-question-" + question : question === 0 ? "#questionnaire-filter" : null;
-	}
-	/**
-	 * Returns the current question's HTML node identifier.
-	 */
-	function getCurrentQuestionNodeId(){
-		return getQuestionNodeId(api_.getCurrentQuestion());
-	}
-	/**
 	 * Returns the specified question's HTML node.
 	 */
 	function getQuestionElement(question){
-		return $(getQuestionNodeId(question));
+		return $(".question[data-id='" + question + "']");
 	}
 	/**
 	 * Returns the current question's HTML node.
@@ -403,10 +391,11 @@
 	 */
 	function getStorageKey(question){
 		var key = null;
-		var nodeId = getQuestionNodeId(question);
-		if (nodeId){
-			var field = $(nodeId + " > div.answer").data("saved-as");
-			key = field ? field : null;
+		var $node = $("div.answer", getQuestionElement(question));
+		if ($node){
+			var savedAs = $node.data("saved-as");
+			if (savedAs)
+				key = savedAs;
 		}
 		return key;
 	}
@@ -435,8 +424,8 @@
 		api_.showQuestion(initialQuestion_);
 
 		// Start a questionnaire tour.
-		if (!geotagx.tour.questionnaireTourEnded())
-			setTimeout(geotagx.tour.startQuestionnaireTour, 1000);
+		// if (!geotagx.tour.questionnaireTourEnded())
+			setTimeout(geotagx.tour.startQuestionnaireTour, 4000);
 	};
 	/**
 	 * Returns the number of questions.

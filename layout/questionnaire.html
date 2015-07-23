@@ -27,7 +27,8 @@
 		<footer><div id="questionnaire-progress"><div id="questionnaire-progress-bar"></div></div></footer>
 	</div>
 	<button id="questionnaire-rewind" class="btn btn-sm btn-default btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
-	<div id="questionnaire-filter" class="question hide">
+{#
+	<div id="questionnaire-filter" class="question" data-type="binary" data-id="0">
 		<header>Is this photo spam?</header>
 		<p>Sometimes, people collecting photos might accidentally send something that is not useful like an advertisement. If this photo is an advertisement or similar, you should choose <button class="btn btn-danger btn-xs" disabled>Yes</button> and it will be skipped.</p>
 		<p>If you are not sure whether the photo is spam, selecting <button class="btn btn-xs btn-warning" disabled>I don't know</button> will also skip the image.</p>
@@ -40,9 +41,10 @@
 			<button class="btn btn-answer btn-default btn-sm" value="NoPhoto">No photo</button>
 		</div>
 	</div>
+#}
 	{% if questions %}
 	{% for question in questions -%}
-	<div id="questionnaire-question-{{question.id}}" class="question hide" data-type="{{question.type}}">
+	<div id="questionnaire-question-{{question.id}}" class="question hide" data-type="{{question.type}}" data-id="{{question.id}}">
 		<header class="title">{{question.title}}</header>
 
 		{% if question.hint %}
