@@ -424,8 +424,8 @@
 		api_.showQuestion(initialQuestion_);
 
 		// Start a questionnaire tour.
-		// if (!geotagx.tour.questionnaireTourEnded())
-			setTimeout(geotagx.tour.startQuestionnaireTour, 4000);
+		if (!geotagx.tour.questionnaireTourEnded())
+			setTimeout(geotagx.tour.startQuestionnaireTour, 1000);
 	};
 	/**
 	 * Returns the number of questions.
