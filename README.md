@@ -1,5 +1,4 @@
-GeoTag-X project template
-=========================
+# GeoTag-X project template
 
 This is the template off which all projects for the [GeoTag-X](http://geotagx.org) platform are based. To build and
 use it, you'll need to download it first
@@ -88,28 +87,32 @@ While it is not necessary to build your project with this template, it does
 greatly simplify the process.
 
 To build your project using this template, we have added a few more requirements
-that you will need to specify in your project structure file. We have also added
-the possibility of defining a tutorial structure file that allows you to create
-a project tutorial.
+that you will need to specify in your project configuration. We have also added
+the possibility of defining a tutorial configuration that allows you to create
+one or more tutorials to go alongside your project.
 
-The template supports both JSON and YAML formats for the structure files.
+The aforementioned configurations can be written in both JSON and YAML formats.
 
-#### The project structure (project.json/project.yaml)
+#### The project configuration (project.json/project.yaml)
 
-The project structure used by this template has been extended to include a
-few requirements to help create a project's task presenter. In addition to the
-`name`, `short_name` and `description` fields required by PyBossa, you will need
-to specify the following fields:
+The project configuration -- based on the classic PyBossa configuration -- has been
+extended to include a few requirements to help create a project's task presenter.
+In addition to the `name`, `short_name` and `description` fields required by PyBossa,
+you will need to specify the following fields:
 - `why`: a reminder to volunteers about the importance of their contribution to the project.
-- `questions`: a set of questions asked to volunteers.
+- `questions`: a set of one or more questions asked to volunteers.
 
-#### The tutorial structure (tutorial.json/tutorial.yaml)
+#### The tutorial configuration (tutorial.json/tutorial.yaml)
 
 Project tutorials are a great way of introducing volunteers to your project and
 while optional, it is highly recommended that you include a few in your project.
 
-The tutorial structure is comprised of one or more entries where each entry
+The tutorial configuration is comprised of one or more tutorials where each one
 contains the following fields:
 - `image`: a direct link to an image to analyse.
 - `image_source`: a link to a web page that provides contextual information about `image`.
 - `assertions`: a set of assertions about `image`.
+
+
+For more information on how to create your project's questionnaire and tutorial,
+please refer to the [**creation guide**](GUIDE.md).
