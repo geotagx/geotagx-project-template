@@ -91,7 +91,8 @@ answer:{
 ```
 type:url
 answer:{
-	key:string
+	key:string,
+	placeholder:string
 }
 ```
 
