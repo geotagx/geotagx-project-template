@@ -7,8 +7,8 @@
 	var api_ = {}; // The project-specific analytics API.
 	var taskId_ = 0; // The current task's identifier.
 	var projectId_ = null; // The current project's short name.
-	var questionId_ = 0; // The current question number.
-	var previousQuestionId_ = 0; // The previous question number.
+	var questionId_ = null; // The current question number.
+	var previousQuestionId_ = null; // The previous question number.
 
 	$(document).on("gtmready", function(){
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
@@ -47,7 +47,7 @@
 	 * @param questionId the current question identifier.
 	 */
 	api_.onQuestionChanged = function(questionId){
-		previousQuestionId_ = questionId_;
+		previousQuestionId_ = questionId_ == null ? questionId : questionId_; // Pay attention to the trailing underscore.
 		questionId_ = questionId;
 	};
 	/**

@@ -60,10 +60,9 @@
 		$("#take-another-tutorial").on("click.tutorial", function(){
 			currentTutorial_ = (currentTutorial_ + 1) % numberOfTutorials_;
 			setTutorial(tutorial[currentTutorial_]);
-			geotagx.questionnaire.start(1);
+			geotagx.questionnaire.start();
 		});
-
-		geotagx.questionnaire.start(1);
+		geotagx.questionnaire.start();
 	};
 
 	function setTutorial(tutorial){

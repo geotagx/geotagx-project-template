@@ -123,7 +123,7 @@
 				});
 			});
 			geotagx.analytics.onTaskChanged(task.id);
-			geotagx.questionnaire.start(1);
+			geotagx.questionnaire.start();
 		}
 		else {
 			// If there're no more tasks, then hide the questionnaire and image,
