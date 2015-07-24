@@ -6,6 +6,7 @@
 
 	var api_ = {}; // The questionnaire API.
 	var answers_ = {}; // The questionnaire's answers.
+	var $questions_ = null; // The set of questions.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
 	var initialQuestion_ = 0; // The questionnaire's initial question.
     var percentageComplete_ = 0; // The percentage of questions completed.
@@ -13,7 +14,9 @@
 	var olMap_ = null; // The OpenLayers 3 map instance.
 
 	$(document).ready(function(){
-		numberOfQuestions_ = $(".question").length;
+		$questions_ = $(".question");
+		numberOfQuestions_ = $questions_.length;
+		initialQuestion_ = $questions_.first().data("id");
 
 		$("#questionnaire-rewind").on("click", showPreviousQuestion);
 
@@ -50,7 +53,7 @@
 		$(".btn-answer").on("click.questionnaire", function(){
 			var $submitter = $(this);
 			var question = api_.getCurrentQuestion();
-			var answer = parseAnswer(getQuestionType(question), $submitter);
+			var answer = parseAnswer(api_.getQuestionType(question), $submitter);
 
 			// Save the answer.
 			var storageKey = getStorageKey(question);
@@ -233,14 +236,7 @@
 	 * @param $submitter the HTML element that submitted the answer to the specified question.
 	 */
 	function showNextQuestion(question, answer, $submitter){
-		if (isSpamFilter(question)){
-			if (answer === "no")
-				api_.showQuestion(question + 1); // The content to analyze is not spam, proceed to the first question.
-			else
-				api_.finish();
-		}
-		else
-			api_.showQuestion(getNextQuestion(question, answer));
+		api_.showQuestion(getNextQuestion(question, answer, $submitter));
 	}
 	/**
 	 * Displays the previous question, iff it exists.
@@ -254,9 +250,9 @@
             // Destroy the current result before loading the previous question.
             saveAnswer(getStorageKey(current), null);
 
-            // Update the progress stack and progress bar.
+            // Update the progress stack and status panel.
             progress_.pop();
-            updateProgress();
+            updateStatus();
 
             // Disable the rewind button if there're no more previous questions.
             if (progress_.length === 1)
@@ -272,8 +268,6 @@
         else
             console.log("[geotagx::questionnaire::showPrevQuestion] Error! Could not load the previous question!");
 	};
-
-
 	/**
 	 * Returns the answer submitted by the specified submitter.
 	 */
@@ -322,11 +316,8 @@
 	 * @param answer the answer to save.
 	 */
 	function saveAnswer(storageKey, answer){
-		if (storageKey){
+		if (storageKey)
 			answers_[storageKey] = $.type(answer) === "undefined" ? null : answer;
-		}
-		else
-			console.log("[geotagx::questionnaire::saveAnswer] Error! Invalid storage key. Answer discarded...");
 	};
 	/**
 	 * Returns the specified question's HTML node.
@@ -341,39 +332,24 @@
 		return getQuestionElement(api_.getCurrentQuestion());
 	}
 	/**
-	 * Returns the type of the specified question.
+	 * Updates the questionnaire status, which includes information such
+	 * as the user's progress.
 	 */
-	function getQuestionType(question){
-		return getQuestionElement(question).data("type");
-	}
-	/**
-	 * Updates the progress bar and percentage.
-	 */
-	function updateProgress(){
-		percentageComplete_ = progress_.length > 0 ? (((api_.getCurrentQuestion() - initialQuestion_) / (numberOfQuestions_ - initialQuestion_)) * 100).toFixed(0) : 0;
+	function updateStatus(){
+		percentageComplete_ = progress_.length > 0
+		                    ? Math.max(0, Math.min(100, (((api_.getCurrentQuestion() - initialQuestion_) / (numberOfQuestions_ - initialQuestion_)) * 100).toFixed(0)))
+							: 0;
 
 		$("#current-analysis-progress").html(percentageComplete_);
 		$("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
 
-		var $statusPanel = $("#questionnaire-status-panel");
+		var $panel = $("#questionnaire-status-panel");
 		if (percentageComplete_ == 100)
-			$statusPanel.addClass("analysis-complete");
+			$panel.addClass("analysis-complete");
 		else
-			$statusPanel.removeClass("analysis-complete");
+			$panel.removeClass("analysis-complete");
+
 	};
-	/**
-	 * Returns true if the question identifier refers to the spam filter, false otherwise.
-	 */
-	function isSpamFilter(question){
-		return question === 0;
-	}
-	/**
-	 * Returns true if the questionnaire has been completed, false otherwise.
-	 * A questionnaire is considered complete if the question identifier is equal to the total number of questions.
-	 */
-	function isCompleted(question){
-		return question === numberOfQuestions_;
-	}
 	/**
 	 * Resets all user input.
 	 */
@@ -401,9 +377,10 @@
 	}
 	/**
 	 * Starts the questionnaire from the specified question.
+	 * If an initial question is not specified, then it is determined automatically.
 	 */
 	api_.start = function(question){
-		$(".question").addClass("hide");
+		$questions_.addClass("hide");
 
 		resetInput();
 		progress_ = [];
@@ -418,12 +395,13 @@
 		// Toggle wheelzoom on the image.
 		wheelzoom($("#image"));
 
-		// Determine the first question.
-		initialQuestion_ = question && $.type(question) === "number" ? question : 0;
+		// Override the initial question identifier, if need be.
+		if (question && $.type(question) === "number")
+			initialQuestion_ = question;
 
 		api_.showQuestion(initialQuestion_);
 
-		// Start a questionnaire tour.
+		// Start a questionnaire tour, if one hasn't already been completed.
 		if (!geotagx.tour.questionnaireTourEnded())
 			setTimeout(geotagx.tour.startQuestionnaireTour, 1000);
 	};
@@ -432,6 +410,12 @@
 	 */
 	api_.getNumberOfQuestions = function(){
 		return numberOfQuestions_;
+	};
+	/**
+	 * Returns the type of the specified question.
+	 */
+	api_.getQuestionType = function(question){
+		return getQuestionElement(question).data("type");
 	};
 	/**
 	 * Returns the current answer for the specified question.
@@ -484,26 +468,30 @@
 	};
 	/**
 	 * Displays the specified question.
+	 * Note that since question IDs are sequential, we assume the questionnaire
+	 * is completed when the specified question ID is greater than the number
+	 * questions, at which point a submit button is displayed.
 	 * @param question a positive integer used to identify a question.
 	 */
 	api_.showQuestion = function(question){
+		// If at least one question has been answered, hide the current question
+		// before moving onto the next. Update the rewind button too.
 		var hasAnsweredQuestion = progress_.length > 0;
-
-		// Enable the rewind button if the user has at least one answered question, disable it otherwise.
-		$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
-
-		// Hide the current question since we'll be moving onto the next.
 		if (hasAnsweredQuestion)
 			getCurrentQuestionElement().addClass("hide");
 
-		// If we have a valid question id ...
-		if (question >= 0 && question <= numberOfQuestions_){
-			// Update the progress stack and progress bar.
-			progress_.push(question);
-			updateProgress();
+		$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
 
-			// If the questionnaire has not been completed, display the next question.
-			if (!isCompleted(question)){
+		if (question >= initialQuestion_){
+			// Update the progress stack.
+			progress_.push(question);
+
+			// Update the status panel. Remember that when the questionnaire is
+			// complete, a submit button is displayed in the status panel.
+			updateStatus();
+
+			// If we haven't completed the questionnaire yet, display the next question.
+			if (question < (initialQuestion_ + numberOfQuestions_)){
 				var $element = getQuestionElement(question);
 				$element.removeClass("hide").hide().fadeIn(300, function(){
 					// If the question type is geotagging, then we need to resize the map only when the question is
@@ -524,8 +512,10 @@
 	 * This function will skip any remaining questions and display the user's input summary, their current statistics, as well as a submit button.
 	 */
 	api_.finish = function(){
-		// The task is considered finished when the current question is equal to the total number of questions.
-		api_.showQuestion(numberOfQuestions_);
+		// Since the question IDs are distributed sequentially, the questionnaire
+		// is considered finished when the current question  ID is greater than
+		// or equal to the total number of questions plus the initial question's ID.
+		api_.showQuestion(initialQuestion_ + numberOfQuestions_);
 	};
 
 	geotagx.questionnaire = api_;
