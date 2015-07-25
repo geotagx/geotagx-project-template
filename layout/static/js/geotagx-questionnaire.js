@@ -64,9 +64,9 @@
 		});
 
 		// Initialize the answers_ object's properties. A property is located in each
-		// element with the 'answer' class, that has a non-empty 'saved-as' data attribute.
+		// element with the 'answer' class, that has a non-empty 'key' data attribute.
 		$(".answer").each(function(){
-			var property = $.trim($(this).data("saved-as"));
+			var property = $.trim($(this).data("key"));
 			if (property)
 				answers_[property] = null;
 		});
@@ -128,20 +128,6 @@
 		}
 		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
 		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
-
-		// Set up handlers that change "None of the above" into "Done" and
-		// vice versa, for questions with multiple answers.
-		$(".answer input").on("change.questionnaire", function(){
-			var $input = $(this);
-			var inputName = $input.attr("name");
-			var $parent = $(".answer[data-saved-as='" + inputName + "']");
-
-			// If the current input is not checked, find at least one that shares the same name.
-			if ($input.is(":checked") || $("input[name=" + inputName + "]:checked").length > 0)
-				$parent.addClass("item-selected");
-			else
-				$parent.removeClass("item-selected");
-		});
 	});
 	/**
 	 * Creates an OpenLayers map.
@@ -283,6 +269,13 @@
 		var answer = $submitter.attr("value");
 		if (answer === "Done"){
 			switch (questionType){
+				case "dropdown-list":
+					// Find the selected item that isn't disabled. Remember that
+					// the prompt is selected by default, but disabled to prevent
+					// users from ever selecting it.
+					var $input = $("#" + $submitter.data("input-id"));
+					var $item = $(":checked:not(:disabled)", $input);
+					return $item.length > 0 ? $.trim($item.val()) : "None";
 				case "select":
 					var $input = $("input:checked", $submitter.siblings("label"));
 					return $input.length > 0 ? $input.val() : "None";
@@ -299,12 +292,15 @@
 					     : ($input.length === 0 ? "None" : inputToString($input));
 				case "geotagging":
 					return getMapSelection();
+				case "url":
 				case "text":
-					var $input = $("input[type='text']", $submitter.siblings());
-					return $input.length > 0 ? $.trim($input.val()) : "";
 				case "longtext":
-					var $input = $("textarea", $submitter.siblings());
-					return $input.length > 0 ? $.trim($input.val()) : "";
+					return $.trim($("#" + $submitter.data("input-id")).val());
+				case "number":
+					var numberString = $.trim($("#" + $submitter.data("input-id")).val());
+					return numberString ? parseFloat(numberString) : null;
+				default:
+					return null;
 			}
 		}
 		else
@@ -357,23 +353,22 @@
 		$("input").removeAttr("checked");
 		$("input:text").val("");
 		$("textarea").val("");
-		$(".answer").removeClass("item-selected");
 
 		resetMap(true);
 	}
 	/**
 	 * Returns the storage key for the specified question, or null if it doesn't exist.
-	 * A storage key is stored in the question's answer div as the "saved-as" data attribute.
+	 * A storage key is stored in the question's answer div as the "key" data attribute.
 	 */
 	function getStorageKey(question){
-		var key = null;
+		var storageKey = null;
 		var $node = $("div.answer", getQuestionElement(question));
 		if ($node){
-			var savedAs = $node.data("saved-as");
-			if (savedAs)
-				key = savedAs;
+			var key = $node.data("key");
+			if (key)
+				storageKey = key;
 		}
-		return key;
+		return storageKey;
 	}
 	/**
 	 * Starts the questionnaire from the specified question.
