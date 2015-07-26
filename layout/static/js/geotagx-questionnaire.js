@@ -332,8 +332,10 @@
 	 * as the user's progress.
 	 */
 	function updateStatus(){
+		// Having sequential question identifiers implies that the user has
+		// completed (Q - 1) questions where Q is the current question identifier.
 		percentageComplete_ = progress_.length > 0
-		                    ? Math.max(0, Math.min(100, (((api_.getCurrentQuestion() - initialQuestion_) / (numberOfQuestions_ - initialQuestion_)) * 100).toFixed(0)))
+		                    ? Math.max(0, Math.min(100, (((api_.getCurrentQuestion() - 1) / numberOfQuestions_) * 100).toFixed(0)))
 							: 0;
 
 		$("#current-analysis-progress").html(percentageComplete_);
@@ -344,7 +346,6 @@
 			$panel.addClass("analysis-complete");
 		else
 			$panel.removeClass("analysis-complete");
-
 	};
 	/**
 	 * Resets all user input.
