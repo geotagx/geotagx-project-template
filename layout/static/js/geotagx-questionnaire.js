@@ -379,9 +379,11 @@
 	 * Resets all user input.
 	 */
 	function resetInput(){
-		$("input").removeAttr("checked");
-		$("input:text").val("");
 		$("textarea").val("");
+		$("input").removeAttr("checked");
+		$("input[type='text']").val("");
+		$("input[type='url']").val("");
+		$("input[type='number']").val("");
 
 		resetMap(true);
 	}
