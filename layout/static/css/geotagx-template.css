@@ -64,6 +64,19 @@ input[type="checkbox"]
     margin:0.25em 0 0.75em 0;
 }
 
+input + .other-input
+{
+    visibility:hidden;
+    border:1px solid #BBB;
+    margin-left:0.45em;
+    padding:0 0.2em;
+    border-radius:1px;
+}
+input:checked + .other-input
+{
+    visibility:visible;
+}
+
 #content-main
 {
     font:400 1em Martel Sans, Open Sans, Lato;

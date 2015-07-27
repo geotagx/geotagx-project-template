@@ -258,10 +258,36 @@
 	 * Returns the answer submitted by the specified submitter.
 	 */
 	function parseAnswer(questionType, $submitter){
-		function inputToString($input){
+		/**
+		 * Returns the value of an item.
+		 */
+		function getItemValue($item){
 			var output = "";
-			$input.each(function(){
-				output += ", " + $(this).val();
+			if ($item && $item.length > 0){
+				// Does the item contain its value in a text input field? If it
+				// does, then get the actual value from the text input field.
+				var otherInputId = $.trim($item.data("other-input-id"));
+				if (otherInputId.length > 0){
+					var $otherInput = $("#" + otherInputId);
+					if ($otherInput.length > 0){
+						var value = $.trim($otherInput.val());
+						output = value.length > 0 ? value : "Other";
+					}
+				}
+				else
+					output = $.trim($item.val());
+			}
+			return output;
+		}
+		/**
+		 * Converts a list of item values into a string.
+		 */
+		function itemValuesToString($items){
+			var output = "";
+			$items.each(function(){
+				var value = getItemValue($(this));
+				if (value.length > 0)
+					output += ", " + value;
 			});
 			return output.substring(2); // Remove the leading comma and space.
 		}
@@ -277,19 +303,21 @@
 					var $item = $(":checked:not(:disabled)", $input);
 					return $item.length > 0 ? $.trim($item.val()) : "None";
 				case "select":
-					var $input = $("input:checked", $submitter.siblings("label"));
-					return $input.length > 0 ? $input.val() : "None";
+					var $item = $("input:checked", $submitter.siblings("label"));
+					var value = getItemValue($item);
+					return value.length > 0 ? value : "None";
 				case "checklist":
-					var $input = $("input:checked", $submitter.siblings("label"));
-					return $input.length > 0 ? inputToString($input) : "None";
+					var $checkedItems = $("input:checked", $submitter.siblings("label"));
+					var value = itemValuesToString($checkedItems);
+					return value.length > 0 ? value : "None";
 				case "illustrative-checklist":
 					var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
 					var $input = $("input[type='checkbox']:checked", $illustrations);
 
 					answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
 					return answer
-					     ? ($input.length === 0 ? answer : answer + ", " + inputToString($input))
-					     : ($input.length === 0 ? "None" : inputToString($input));
+					     ? ($input.length === 0 ? answer : answer + ", " + itemValuesToString($input))
+					     : ($input.length === 0 ? "None" : itemValuesToString($input));
 				case "geotagging":
 					return getMapSelection();
 				case "url":

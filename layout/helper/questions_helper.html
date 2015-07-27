@@ -70,6 +70,7 @@
 	<label><input type="radio" value="{{key}}" name="{{answer.saved_as}}">{{choice[key]}}</label><br>
 	{%- endfor %}
 	{%- endfor %}
+	<label><input type="radio" name="{{answer.saved_as}}" data-other-input-id="other-input-for-{{answer.saved_as}}">Other<input type="text" id="other-input-for-{{answer.saved_as}}" class="other-input" placeholder="Please specify"></label><br>
 	<button class="btn btn-answer btn-success btn-sm" value="Done">Done</button>
 	<button class="btn btn-answer btn-danger  btn-sm" value="None">None of the above</button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
@@ -85,6 +86,7 @@
 	<label><input type="checkbox" value="{{key}}" name="{{answer.saved_as}}">{{choice[key]}}</label><br>
 	{%- endfor %}
 	{%- endfor %}
+	<label><input type="checkbox" name="{{answer.saved_as}}" data-other-input-id="other-input-for-{{answer.saved_as}}">Other<input type="text" id="other-input-for-{{answer.saved_as}}" class="other-input" placeholder="Please specify"></label><br>
 	<button class="btn btn-answer btn-success btn-sm" value="Done">Done</button>
 	<button class="btn btn-answer btn-danger  btn-sm" value="None">None of the above</button>
 	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
