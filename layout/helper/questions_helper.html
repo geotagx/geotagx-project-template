@@ -161,6 +161,11 @@
 
 {% macro datetime_answer(question_id, answer, has_help) -%}
 <div class="answer" data-key="{{answer.saved_as}}">
+	{% set input_id = ["datetime-input-for-", answer.saved_as] | join() %}
+	<div class="row"><div class="col-md-12"><div id="{{input_id}}" class="datetime-picker"></div></div></div>
+	<button class="btn btn-answer btn-primary btn-sm" value="Done" data-validator="datetime" data-input-id="{{input_id}}">Done</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
 </div>
 {%- endmacro %}
 

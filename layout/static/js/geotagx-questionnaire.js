@@ -128,6 +128,19 @@
 		}
 		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
 		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
+
+		// Initialize datetime pickers.
+		$(".datetime-picker").datetimepicker({
+			format:"YYYY/MM/DD HH:mm",
+			inline:true,
+			sideBySide:true,
+			icons:{
+				"up":"fa fa-2x fa-chevron-up",
+				"down":"fa fa-2x fa-chevron-down",
+				"next":"fa fa-chevron-right",
+				"previous":"fa fa-chevron-left"
+			}
+		});
 	});
 	/**
 	 * Creates an OpenLayers map.
@@ -327,7 +340,13 @@
 				case "number":
 					var numberString = $.trim($("#" + $submitter.data("input-id")).val());
 					return numberString ? parseFloat(numberString) : null;
+				case "datetime":
+					var date = $("#" + $submitter.data("input-id")).data("DateTimePicker").date();
+					return date != null
+						 ? date.format("X") // Return date and time as a Unix timestamp.
+						 : null;
 				default:
+					console.log("[geotagx::questionnaire::parseAnswer] Error! Unknown question type '" + questionType + "'.");
 					return null;
 			}
 		}
@@ -384,6 +403,7 @@
 		$("input[type='text']").val("");
 		$("input[type='url']").val("");
 		$("input[type='number']").val("");
+		$(".datetime-picker").data("DateTimePicker").date(null);
 
 		resetMap(true);
 	}
