@@ -82,8 +82,20 @@ answer:{
 type:datetime
 answer:{
 	key:string,
-	placeholder:string,
-	format:string
+	mindate:string,
+	maxdate:string,
+	mintime:string,
+	maxtime:string
+}
+```
+
+### Date input
+```
+type:date
+answer:{
+	key:string,
+	min:string,
+	max:string
 }
 ```
 

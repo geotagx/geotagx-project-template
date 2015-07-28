@@ -170,6 +170,17 @@
 {%- endmacro %}
 
 
+{% macro date_answer(question_id, answer, has_help) -%}
+<div class="answer" data-key="{{answer.saved_as}}">
+	{% set input_id = ["date-input-for-", answer.saved_as] | join() %}
+	<div class="row" style="margin-bottom:1em"><div class="col-md-12"><div id="{{input_id}}" class="date-picker"></div></div></div>
+	<button class="btn btn-answer btn-primary btn-sm" value="Done" data-validator="date" data-input-id="{{input_id}}">Done</button>
+	<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
+	<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
+</div>
+{%- endmacro %}
+
+
 {% macro url_answer(question_id, answer, has_help) -%}
 <div class="answer" data-key="{{answer.saved_as}}">
 	{% set maxlength = answer.maxlength if answer.maxlength else 2048 %}

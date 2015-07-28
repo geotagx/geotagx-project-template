@@ -52,6 +52,7 @@
 		{% elif question.type == "longtext"                    %}{{questions_helper.longtext_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "number"                      %}{{questions_helper.number_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "datetime"                    %}{{questions_helper.datetime_answer(question.id, question.answer, has_help)}}
+		{% elif question.type == "date"                        %}{{questions_helper.date_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "url"                         %}{{questions_helper.url_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, has_help)}}
 		{% elif question.type == "custom"                      %}{{questions_helper.custom_answer(question.id, question.answer, has_help)}}

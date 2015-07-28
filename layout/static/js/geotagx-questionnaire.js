@@ -129,18 +129,32 @@
 		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
 		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
 
-		// Initialize datetime pickers.
-		$(".datetime-picker").datetimepicker({
-			format:"YYYY/MM/DD HH:mm",
-			inline:true,
-			sideBySide:true,
-			icons:{
-				"up":"fa fa-2x fa-chevron-up",
-				"down":"fa fa-2x fa-chevron-down",
-				"next":"fa fa-chevron-right",
-				"previous":"fa fa-chevron-left"
-			}
-		});
+		// Initialize date, time and datetime pickers.
+		var $datetimePickers = $(".datetime-picker");
+		if ($datetimePickers.length > 0){
+			$datetimePickers.datetimepicker({
+				format:"YYYY/MM/DD HH:mm:ss",
+				inline:true,
+				sideBySide:true,
+				icons:{
+					up:"fa fa-2x fa-chevron-up",
+					down:"fa fa-2x fa-chevron-down",
+					next:"fa fa-chevron-right",
+					previous:"fa fa-chevron-left"
+				}
+			});
+		}
+		var $datePickers = $(".date-picker");
+		if ($datePickers.length > 0){
+			$datePickers.datetimepicker({
+				format:"YYYY-MM-DD",
+				inline:true,
+				icons:{
+					next:"fa fa-chevron-right",
+					previous:"fa fa-chevron-left"
+				}
+			});
+		}
 	});
 	/**
 	 * Creates an OpenLayers map.
@@ -341,10 +355,11 @@
 					var numberString = $.trim($("#" + $submitter.data("input-id")).val());
 					return numberString ? parseFloat(numberString) : null;
 				case "datetime":
+					var datetime = $("#" + $submitter.data("input-id")).data("DateTimePicker").date();
+					return datetime != null ? datetime.format("X") : null; // Return date and time as a Unix timestamp.
+				case "date":
 					var date = $("#" + $submitter.data("input-id")).data("DateTimePicker").date();
-					return date != null
-						 ? date.format("X") // Return date and time as a Unix timestamp.
-						 : null;
+					return date != null ? date.format("YYYY-MM-DD") : null;
 				default:
 					console.log("[geotagx::questionnaire::parseAnswer] Error! Unknown question type '" + questionType + "'.");
 					return null;
@@ -403,8 +418,11 @@
 		$("input[type='text']").val("");
 		$("input[type='url']").val("");
 		$("input[type='number']").val("");
-		$(".datetime-picker").data("DateTimePicker").date(null);
-
+		$([".datetime-picker", ".date-picker"]).each(function(){
+			var $picker = $(this);
+			if ($picker.length > 0)
+				$picker.data("DateTimePicker").clear();
+		});
 		resetMap(true);
 	}
 	/**
