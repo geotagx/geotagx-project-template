@@ -9,6 +9,7 @@
 	var $questions_ = null; // The set of questions.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
 	var initialQuestion_ = 0; // The questionnaire's initial question.
+	var questionChanged_ = function(question){}; // A handler that is called each time a question changes.
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout the questionnaire. It also allows a user to rewind to a previous question.
 	var olMap_ = null; // The OpenLayers 3 map instance.
@@ -531,6 +532,14 @@
 			showNextQuestion = handler;
 	};
 	/**
+	 * Set a user-defined function that is called each time the user switches questions.
+	 * @param handler a user-defined function that is called each time the current question changes.
+	 */
+	api_.onQuestionChanged = function(handler){
+		if (handler && $.type(handler) === "function")
+			questionChanged_ = handler;
+	};
+	/**
 	 * Displays the specified question.
 	 * Note that since question IDs are sequential, we assume the questionnaire
 	 * is completed when the specified question ID is greater than the number
@@ -564,7 +573,7 @@
 						olMap_.updateSize();
 				});
 
-				// Update analytics parameters.
+				questionChanged_(question);
 				geotagx.analytics.onQuestionChanged(question);
 			}
 		}

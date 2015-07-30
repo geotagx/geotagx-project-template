@@ -173,19 +173,33 @@ def get_project_tutorial(project_dir):
 		output = ""
 		for question in assertions:
 			assertion = assertions[question]
-			expects = assertion["expects"].lower() # lower-case for case-insensitive string comparisons.
-			default_message = assertion["default_message"]
-			messages = parse_messages(assertion["messages"])
 
-			output += """
-			{0}:{{
-					"expects":"{1}",
-					"default_message":"{2}",
-					"messages":{{
-						{3}
-					}}
-			\t}},
-			""".format(question, expects, default_message, messages).strip()
+			skip = assertion.get("skip", False)
+			if skip:
+				output += """
+					{0}:{{"skip":{1}\t}},
+				""".format(question, "true" if skip else "false").strip()
+			else:
+				expects_ = assertion.get("expects")
+				default_message_ = assertion.get("default_message")
+				messages_ = parse_messages(assertion["messages"])
+				autocomplete_ = assertion.get("autocomplete", False)
+				output += """
+				{q}:{{
+						"expects":"{expects}",
+						"autocomplete":{autocomplete},
+						"default_message":"{default_message}",
+						"messages":{{
+							{messages}
+						}}
+				\t}},
+				""".format(
+					q=question,
+					expects=expects_,
+					autocomplete="true" if autocomplete_ else "false",
+					default_message=default_message_,
+					messages=messages_
+				).strip()
 
 		return output.rstrip(",")
 

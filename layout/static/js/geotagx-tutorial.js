@@ -8,6 +8,8 @@
 	var numberOfTutorials_ = 0; // The number of available tutorials.
 	var currentTutorial_ = 0; // The index of the current tutorial.
 	var assertions_ = null; // An object containing assertions about the image being analyzed.
+	var nextQuestion_ = 0; // The next question's identifier.
+	var getNextQuestion_ = null; // A user-defined function that determines the next question.
 
 	/**
 	 * Begins the project tutorial.
@@ -21,33 +23,13 @@
 			return;
 		}
 
+		getNextQuestion_ = getNextQuestion;
 		numberOfTutorials_ = tutorial.length;
 		currentTutorial_ = Math.floor((Math.random() * numberOfTutorials_)); // Select a random tutorial out of all available ones.
 		setTutorial(tutorial[currentTutorial_]);
 
-		// The next question's identifier. This value is determined each time
-		// a correct answer is input by the user.
-		var nextQuestion = 0;
-
-		// Override the showNextQuestion function so that instead of automatically
-		// displaying the next question, a notification is displayed to the user.
-		// A notification may contain a "NEXT" button which allows a user to
-		// advance to the next question.
-		geotagx.questionnaire.onShowNextQuestion(function(question, answer, $submitter){
-			answer = $.type(answer) === "string" ? answer.toLowerCase() : answer; // toLowerCase for case-insensitive comparisons.
-
-			var assertion = assertions_[question];
-			var message = assertion.messages[answer] ? assertion.messages[answer] : assertion.default_message;
-			var isExpectedAnswer = answer === assertion.expects;
-			if (isExpectedAnswer){
-				nextQuestion = getNextQuestion(question, answer);
-				geotagx.analytics.onCorrectTutorialAnswer();
-			}
-			else
-				geotagx.analytics.onWrongTutorialAnswer();
-
-			showNotification(message, isExpectedAnswer);
-		});
+		geotagx.questionnaire.onShowNextQuestion(onShowNextQuestion);
+		geotagx.questionnaire.onQuestionChanged(onQuestionChanged);
 
 		$(".show-on-task-loaded").removeClass("show-on-task-loaded").hide().fadeIn(200);
 		$(".hide-on-task-loaded").hide();
@@ -55,7 +37,7 @@
 			hideNotification();
 		});
 		$("#tutorial-next-question").on("click.tutorial", function(){
-			hideNotification(function(){ geotagx.questionnaire.showQuestion(nextQuestion) });
+			hideNotification(function(){ geotagx.questionnaire.showQuestion(nextQuestion_) });
 		});
 		$("#take-another-tutorial").on("click.tutorial", function(){
 			currentTutorial_ = (currentTutorial_ + 1) % numberOfTutorials_;
@@ -75,6 +57,72 @@
 			console.log("[geotagx::tutorial::start::setTutorial] Error! Could not set image to analyze!");
 
 		assertions_ = tutorial.assertions;
+	}
+	/**
+	 * Returns the next question that has not been explicitly omitted.
+	 */
+	function getNextUnskippedQuestion(question, answer){
+		var nextQuestion = getNextQuestion_(question, answer);
+		var assertion = assertions_[nextQuestion];
+		while (assertion && assertion.skip){
+			nextQuestion = getNextQuestion_(nextQuestion, "Unknown");
+			assertion = assertions_[nextQuestion];
+		}
+		return nextQuestion;
+	}
+	/**
+	 * A user-defined method that displays the next question. This method
+	 * prevents the questionnaire from automatically progressing to the next
+	 * question. Instead, it validates the user's answer and if it matches with
+	 * an expected expected, a notification containing a 'NEXT' button is
+	 * displayed, thereby allowing the user to advance to the next question.
+	 * If the answer does not match, a different kind of notification -- inviting
+	 * the user to try again -- is displayed.
+	 */
+	function onShowNextQuestion(question, answer, $submitter){
+		var assertion = assertions_[question];
+		var message = assertion.default_message;
+		var isExpectedAnswer = false;
+		if ($.type(answer) === "string"){
+			isExpectedAnswer = answer.toLowerCase() === assertion.expects.toLowerCase();
+
+			var answerMessage = assertion.messages[answer];
+			if (answerMessage)
+				message = answerMessage;
+		}
+		else
+			isExpectedAnswer = answer === assertion.expects;
+
+		if (isExpectedAnswer){
+			nextQuestion_ = getNextUnskippedQuestion(question, answer);
+			geotagx.analytics.onCorrectTutorialAnswer();
+		}
+		else
+			geotagx.analytics.onWrongTutorialAnswer();
+
+		showNotification(message, isExpectedAnswer);
+	}
+	/**
+	 * A method that is called when a new question is presented to the user.
+	 */
+	function onQuestionChanged(question){
+		var assertion = assertions_[question];
+		if (assertion){
+			var autoComplete = assertion.autocomplete;
+			if (autoComplete){
+				var selector = ".question[data-id='" + question + "'] .answer ";
+				// When auto-complete is set to true, we need to fill the
+				// input with the expected answer and trigger the 'Done' button.
+				var $input = $(selector + "input");
+				if ($input.length > 0){
+					$input.val(assertion.expects);
+					$input.prop("disabled", true);
+					var $button = $(".question[data-id='" + question + "'] .answer button.btn-answer[value='Done']");
+					if ($button.length > 0)
+						$button.trigger("click");
+				}
+			}
+		}
 	}
 
 	function showNotification(message, isExpected){
