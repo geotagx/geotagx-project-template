@@ -19,17 +19,19 @@
 		}
 		shortName_ = shortName;
 
-		if (isTutorial)
+		if (isTutorial){
 			geotagx.tutorial.start(shortName, getNextQuestion, tutorial);
+			geotagx.analytics.onStartTutorial(shortName);
+		}
 		else {
 			geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
 
 			pybossa.taskLoaded(onTaskLoaded);
 			pybossa.presentTask(onTaskPresented);
 			pybossa.run(shortName_);
-		}
 
-		geotagx.analytics.onProjectChanged(shortName_);
+			geotagx.analytics.onStartProject(shortName_);
+		}
 	};
 	/**
 	 * Returns the project's short name.

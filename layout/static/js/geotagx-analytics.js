@@ -29,13 +29,6 @@
 		$("#project-task-presenter.analysis .help-toggle").on("click.analytics", onShowHelp);
 	});
 	/**
-	 * Updates the tracking parameters when a new project is started.
-	 * @param projectId the project's short name.
-	 */
-	api_.onProjectChanged = function(projectId){
-		projectId_ = projectId;
-	};
-	/**
 	 * Updates the tracking parameters when a new task is presented to the user.
 	 * @param taskId the task's identifier.
 	 */
@@ -69,6 +62,30 @@
 			"questionId":questionId_
 		};
 		analytics.fireEvent("action.wrongTutorialAnswer", data);
+	};
+	/**
+	 * Fires an event when a user starts a project.
+	 */
+	api_.onStartProject = function(projectId){
+		projectId_ = projectId;
+		analytics.setGlobal("userId", $("body").data("user-id"));
+		analytics.setGlobal("userRemoteAddr", window.client_remote_addr);
+		var data = {
+			"projectId":projectId_
+		};
+		analytics.fireEvent("action.startProject", data);
+	};
+	/**
+	 * Fires an event when a user starts a project tutorial.
+	 */
+	api_.onStartTutorial = function(projectId){
+		projectId_ = projectId;
+		analytics.setGlobal("userId", $("body").data("user-id"));
+		analytics.setGlobal("userRemoteAddr", window.client_remote_addr);
+		var data = {
+			"projectId":projectId_
+		};
+		analytics.fireEvent("action.startTutorial", data);
 	};
 	/**
 	 * Fires an event when a user answers a question during an analysis.
