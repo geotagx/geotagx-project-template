@@ -86,9 +86,8 @@
 		if ($.type(answer) === "string"){
 			isExpectedAnswer = answer.toLowerCase() === assertion.expects.toLowerCase();
 
-			var answerMessage = assertion.messages[answer];
-			if (answerMessage)
-				message = answerMessage;
+			var m = assertion.messages;
+			message = m[answer] || m[answer.toLowerCase()] || m[answer.toUpperCase()] || message;
 		}
 		else
 			isExpectedAnswer = answer === assertion.expects;
