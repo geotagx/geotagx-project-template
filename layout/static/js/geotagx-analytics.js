@@ -44,6 +44,8 @@
 
 		$("#project-task-presenter.tutorial .help-toggle").on("click.analytics", onShowTutorialHelp);
 		$("#project-task-presenter.analysis .help-toggle").on("click.analytics", onShowHelp);
+
+		$("#submit-analysis").on("click.analytics", onSubmitTask);
 	});
 	/**
 	 * Updates the tracking parameters when a new task is presented to the user.
@@ -51,6 +53,11 @@
 	 */
 	api_.onTaskChanged = function(taskId){
 		taskId_ = taskId;
+		var data = {
+			"projectId":projectId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.startTask", data);
 	};
 	/**
 	 * Updates the tracking parameters when a new question is presented to the user.
@@ -240,6 +247,16 @@
 			"taskId":taskId_
 		};
 		analytics.fireEvent("action.showHelp", data);
+	}
+	/**
+	 * Fires an event when a user submits a task.
+	 */
+	function onSubmitTask(){
+		var data = {
+			"projectId":projectId_,
+			"taskId":taskId_
+		};
+		analytics.fireEvent("action.submitTask", data);
 	}
 
 	// Expose the API.
