@@ -46,6 +46,9 @@
 		$("#project-task-presenter.analysis .help-toggle").on("click.analytics", onShowHelp);
 
 		$("#submit-analysis").on("click.analytics", onSubmitTask);
+
+		$("#skip-tutorial").on("click.analytics", onSkipTutorial);
+		$("#start-contributing").on("click.analytics", onCompleteTutorial);
 	});
 	/**
 	 * Updates the tracking parameters when a new task is presented to the user.
@@ -257,6 +260,24 @@
 			"taskId":taskId_
 		};
 		analytics.fireEvent("action.submitTask", data);
+	}
+	/**
+	 * Fires an event when a user skips a project tutorial.
+	 */
+	function onSkipTutorial(){
+		var data = {
+			"projectId":projectId_
+		};
+		submitEvent("action.skipTutorial", data);
+	}
+	/**
+	 * Fires an event when a user completes a tutorial and starts contributing to a project.
+	 */
+	function onCompleteTutorial(){
+		var data = {
+			"projectId":projectId_
+		};
+		analytics.fireEvent("action.completeTutorial", data);
 	}
 
 	// Expose the API.
