@@ -9,8 +9,25 @@
 	var projectId_ = null; // The current project's short name.
 	var questionId_ = null; // The current question number.
 	var previousQuestionId_ = null; // The previous question number.
+	var queuedEvents_ = []; // A queue to store events that have not been fired because the analytics was not configured yet.
 
-	$(document).on("gtmready", function(){
+	$(document).on("geotagx-analytics-disabled", function(){
+		// When the analytics have been disabled, we need to stop queueing all new events.
+		submitEvent = function(name, data){};
+	});
+
+	$(document).on("geotagx-analytics-configured", function(){
+		// Since the analytics is ready, bind the submitEvent to the fireEvent
+		// method so that it no longer queues events.
+		submitEvent = analytics.fireEvent.bind(analytics);
+
+		// Fire any deferred events before setting up the rest.
+		for (var i = 0; i < queuedEvents_.length; ++i){
+			var event = queuedEvents_[i];
+			analytics.fireEvent(event.name, event.data);
+		}
+		queuedEvents_.length = 0; // Empty the queue.
+
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
 		$("#project-task-presenter.tutorial #image").on("scroll.analytics", _debounce(onTutorialImageZoom, 350));
@@ -68,25 +85,33 @@
 	 */
 	api_.onStartProject = function(projectId){
 		projectId_ = projectId;
-		analytics.setGlobal("userId", $("body").data("user-id"));
-		analytics.setGlobal("userRemoteAddr", window.client_remote_addr);
 		var data = {
 			"projectId":projectId_
 		};
-		analytics.fireEvent("action.startProject", data);
+		submitEvent("action.startProject", data);
 	};
 	/**
 	 * Fires an event when a user starts a project tutorial.
 	 */
 	api_.onStartTutorial = function(projectId){
 		projectId_ = projectId;
-		analytics.setGlobal("userId", $("body").data("user-id"));
-		analytics.setGlobal("userRemoteAddr", window.client_remote_addr);
 		var data = {
 			"projectId":projectId_
 		};
-		analytics.fireEvent("action.startTutorial", data);
+		submitEvent("action.startTutorial", data);
 	};
+	/**
+	 * Submits an event to be fired. If the analytics is not yet configured, the event is queued.
+	 * Note that once the analytics is configured, the identifier 'submitEvent'
+	 * is bound to the 'analytics.fireEvent' method.
+	 */
+	function submitEvent(name, data){
+		// TODO Set a hard limit to the queue size.
+		queuedEvents_.push({
+			"name":name,
+			"data":data
+		});
+	}
 	/**
 	 * Fires an event when a user answers a question during an analysis.
 	 */
