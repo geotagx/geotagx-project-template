@@ -109,6 +109,9 @@
 		if (assertion){
 			var autoComplete = assertion.autocomplete;
 			if (autoComplete){
+				// The analytic's questionId parameter needs to be updated manually.
+				geotagx.analytics.onQuestionChanged(question);
+
 				var selector = ".question[data-id='" + question + "'] .answer ";
 				// When auto-complete is set to true, we need to fill the
 				// input with the expected answer and trigger the 'Done' button.
