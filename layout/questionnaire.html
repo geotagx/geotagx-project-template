@@ -6,10 +6,10 @@
 			<div id="questionnaire-busy-icon" class="pull-right hide"><i class="fa fa-pulse fa-spinner"></i></div>
 		</header>
 		<main>
-			<div class="show-on-analysis-complete">
+			<div class="show-on-analysis-complete-x">
 				{% if is_tutorial %}
 				<p>You have successfully completed one of the project's tutorials however if you feel like you are not quite ready, we highly recommend <a id="take-another-tutorial" class="clickable">taking another</a>.</p>
-				<a class="btn btn-success btn-block" href="/project/{{slug}}/newtask"><strong>START CONTRIBUTING</strong></a>
+				<a id="start-contributing" class="btn btn-success btn-block" href="/project/{{slug}}/newtask">START CONTRIBUTING</a>
 				{% else %}
 				<div style="position:relative">
 					<button id="submit-analysis" class="btn btn-block btn-success">
