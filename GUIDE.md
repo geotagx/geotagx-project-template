@@ -1,87 +1,76 @@
 ### Binary input
 ```
 type:binary
-answer:{
-	key:string
-}
 ```
 
 ### Dropdown lists
 ```
 type:dropdown-list
-answer:{
-	key:string,
-	choices:array,
+parameters:{
+	options:array,
 	prompt:string,
-	size:integer
+	size:number
 }
 ```
 
 ### Single-choice input
 ```
 type:select
-answer:{
-	key:string,
-	choices:array
+parameters:{
+	options:array
 }
 ```
 
 ### Check lists
 ```
 type:checklist
-answer:{
-	key:string,
-	choices:array,
-	size:integer
+parameters:{
+	options:array,
+	size:number
 }
 ```
 
 ### Illustrative check lists
 ```
 type:illustrative-checklist
-answer:{
-	key:string,
-	choices:array,
-	size:integer
+parameters:{
+	options:array,
+	size:number
 }
 ```
 
 ### Short text input
 ```
 type:text
-answer:{
-	key:string,
+parameters:{
 	placeholder:string,
-	maxlength:integer
+	maxlength:number
 }
 ```
 
 ### Long text input
 ```
 type:longtext
-answer:{
-	key:string,
+parameters:{
 	placeholder:string,
-	maxlength:integer
+	maxlength:number
 }
 ```
 
 ### Number input
 ```
 type:number
-answer:{
-	key:string,
+parameters:{
 	placeholder:string,
-	min:integer,
-	max:integer
+	min:number,
+	max:number
 }
 ```
 
 ### Date and time input
 ```
 type:datetime
-answer:{
-	key:string,
+parameters:{
 	mindate:string,
 	maxdate:string,
 	mintime:string,
@@ -92,8 +81,7 @@ answer:{
 ### Date input
 ```
 type:date
-answer:{
-	key:string,
+parameters:{
 	min:string,
 	max:string
 }
@@ -102,8 +90,7 @@ answer:{
 ### URL input
 ```
 type:url
-answer:{
-	key:string,
+parameters:{
 	placeholder:string
 }
 ```
@@ -111,8 +98,7 @@ answer:{
 ### Geotagging input
 ```
 type:geotagging
-answer:{
-	key:string,
+parameters:{
 	location:string
 }
 ```
