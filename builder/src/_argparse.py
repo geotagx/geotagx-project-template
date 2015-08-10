@@ -1,5 +1,19 @@
+# This module is part of the GeoTag-X template builder.
+# Copyright (C) 2015 UNITAR, Jeremy Othieno.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 import argparse
-
 
 def bold(text):
 	"""bold(text:string)
@@ -16,10 +30,9 @@ class CustomHelpFormatter(argparse.RawTextHelpFormatter):
 		Converts the block of text into smaller blocks in multiple arrays.
 		"""
 		import textwrap
-		# return textwrap.wrap(self._whitespace_matcher.sub(" ", text).strip(), width)
+
 		text = self._whitespace_matcher.sub(" ", text).strip()
 		return textwrap.wrap(text, self._width)
-		# help_lines = textwrap.wrap(self._whitespace_matcher.sub(" ", help_text).strip(), help_width)
 
 
 	def _format_action(self, action):
@@ -68,13 +81,15 @@ class CustomHelpFormatter(argparse.RawTextHelpFormatter):
 		"""add_epilogue(epilog:string)
 		Adds an epilogue to the help.
 		"""
-		self.add_text("""\r\n{0}\n\tWritten by Jeremy Othieno.
-			\r\n{1}\n\tReport bugs or any issues at https://github.com/geotagx/geotagx-project-template/issues
-			\r\n{2}\n\tTo be confirmed""".format( #TODO Set copyright.
+		self.add_text(
+			"{authors_label}\n\tWritten by Jeremy Othieno.\n\n"
+			"{report_label}\n\tReport bugs or any issues at https://github.com/geotagx/geotagx-project-template/issues.\n\n"
+			"{copyright_label}\n\t{copyright_notice}".format(
 				# epilogue, #TODO Add me.
-				bold("AUTHORS"),
-				bold("REPORTING BUGS"),
-				bold("COPYRIGHT")
+				authors_label    = bold("AUTHORS"),
+				report_label     = bold("REPORTING BUGS"),
+				copyright_label  = bold("COPYRIGHT"),
+				copyright_notice = "\n\t".join(self._multiline("Copyright (c) 2015 UNITAR. This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version."))
 			)
 		)
 
