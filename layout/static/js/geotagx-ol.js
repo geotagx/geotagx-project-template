@@ -351,7 +351,7 @@
 		/**
 		 * Creates an instance of the OpenLayers map.
 		 */
-		createMap:function(targetId){
+		Map:function(targetId){
 			return new Map(targetId);
 		}
 	};
