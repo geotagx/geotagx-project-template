@@ -1,0 +1,55 @@
+.geotagx-ol-control-view
+{
+	bottom:0.5em;
+	left:0.5em;
+}
+.geotagx-ol-control-view.aerial { left:2.5em; }
+.geotagx-ol-control-view.map    { left:4.5em; }
+/**
+ * Fill the screen when in full-screen mode.
+ */
+.geotagx-ol-map:-moz-full-screen { height:100% !important; }
+.geotagx-ol-map:-webkit-full-screen { height:100% !important; }
+.geotagx-ol-map:-ms-fullscreen { height:100% !important; }
+.geotagx-ol-map:fullscreen { height:100% !important; }
+/**
+ * Place the zoomslider in between the zoom-in and zoom-out buttons.
+ */
+.geotagx-ol-map .ol-zoom .ol-zoom-out
+{
+	margin-top:10.65em;
+}
+.geotagx-ol-map .ol-zoomslider
+{
+	top:1.8em;
+	left:0;
+	width:2em;
+	height:12em;
+	margin:0.5em;
+	padding:0;
+	background:transparent;
+}
+	.geotagx-ol-map .ol-zoomslider .ol-zoomslider-thumb
+	{
+		margin:0.1em 0.3em;
+		padding:0;
+		width:1.3em;
+	}
+.geotagx-ol-map .ol-touch .ol-zoom .ol-zoom-out
+{
+	margin-top:212px;
+}
+.geotagx-ol-map .ol-touch .ol-zoomslider
+{
+	top:2.75em;
+}
+.geotagx-ol-map .ol-zoom-in.ol-has-tooltip:hover [role=tooltip],
+.geotagx-ol-map .ol-zoom-in.ol-has-tooltip:focus [role=tooltip]
+{
+	top:3px;
+}
+.geotagx-ol-map .ol-zoom-out.ol-has-tooltip:hover [role=tooltip],
+.geotagx-ol-map .ol-zoom-out.ol-has-tooltip:focus [role=tooltip]
+{
+	top:232px;
+}
