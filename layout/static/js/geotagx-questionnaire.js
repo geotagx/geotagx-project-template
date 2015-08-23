@@ -421,7 +421,7 @@
 		$("input[type='number']").val("");
 		$([".datetime-picker", ".date-picker"]).each(function(){
 			var $picker = $(this);
-			if ($picker.length > 0)
+			if ($picker.length > 0 && $picker.data("DateTimePicker"))
 				$picker.data("DateTimePicker").clear();
 		});
 		resetMap(true);
