@@ -195,10 +195,9 @@
 {% macro geotagging_answer(question_id, answer, has_help) -%}
 <div class="answer" data-key="{{answer.saved_as}}">
 	<p>Select a region on the map within which you think this image comes from. You can also quickly zoom in on a location by searching for it.</p>
-	<div id="ol-map-search"><input id="ol-map-search-input" type="text" class="form-control" placeholder="Search for a location by name"><button id="ol-map-search-button" class="btn btn-xs" disabled><i class="fa fa-fw fa-search"></i></button></div>
-	<div id="ol-map" class="ol-map"></div>
+	<div id="geotagx-ol-map-{{answer.saved_as}}" class="geotagx-ol-map"></div>
 	<div class="answer">
-		<button class="btn btn-answer btn-primary btn-sm" value="Done">Done</button>
+		<button class="btn btn-answer btn-primary btn-sm" value="Done" data-target-id="geotagx-ol-map-{{answer.saved_as}}">Done</button>
 		<button class="btn btn-answer btn-warning btn-sm" value="Unknown"{% if has_help %} data-toggle="tooltip" data-placement="bottom" title="Did you read the help?"{% endif %}>I don't know</button>
 		<button class="btn btn-answer btn-default btn-sm" value="NotClear">Image not clear</button>
 	</div>

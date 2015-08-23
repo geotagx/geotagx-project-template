@@ -89,6 +89,12 @@
 		reset(this.openLayersMap_, panToCenter);
 	};
 	/**
+	 * Update the map's size.
+	 */
+	Map.prototype.updateSize = function(){
+		this.openLayersMap_.updateSize();
+	};
+	/**
 	 * Centers the map at the specified location.
 	 * If the input element is specified, then its value will be updated with the location's full name.
 	 */
