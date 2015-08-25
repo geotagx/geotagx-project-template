@@ -24,8 +24,7 @@
 	<script src="../layout/static/js/geotagx-ol.js"></script>
 	<script>
 	$(document).ready(function(){
-		var map = new geotagx.ol.Map("ol-map");
-
+		var map = geotagx.ol.createMap("ol-map");
 		var $locationSelector = $("#location-selector");
 		$locationSelector.on("keypress", function(e){
 			var keycode = (e.keyCode ? e.keyCode : e.which);

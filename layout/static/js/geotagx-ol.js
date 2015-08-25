@@ -4,12 +4,50 @@
 ;(function(geotagx, $, undefined){
 	"use strict";
 	/**
-	 * Custom controls.
+	 * A dictionary that maps a target identifier to an instantiated map object.
 	 */
-	var control_ = {
-		// listenerKey:{
-		// 	moveend:null
-		// },
+	var maps_ = {};
+	/**
+	 * The wrapper API.
+	 */
+	var api_  = {
+		/**
+		 * Instantiates a Map object. If a Map with the specified targetId
+		 * already exists, then it is returned instead.
+		 */
+		createMap:function(targetId){
+			var map = null;
+			targetId = sanitizeTargetId_(targetId);
+			if (targetId){
+				// Have we cached a Map object with the specified targetId? If
+				// so, return the object. If, however, the targetId exists but
+				// no data is mapped to it, then a new Map is instantiated.
+				if (targetId in maps_)
+					map = maps_[targetId];
+
+				if (!map){
+					map = new Map(targetId);
+					maps_[targetId] = map;
+				}
+			}
+			return map;
+		},
+		/**
+		 * Returns the instance of the Map with the specified target identifier,
+		 * or null if none exists.
+		 */
+		findMap:function(targetId){
+			var map = null;
+			targetId = sanitizeTargetId_(targetId);
+			if (targetId)
+				map = maps_[targetId];
+			return map;
+		}
+	};
+	/**
+	 * The map's controls.
+	 */
+	var controls_ = {
 		ViewSelector:function(context, options, name){
 			function onClick(){
 				var map = context.getMap();
@@ -34,14 +72,14 @@
 
 					// A handler to hide the 'Borders' layer when we reach a
 					// certain resolution.
-					// control_.listenerKey.moveend = map.on("moveend", function(){
+					// controls_.listenerKey.moveend = map.on("moveend", function(){
 					// 	var resolution = mapView.getResolution();
 					// 	bordersLayer.setVisible(resolution > 100);
 					// });
 				}
 				else {
 					bordersLayer.setVisible(false);
-					// map.unByKey(control_.listenerKey.moveend);
+					// map.unByKey(controls_.listenerKey.moveend);
 				}
 			}
 
@@ -62,37 +100,37 @@
 			});
 		},
 		SatelliteViewSelector:function(options){
-			control_.ViewSelector(this, options, "Satellite");
+			controls_.ViewSelector(this, options, "Satellite");
 		},
 		AerialViewSelector:function(options){
-			control_.ViewSelector(this, options, "Aerial");
+			controls_.ViewSelector(this, options, "Aerial");
 		},
 		MapViewSelector:function(options){
-			control_.ViewSelector(this, options, "Map");
+			controls_.ViewSelector(this, options, "Map");
 		}
 	};
-	ol.inherits(control_.SatelliteViewSelector, ol.control.Control);
-	ol.inherits(control_.AerialViewSelector, ol.control.Control);
-	ol.inherits(control_.MapViewSelector, ol.control.Control);
+	ol.inherits(controls_.SatelliteViewSelector, ol.control.Control);
+	ol.inherits(controls_.AerialViewSelector, ol.control.Control);
+	ol.inherits(controls_.MapViewSelector, ol.control.Control);
 	/**
 	 * Creates a Map object which includes a private internal map (an actual OpenLayers map)
 	 * object and an accessor to the aforementioned object.
 	 */
 	var Map = function(targetId){
-		this.openLayersMap_ = createOpenLayersMap(targetId);
+		this.openLayersMap = createOpenLayersMap(targetId);
 	};
 	/**
 	 * Removes any plotted polygons or selected countries from the map.
 	 * If moveToCenter is set to true, the map is centered at the origin.
 	 */
 	Map.prototype.reset = function(panToCenter){
-		reset(this.openLayersMap_, panToCenter);
+		reset(this.openLayersMap, panToCenter);
 	};
 	/**
 	 * Update the map's size.
 	 */
 	Map.prototype.updateSize = function(){
-		this.openLayersMap_.updateSize();
+		this.openLayersMap.updateSize();
 	};
 	/**
 	 * Centers the map at the specified location.
@@ -100,7 +138,7 @@
 	 */
 	Map.prototype.setLocation = function(location, input){
 		if (location && typeof(location) === "string"){
-			var map = this.openLayersMap_;
+			var map = this.openLayersMap;
 			if (map){
 				// Query OpenStreetMap for the location's coordinates.
 				$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
@@ -142,9 +180,9 @@
 	 */
 	Map.prototype.getSelection = function(){
 		var selection = null;
-		if (this.openLayersMap_){
+		if (this.openLayersMap){
 			// If a polygon (feature) has been drawn, return its vertices in the form of an array of <X, Y> pairs.
-			var features = getLayer(this.openLayersMap_, "interaction", "Plot").getSource().getFeatures();
+			var features = getLayer(this.openLayersMap, "interaction", "Plot").getSource().getFeatures();
 			if (features.length > 0)
 				selection = [].concat(features[0].getGeometry().getCoordinates()[0]);
 		}
@@ -155,8 +193,8 @@
 	 */
 	Map.prototype.getSelectedCountries = function(){
 		var features = null;
-		if (this.openLayersMap_){
-			var interactions = this.openLayersMap_.getInteractions();
+		if (this.openLayersMap){
+			var interactions = this.openLayersMap.getInteractions();
 
 			// The select interaction was the last to be inserted and is therefore the last item in the collection.
 			var selectInteraction = interactions.item(interactions.getLength() - 1);
@@ -214,9 +252,9 @@
 			controls:ol.control.defaults().extend([
 				new ol.control.ZoomSlider(),
 				new ol.control.FullScreen(),
-				new control_.SatelliteViewSelector(),
-				new control_.AerialViewSelector(),
-				new control_.MapViewSelector()
+				new controls_.SatelliteViewSelector(),
+				new controls_.AerialViewSelector(),
+				new controls_.MapViewSelector()
 			]),
 			layers:[
 				new ol.layer.Group({
@@ -258,7 +296,7 @@
 					name:"interaction",
 					layers:[
 						// new ol.layer.Vector({
-						// 	name: 'Sea color',
+						// 	name: 'Country',
 						// 	source:new ol.source.Vector({
 						// 		url:"http://openlayers.org/en/v3.8.2/examples/data/geojson/countries.geojson",
 						// 		//url:"data/countries.geojson",
@@ -312,11 +350,11 @@
 	 * Returns the map layer with the specified name in the group with the
 	 * specified name.
 	 */
-	function getLayer(map, groupName, layerName){
+	function getLayer(openLayersMap, groupName, layerName){
 		// TODO Optimize me. This function's time complexity hurts my eyes.
 		var output = null;
-		if (map && groupName && groupName.length > 0){
-			var groups = map.getLayers();
+		if (openLayersMap && groupName && groupName.length > 0){
+			var groups = openLayersMap.getLayers();
 			for (var i = 0; i < groups.getLength(); ++i){
 				var group = groups.item(i);
 				if (group.get("name") === groupName){
@@ -341,24 +379,33 @@
 	 * Removes any plotted polygons from the map, and if panToCenter is set to
 	 * true, then the map is centered at the origin.
 	 */
-	function reset(map, panToCenter){
-		getLayer(map, "interaction", "Plot").getSource().clear();
+	function reset(openLayersMap, panToCenter){
+		getLayer(openLayersMap, "interaction", "Plot").getSource().clear();
 		if (panToCenter){
-			var view = map.getView();
+			var view = openLayersMap.getView();
 			if (view){
 				view.setCenter([0, 0]);
 				view.setZoom(2);
 			}
 		}
 	}
+	/**
+	 * Cleans up the specified target identifier and returns a properly formed
+	 * identifier. If the specified identifier is not valid, null is returned.
+	 */
+	function sanitizeTargetId_(targetId){
+		if (typeof(targetId) !== "string"){
+			console.error("[geotagx::ol::sanitizeTargetId_] Error! The target ID must be a string.");
+			return null;
+		}
+		targetId = targetId.trim();
+		if (targetId.length === 0){
+			console.error("[geotagx::ol::sanitizeTargetId_] Error! The target ID must be a non-empty string.");
+			return null;
+		}
+		return targetId;
+	}
 
 	// Expose the wrapper API.
-	geotagx.ol = {
-		/**
-		 * Creates an instance of the OpenLayers map.
-		 */
-		Map:function(targetId){
-			return new Map(targetId);
-		}
-	};
+	geotagx.ol = api_;
 })(window.geotagx = window.geotagx || {}, jQuery);
