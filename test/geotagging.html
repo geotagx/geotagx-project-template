@@ -2,12 +2,12 @@
 <html>
 <head>
 	<title>geotagx-ol.js wrapper test</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../layout/static/css/vendor/ol.css">
 	<link rel="stylesheet" href="../layout/static/css/geotagx-ol.css">
 </head>
 <body>
 	<div id="ol-map" class="geotagx-ol-map" style="width:100%; height:400px"></div>
-	<input id="location-selector" placeholder="Select a location and press ENTER to center the map in that region." style="margin:1em 0; width:640px;"></input>
 	<!-- <div>
 		<button id="get-selection">Print selected countries</button>
 		<p id="selected-countries"></p>
@@ -25,12 +25,6 @@
 	<script>
 	$(document).ready(function(){
 		var map = geotagx.ol.createMap("ol-map");
-		var $locationSelector = $("#location-selector");
-		$locationSelector.on("keypress", function(e){
-			var keycode = (e.keyCode ? e.keyCode : e.which);
-			if (keycode === 13)
-				map.setLocation($locationSelector.val(), $locationSelector[0]); // The input parameter has to be a native DOM element.
-		});
 
 		// $("#get-selection").on("click", function(){
 		// 	var selectedCountries = map.getSelectedCountries();

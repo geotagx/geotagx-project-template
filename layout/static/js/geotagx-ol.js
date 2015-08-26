@@ -48,6 +48,53 @@
 	 * The map's controls.
 	 */
 	var controls_ = {
+		Search:function(options){
+			var context = this;
+
+			var toggleButton = document.createElement("button");
+			toggleButton.innerHTML = '<i class="hide-on-expanded fa fa-fw fa-search"></i><i class="show-on-expanded fa fa-fw fa-close"></i>';
+			toggleButton.className = "geotagx-ol-search-toggle";
+			toggleButton.addEventListener("click", onToggleVisibility, false);
+			toggleButton.addEventListener("touchstart", onToggleVisibility, false);
+
+			var input = document.createElement("input");
+			input.className = "geotagx-ol-search-input show-on-expanded";
+			input.placeholder = "Search for a location by name";
+			input.addEventListener("keypress", onInput, false);
+
+			var searchButton = document.createElement("button");
+			searchButton.innerHTML = 'SEARCH';
+			searchButton.className = "geotagx-ol-search-button show-on-expanded";
+			searchButton.addEventListener("click", onSearch, false);
+			searchButton.addEventListener("touchstart", onSearch, false);
+
+			var container = document.createElement("div");
+			container.className = "ol-control ol-unselectable geotagx-ol-control-search";
+			container.appendChild(input);
+			container.appendChild(searchButton);
+			container.appendChild(toggleButton);
+
+			ol.control.Control.call(this, {element:container});
+
+			function onToggleVisibility(){
+				$(this).parent("div").toggleClass("expanded");
+			}
+
+			function onInput(e){
+				var keycode = (e.keyCode ? e.keyCode : e.which);
+				if (keycode === 13){ // Keycode 13 is the carriage return key.
+					var location = $.trim(input.value);
+					if (location)
+						setLocation(context.getMap(), location, this);
+				}
+			}
+
+			function onSearch(){
+				var location = $.trim(input.value);
+				if (location)
+					setLocation(context.getMap(), location, input);
+			}
+		},
 		ViewSelector:function(context, options, name){
 			function onClick(){
 				var map = context.getMap();
@@ -109,6 +156,7 @@
 			controls_.ViewSelector(this, options, "Map");
 		}
 	};
+	ol.inherits(controls_.Search, ol.control.Control);
 	ol.inherits(controls_.SatelliteViewSelector, ol.control.Control);
 	ol.inherits(controls_.AerialViewSelector, ol.control.Control);
 	ol.inherits(controls_.MapViewSelector, ol.control.Control);
@@ -137,43 +185,8 @@
 	 * If the input element is specified, then its value will be updated with the location's full name.
 	 */
 	Map.prototype.setLocation = function(location, input){
-		if (location && typeof(location) === "string"){
-			var map = this.openLayersMap;
-			if (map){
-				// Query OpenStreetMap for the location's coordinates.
-				$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
-					if (results.length > 0){
-						var result = results[0];
-						var latitude = parseFloat(result.lat);
-						var longitude = parseFloat(result.lon);
-						var center = ol.proj.transform([longitude, latitude], "EPSG:4326", "EPSG:3857");
-						var view = map.getView();
-
-						var start = Number(new Date());
-						var duration = 2000;
-						var pan = ol.animation.pan({
-							duration:duration,
-							source:view.getCenter(),
-							start:start
-						});
-						var bounce = ol.animation.bounce({
-							duration:duration,
-							resolution:4 * view.getResolution(),
-							start:start
-						});
-						map.beforeRender(pan, bounce);
-						view.setCenter(center);
-						view.setZoom(7);
-
-						// If an input field was specified, replace its value with the location's full name.
-						if (input)
-							input.value = result.display_name;
-					}
-					else
-						console.log("Location not found."); // e.g. xyxyxyxyxyxyx
-				});
-			}
-		}
+		if (this.openLayersMap)
+			setLocation(this.openLayersMap, location, input);
 	};
 	/**
 	 * Returns the coordinates of the plotted polygon.
@@ -252,6 +265,7 @@
 			controls:ol.control.defaults().extend([
 				new ol.control.ZoomSlider(),
 				new ol.control.FullScreen(),
+				new controls_.Search(),
 				new controls_.SatelliteViewSelector(),
 				new controls_.AerialViewSelector(),
 				new controls_.MapViewSelector()
@@ -404,6 +418,46 @@
 			return null;
 		}
 		return targetId;
+	}
+	/**
+	 * Centers the map at the specified location. If input element is specified,
+	 * its value is replaced with location's full name.
+	 */
+	function setLocation(openLayersMap, location, input){
+		if (location && typeof(location) === "string" && openLayersMap){
+			// Query OpenStreetMap for the location's coordinates.
+			$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
+				if (results.length > 0){
+					var result = results[0];
+					var latitude = parseFloat(result.lat);
+					var longitude = parseFloat(result.lon);
+					var center = ol.proj.transform([longitude, latitude], "EPSG:4326", "EPSG:3857");
+					var view = openLayersMap.getView();
+
+					var start = Number(new Date());
+					var duration = 2000;
+					var pan = ol.animation.pan({
+						duration:duration,
+						source:view.getCenter(),
+						start:start
+					});
+					var bounce = ol.animation.bounce({
+						duration:duration,
+						resolution:4 * view.getResolution(),
+						start:start
+					});
+					openLayersMap.beforeRender(pan, bounce);
+					view.setCenter(center);
+					view.setZoom(7);
+
+					// If an input field was specified, replace its value with the location's full name.
+					if (input)
+						input.value = result.display_name;
+				}
+				else
+					console.log("Location not found."); // e.g. xyxyxyxyxyxyx
+			});
+		}
 	}
 
 	// Expose the wrapper API.

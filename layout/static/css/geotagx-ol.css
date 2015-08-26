@@ -63,3 +63,51 @@
 {
 	top:232px;
 }
+/**
+ * Search controls.
+ */
+.geotagx-ol-control-search
+{
+	position:absolute;
+	right:0.5em;
+	bottom:2.8em;
+	width:1.7em;
+	height:1.7em;
+}
+.geotagx-ol-control-search.expanded
+{
+	width:23.5em;
+}
+.geotagx-ol-control-search .show-on-expanded,
+.geotagx-ol-control-search.expanded .hide-on-expanded
+{
+	display:none;
+}
+.geotagx-ol-control-search.expanded .show-on-expanded,
+.geotagx-ol-control-search .hide-on-expanded
+{
+	display:inline;
+}
+	.geotagx-ol-search-toggle
+	{
+		float:right;
+	}
+	.geotagx-ol-search-input
+	{
+		position:absolute;
+		top:0.15em;
+		left:0.4em;
+		bottom:0.15em;
+		width:21em;
+		border:none;
+		background:transparent;
+	}
+	.geotagx-ol-search-button
+	{
+		position:absolute;
+		top:0.5em;
+		right:2.5em;
+		width:5em !important;
+		font-size:0.75em !important;
+		cursor:pointer;
+	}
