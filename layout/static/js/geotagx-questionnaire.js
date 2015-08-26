@@ -12,7 +12,6 @@
 	var questionChanged_ = function(question){}; // A handler that is called each time a question changes.
     var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout the questionnaire. It also allows a user to rewind to a previous question.
-	var maps_ = {}; // OpenLayers 3 map instances.
 
 	$(document).ready(function(){
 		$questions_ = $(".question");
@@ -76,7 +75,7 @@
 		$(".geotagx-ol-map").each(function(){
 			var targetId = $.trim($(this).attr("id"));
 			if (targetId.length > 0)
-				maps_[targetId] = new geotagx.ol.Map(targetId);
+				geotagx.ol.createMap(targetId);
 		});
 
 		// Set image zoom button handler.
@@ -243,7 +242,7 @@
 					var coordinates = null;
 					var targetId = $submitter.data("target-id");
 					if (targetId){
-						var map = maps_[targetId];
+						var map = geotagx.ol.findMap(targetId);
 						if (map)
 							coordinates = map.getSelection();
 					}
@@ -324,8 +323,7 @@
 			if ($picker.length > 0 && $picker.data("DateTimePicker"))
 				$picker.data("DateTimePicker").clear();
 		});
-		for (var key in maps_)
-			maps_[key].reset();
+		geotagx.ol.resetAllMaps();
 	}
 	/**
 	 * Returns the storage key for the specified question, or null if it doesn't exist.
@@ -475,7 +473,7 @@
 						if ($mapContainer.length > 0){
 							var targetId = $mapContainer.attr("id");
 							if (targetId){
-								var map = maps_[targetId];
+								var map = geotagx.ol.findMap(targetId);
 								if (map)
 									map.updateSize();
 							}
