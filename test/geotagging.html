@@ -3,6 +3,7 @@
 <head>
 	<title>geotagx-ol.js wrapper test</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../layout/static/css/vendor/ol.css">
 	<link rel="stylesheet" href="../layout/static/css/geotagx-ol.css">
 </head>
@@ -16,8 +17,43 @@
 		<button id="get-polygon">Print plotted polygon coordinates</button>
 		<p id="polygon"></p>
 	</div>
-	<div>
-		Example of using the Draw interaction. Select a geometry type from the dropdown above to start drawing. To finish drawing, click the last point. To activate freehand drawing for lines and polygons, hold the Shift key. Square drawing is achieved by using Circle mode with a geometryFunction that creates a 4-sided regular polygon instead of a circle. Box drawing uses a custom geometryFunction that takes start and end point of a line with 2 points and creates a rectangular box.
+	<div class="geotagx-ol-help">
+		<h2>How to geotag a location</h2>
+		<h4>Locating a region</h4>
+		<p>
+			If you are unsure of the region where the photo was taken, we recommended perusing the
+			source article for any hints. If you do find the name of the location where the photo
+			was taken, you can use <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-search"></i></button>
+			(the Search tool) to quickly zoom in on it.
+		</p>
+		<h4>Changing the view mode</h4>
+		<p>
+			By default, you are presented with a street view however this may not be very useful in cases where you would
+			like to have a somewhat clear view of the terrain. In these instances, it is possible to switch to either satellite
+			imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>S</strong></button> (the Satellite Imagery toggle)
+			or aerial imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>A</strong></button>
+			(the Aerial Imagery toggle). There is a downside to both satellite and aerial imagery: data may not always
+			be available. This is particularly common for satellite imagery, however in almost all cases, aerial imagery
+			can be used as a complement to satellite imagery.<br>
+			To switch back to the street view, you can use <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>M</strong></button>
+			(the Map View toggle).
+		</p>
+		<h4>Selecting a region</h4>
+		<p>
+			To outline a region, start by clicking an initial point on the map. This will toggle the
+			geometry-draw mode, allowing you to plot a polygon around a region of interest.
+			To finish drawing, click the initial point to close the polygon loop.<br>
+			<em>
+				Please remember that only one polygon can be drawn at a time. If you restart the process,
+				any previously rendered polygon will be removed.<br>You can also remove any polygons by
+				using <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-eraser"></i></button> (the Eraser tool).
+			</em>
+		</p>
+		<h4>Full-screen mode</h4>
+		<p>
+			For times where the viewport is too small, you can switch to full-screen with <button disabled class="btn btn-primary" style="padding:0 0.25em"><big>&#8596;</big></button>
+			(the Full-screen toggle). This tool is not visible if your browser does not support full-screen mode!
+		</p>
 	</div>
 	<script src="js/jquery.js"></script>
 	<script src="../layout/static/js/vendor/ol.js"></script>
