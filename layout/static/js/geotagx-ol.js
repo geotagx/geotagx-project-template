@@ -42,6 +42,16 @@
 			if (targetId)
 				map = maps_[targetId];
 			return map;
+		},
+		/**
+		 * Resets all maps.
+		 */
+		resetAllMaps:function(){
+			for (var key in maps_){
+				var map = maps_[key];
+				if (map)
+					map.reset();
+			}
 		}
 	};
 	/**
