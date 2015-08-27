@@ -71,8 +71,8 @@
 	position:absolute;
 	right:0.5em;
 	bottom:2.8em;
-	width:1.7em;
-	height:1.7em;
+	width:2em;
+	height:2em;
 }
 .geotagx-ol-control-search.expanded
 {
@@ -95,17 +95,18 @@
 	.geotagx-ol-search-input
 	{
 		position:absolute;
-		top:0.15em;
-		left:0.4em;
-		bottom:0.15em;
-		width:21em;
+		top:0;
+		left:0;
+		bottom:0;
+		width:21.65em;
+		padding:0 4em 0 0.4em;
 		border:none;
 		background:transparent;
 	}
 	.geotagx-ol-search-button
 	{
 		position:absolute;
-		top:0.5em;
+		top:0.55em;
 		right:2.5em;
 		width:5em !important;
 		font-size:0.75em !important;
