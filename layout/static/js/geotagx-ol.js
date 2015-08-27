@@ -234,49 +234,6 @@
 		return selection;
 	};
 	/**
-	 * Returns an object that contains all selected country names and regions (polygons).
-	 */
-	Map.prototype.getSelectedCountries = function(){
-		var features = null;
-		if (this.openLayersMap){
-			var interactions = this.openLayersMap.getInteractions();
-
-			// The select interaction was the last to be inserted and is therefore the last item in the collection.
-			var selectInteraction = interactions.item(interactions.getLength() - 1);
-			features = selectInteraction.getFeatures();
-		}
-		return new SelectedCountries(features);
-	};
-	/**
-	 *
-	 */
-	var SelectedCountries = function(features){
-		this.selection_ = {};
-		if (features){
-			features.forEach(function(feature, i){
-				var name = feature.get("name");
-				var polygon = feature.getGeometry().getCoordinates()[0];
-				this.selection_[name] = polygon;
-			}, this);
-		}
-	};
-	/**
-	 * Returns the set of names of the selected countries.
-	 */
-	SelectedCountries.prototype.getNames = function(){
-		return Object.keys(this.selection_);
-	};
-	/**
-	 * Returns the set of polygons the define the region of the selected countries.
-	 */
-	SelectedCountries.prototype.getPolygons = function(){
-		var polygons = [];
-		for (var name in this.selection_)
-			polygons.push(this.selection_[name]);
-
-		return polygons;
-	};
-	/**
 	 * Creates an OpenLayers map instance in the DOM element with the specified ID.
 	 */
 	function createOpenLayersMap(targetId){
@@ -342,19 +299,6 @@
 				new ol.layer.Group({
 					name:"interaction",
 					layers:[
-						// new ol.layer.Vector({
-						// 	name: 'Country',
-						// 	source:new ol.source.Vector({
-						// 		url:"http://openlayers.org/en/v3.8.2/examples/data/geojson/countries.geojson",
-						// 		//url:"data/countries.geojson",
-						// 		format:new ol.format.GeoJSON()
-						// 	}),
-						// 	style:new ol.style.Style({
-						// 		stroke:new ol.style.Stroke({
-						// 			color:"#FFCC33"
-						// 		})
-						// 	})
-						// }),
 						new ol.layer.Vector({
 							name:"Plot",
 							source:plotInteractionVector,
@@ -387,9 +331,6 @@
 			resetMap(this, false);
 		}, map);
 		map.addInteraction(plotInteraction);
-
-		// An interaction that allows us to select a predefined region on the map.
-		// new ol.interaction.Select() // Important: Update Map.getSelectedCountries if you change this field.
 
 		// Custom parameters used by the wrapper.
 		map.set("geotagx.ol.currentViewName", "Map");
