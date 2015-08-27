@@ -292,8 +292,8 @@
 			view:new ol.View({
 				center:[0, 0],
 				zoom:2,
-				minZoom:1.5,
-				maxZoom:19
+				minZoom:2,
+				minResolution:0.25 // There is usually no more aerial imagery data for resolutions smaller than 0.298.
 			}),
 			controls:ol.control.defaults().extend([
 				new ol.control.ZoomSlider(),
