@@ -63,6 +63,7 @@
 
 			var toggleButton = document.createElement("button");
 			toggleButton.innerHTML = '<i class="hide-on-expanded fa fa-fw fa-search"></i><i class="show-on-expanded fa fa-fw fa-close"></i>';
+			toggleButton.title = "Search for a location";
 			toggleButton.className = "geotagx-ol-search-toggle";
 			toggleButton.addEventListener("click", onToggleVisibility, false);
 			toggleButton.addEventListener("touchstart", onToggleVisibility, false);
@@ -110,6 +111,7 @@
 
 			var eraseButton = document.createElement("button");
 			eraseButton.innerHTML = '<i class="fa fa-fw fa-eraser"></i>';
+			eraseButton.title = "Erase all polygons from the map";
 			eraseButton.className = "geotagx-ol-erase-button";
 			eraseButton.addEventListener("click", onErase, false);
 			eraseButton.addEventListener("touchstart", onErase, false);
@@ -163,6 +165,7 @@
 
 			var button = document.createElement("button");
 			button.innerHTML = name.charAt(0).toUpperCase();
+			button.title = "Switch to " + name + " view";
 			button.addEventListener("click", onClick, false);
 			button.addEventListener("touchstart", onClick, false);
 
