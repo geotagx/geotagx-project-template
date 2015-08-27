@@ -15,7 +15,7 @@
 		 * Instantiates a Map object. If a Map with the specified targetId
 		 * already exists, then it is returned instead.
 		 */
-		createMap:function(targetId){
+		createMap:function(targetId, location){
 			var map = null;
 			targetId = sanitizeTargetId_(targetId);
 			if (targetId){
@@ -26,9 +26,11 @@
 					map = maps_[targetId];
 
 				if (!map){
-					map = new Map(targetId);
+					map = new Map(targetId, location);
 					maps_[targetId] = map;
 				}
+				else
+					setLocation(map, location, null, false);
 			}
 			return map;
 		},
@@ -105,14 +107,14 @@
 				if (keycode === 13){ // Keycode 13 is the carriage return key.
 					var location = $.trim(input.value);
 					if (location)
-						setLocation(context.getMap(), location, this);
+						setLocation(context.getMap(), location, this, true);
 				}
 			}
 
 			function onSearch(){
 				var location = $.trim(input.value);
 				if (location)
-					setLocation(context.getMap(), location, input);
+					setLocation(context.getMap(), location, input, true);
 			}
 		},
 		Eraser:function(options){
@@ -188,10 +190,14 @@
 	ol.inherits(controls_.MapViewSelector, ol.control.Control);
 	/**
 	 * Creates a Map object which includes a private internal map (an actual OpenLayers map)
-	 * object and an accessor to the aforementioned object.
+	 * object and an accessor to the aforementioned object. If a location is
+	 * specified, the map will be centered at it's coordinates.
 	 */
-	var Map = function(targetId){
+	var Map = function(targetId, location){
 		this.openLayersMap = createOpenLayersMap(targetId);
+		this.defaultLocation = $.trim(location);
+		if (this.defaultLocation.length > 0)
+			setLocation(this.openLayersMap, this.defaultLocation, null, false);
 	};
 	/**
 	 * Removes any plotted polygons or selected countries from the map.
@@ -212,7 +218,7 @@
 	 */
 	Map.prototype.setLocation = function(location, input){
 		if (this.openLayersMap)
-			setLocation(this.openLayersMap, location, input);
+			setLocation(this.openLayersMap, location, input, true);
 	};
 	/**
 	 * Returns the coordinates of the plotted polygon.
@@ -472,7 +478,7 @@
 	 * Centers the map at the specified location. If input element is specified,
 	 * its value is replaced with location's full name.
 	 */
-	function setLocation(openLayersMap, location, input){
+	function setLocation(openLayersMap, location, input, animate){
 		if (location && typeof(location) === "string" && openLayersMap){
 			// Query OpenStreetMap for the location's coordinates.
 			$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
@@ -483,19 +489,21 @@
 					var center = ol.proj.transform([longitude, latitude], "EPSG:4326", "EPSG:3857");
 					var view = openLayersMap.getView();
 
-					var start = Number(new Date());
-					var duration = 2000;
-					var pan = ol.animation.pan({
-						duration:duration,
-						source:view.getCenter(),
-						start:start
-					});
-					var bounce = ol.animation.bounce({
-						duration:duration,
-						resolution:4 * view.getResolution(),
-						start:start
-					});
-					openLayersMap.beforeRender(pan, bounce);
+					if (animate){
+						var start = Number(new Date());
+						var duration = 2000;
+						var pan = ol.animation.pan({
+							duration:duration,
+							source:view.getCenter(),
+							start:start
+						});
+						var bounce = ol.animation.bounce({
+							duration:duration,
+							resolution:4 * view.getResolution(),
+							start:start
+						});
+						openLayersMap.beforeRender(pan, bounce);
+					}
 					view.setCenter(center);
 					view.setZoom(7);
 
