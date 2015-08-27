@@ -112,3 +112,14 @@
 		font-size:0.75em !important;
 		cursor:pointer;
 	}
+/**
+ * Eraser tool.
+ */
+.geotagx-ol-control-eraser
+{
+	position:absolute;
+	right:0.5em;
+	bottom:5.2em;
+	width:2em;
+	height:2em;
+}

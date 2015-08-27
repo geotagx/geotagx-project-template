@@ -105,6 +105,25 @@
 					setLocation(context.getMap(), location, input);
 			}
 		},
+		Eraser:function(options){
+			var context = this;
+
+			var eraseButton = document.createElement("button");
+			eraseButton.innerHTML = '<i class="fa fa-fw fa-eraser"></i>';
+			eraseButton.className = "geotagx-ol-erase-button";
+			eraseButton.addEventListener("click", onErase, false);
+			eraseButton.addEventListener("touchstart", onErase, false);
+
+			var container = document.createElement("div");
+			container.className = "ol-control ol-unselectable geotagx-ol-control-eraser";
+			container.appendChild(eraseButton);
+
+			ol.control.Control.call(this, {element:container});
+
+			function onErase(){
+				resetMap(context.getMap(), false);
+			}
+		},
 		ViewSelector:function(context, options, name){
 			function onClick(){
 				var map = context.getMap();
@@ -167,6 +186,7 @@
 		}
 	};
 	ol.inherits(controls_.Search, ol.control.Control);
+	ol.inherits(controls_.Eraser, ol.control.Control);
 	ol.inherits(controls_.SatelliteViewSelector, ol.control.Control);
 	ol.inherits(controls_.AerialViewSelector, ol.control.Control);
 	ol.inherits(controls_.MapViewSelector, ol.control.Control);
@@ -182,7 +202,7 @@
 	 * If moveToCenter is set to true, the map is centered at the origin.
 	 */
 	Map.prototype.reset = function(panToCenter){
-		reset(this.openLayersMap, panToCenter);
+		resetMap(this.openLayersMap, panToCenter);
 	};
 	/**
 	 * Update the map's size.
@@ -276,6 +296,7 @@
 				new ol.control.ZoomSlider(),
 				new ol.control.FullScreen(),
 				new controls_.Search(),
+				new controls_.Eraser(),
 				new controls_.SatelliteViewSelector(),
 				new controls_.AerialViewSelector(),
 				new controls_.MapViewSelector()
@@ -361,7 +382,7 @@
 			type:"Polygon"
 		});
 		plotInteraction.on("drawstart", function(){
-			reset(this, false);
+			resetMap(this, false);
 		}, map);
 		map.addInteraction(plotInteraction);
 
@@ -403,7 +424,7 @@
 	 * Removes any plotted polygons from the map, and if panToCenter is set to
 	 * true, then the map is centered at the origin.
 	 */
-	function reset(openLayersMap, panToCenter){
+	function resetMap(openLayersMap, panToCenter){
 		getLayer(openLayersMap, "interaction", "Plot").getSource().clear();
 		if (panToCenter){
 			var view = openLayersMap.getView();
