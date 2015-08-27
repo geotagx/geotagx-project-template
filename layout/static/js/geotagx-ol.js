@@ -88,7 +88,16 @@
 			ol.control.Control.call(this, {element:container});
 
 			function onToggleVisibility(){
-				$(this).parent("div").toggleClass("expanded");
+				var $container = $(container);
+
+				$container.toggleClass("expanded");
+
+				if ($container.hasClass("expanded")){
+					input.focus();
+					input.select();
+				}
+				else
+					input.value = "";
 			}
 
 			function onInput(e){
