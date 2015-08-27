@@ -247,8 +247,8 @@
 			loadTilesWhileAnimating:true,
 			view:new ol.View({
 				center:[0, 0],
-				zoom:2,
-				minZoom:2,
+				zoom:1,
+				minZoom:1,
 				minResolution:0.25 // There is usually no more aerial imagery data for resolutions smaller than 0.298.
 			}),
 			controls:ol.control.defaults().extend([
@@ -395,7 +395,7 @@
 			var view = openLayersMap.getView();
 			if (view){
 				view.setCenter([0, 0]);
-				view.setZoom(2);
+				view.setZoom(1);
 			}
 		}
 	}
