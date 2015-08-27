@@ -431,19 +431,13 @@
 					var view = openLayersMap.getView();
 
 					if (animate){
-						var start = Number(new Date());
 						var duration = 2000;
 						var pan = ol.animation.pan({
-							duration:duration,
+							duration:2000,
 							source:view.getCenter(),
-							start:start
+							start:Number(new Date())
 						});
-						var bounce = ol.animation.bounce({
-							duration:duration,
-							resolution:4 * view.getResolution(),
-							start:start
-						});
-						openLayersMap.beforeRender(pan, bounce);
+						openLayersMap.beforeRender(pan);
 					}
 					view.setCenter(center);
 					view.setZoom(7);
