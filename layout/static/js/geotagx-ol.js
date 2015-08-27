@@ -138,36 +138,20 @@
 		ViewSelector:function(context, options, name){
 			function onClick(){
 				var map = context.getMap();
-				var mapView = map.getView();
-				var mapResolution = mapView.getResolution();
+
+				map.set("geotagx.ol.currentViewName", name);
 
 				// When the view's selector is clicked, all other layers are hidden.
 				getLayer(map, "view").getLayers().forEach(function(layer){
 					layer.setVisible(layer.get("name") === name);
 				});
 
-				// The 'Borders' layer is only visible for Satellite and Aerial imagery.
-				var bordersLayer = getLayer(map, "legend", "Borders");
-				var bordersLayerVisible = ["Satellite", "Aerial"].indexOf(name) !== -1;
-				if (bordersLayerVisible){
-					bordersLayer.setVisible(true);
-
-					//FIXME
-					// The layer is only visible to a certain resolution
-					// otherwise it is more obstructive than helpful.
-					// bordersLayer.setVisible(mapResolution > 100);
-
-					// A handler to hide the 'Borders' layer when we reach a
-					// certain resolution.
-					// controls_.listenerKey.moveend = map.on("moveend", function(){
-					// 	var resolution = mapView.getResolution();
-					// 	bordersLayer.setVisible(resolution > 100);
-					// });
-				}
-				else {
-					bordersLayer.setVisible(false);
-					// map.unByKey(controls_.listenerKey.moveend);
-				}
+				// Hide the 'Borders' layer, if need be.
+				var borders = map.get("geotagx.ol.layer.borders");
+				if (["Aerial","Satellite"].indexOf(name) !== -1)
+					borders.setVisible(map.get("geotagx.ol.showBorders"));
+				else
+					borders.setVisible(false);
 			}
 
 			options = options || {};
@@ -401,6 +385,28 @@
 		// An interaction that allows us to select a predefined region on the map.
 		// new ol.interaction.Select() // Important: Update Map.getSelectedCountries if you change this field.
 
+		// Custom parameters used by the wrapper.
+		map.set("geotagx.ol.currentViewName", "Map");
+		map.set("geotagx.ol.layer.borders", getLayer(map, "legend", "Borders"));
+		map.set("geotagx.ol.showBorders", false);
+
+		map.on("moveend", function(){
+			var map = this;
+			var view = map.getView();
+			var viewName = map.get("geotagx.ol.currentViewName");
+			var resolution = map.getView().getResolution();
+			var borders = map.get("geotagx.ol.layer.borders");
+			var showBorders = resolution > 100;
+
+			// The 'Borders' layer becomes a hindrance the more a user zooms in
+			// to the map. It is hidden past a certain zoom level.
+			map.set("geotagx.ol.showBorders", showBorders);
+
+			if (["Aerial","Satellite"].indexOf(viewName) !== -1)
+				borders.setVisible(showBorders);
+			else
+				borders.setVisible(false);
+		});
 		return map;
 	}
 	/**
