@@ -78,9 +78,10 @@
 
 		// Initialize maps if any exist.
 		$(".geotagx-ol-map").each(function(){
-			var targetId = $.trim($(this).attr("id"));
+			var $map = $(this);
+			var targetId = $.trim($map.attr("id"));
 			if (targetId.length > 0)
-				geotagx.ol.createMap(targetId);
+				geotagx.ol.createMap(targetId, $.trim($map.data("location")));
 		});
 
 		// Set image zoom button handler.

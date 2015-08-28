@@ -52,7 +52,7 @@
 			for (var key in maps_){
 				var map = maps_[key];
 				if (map)
-					map.reset();
+					map.reset(true);
 			}
 		}
 	};
@@ -195,16 +195,22 @@
 	 */
 	var Map = function(targetId, location){
 		this.openLayersMap = createOpenLayersMap(targetId);
-		this.defaultLocation = $.trim(location);
-		if (this.defaultLocation.length > 0)
-			setLocation(this.openLayersMap, this.defaultLocation, null, false);
+		this.defaultLocation = null;
+
+		location = $.trim(location);
+		if (location.length > 0){
+			this.defaultLocation = location;
+			setLocation(this.openLayersMap, location, null, false);
+		}
 	};
 	/**
-	 * Removes any plotted polygons or selected countries from the map.
-	 * If moveToCenter is set to true, the map is centered at the origin.
+	 * Removes any plotted polygons or selected countries from the map and if
+	 * panToDefaultLocation is set to true, then the map at is centered at its default
+	 * location. If no default location was specified, the map is centered at
+	 * the origin.
 	 */
-	Map.prototype.reset = function(panToCenter){
-		resetMap(this.openLayersMap, panToCenter);
+	Map.prototype.reset = function(panToDefaultLocation){
+		resetMap(this.openLayersMap, panToDefaultLocation, this.defaultLocation);
 	};
 	/**
 	 * Update the map's size.
@@ -386,16 +392,21 @@
 		return output;
 	}
 	/**
-	 * Removes any plotted polygons from the map, and if panToCenter is set to
-	 * true, then the map is centered at the origin.
+	 * Removes any plotted polygons from the map, and if panToDefaultLocation is
+	 * set to true, then the map is centered at the specified location. If the
+	 * location is not given, then the map is centered at the origin.
 	 */
-	function resetMap(openLayersMap, panToCenter){
+	function resetMap(openLayersMap, panToDefaultLocation, defaultLocation){
 		getLayer(openLayersMap, "interaction", "Plot").getSource().clear();
-		if (panToCenter){
-			var view = openLayersMap.getView();
-			if (view){
-				view.setCenter([0, 0]);
-				view.setZoom(1);
+		if (panToDefaultLocation){
+			if (defaultLocation && defaultLocation.length > 0)
+				setLocation(openLayersMap, defaultLocation, null, false);
+			else {
+				var view = openLayersMap.getView();
+				if (view){
+					view.setCenter([0, 0]);
+					view.setZoom(1);
+				}
 			}
 		}
 	}

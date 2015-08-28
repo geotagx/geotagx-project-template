@@ -112,6 +112,7 @@ answer:{
 ```
 type:geotagging
 answer:{
-	key:string
+	key:string,
+	location:string
 }
 ```
