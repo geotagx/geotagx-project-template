@@ -19,6 +19,10 @@
 		initialQuestion_ = $questions_.first().data("id");
 
 		$("#questionnaire-rewind").on("click", showPreviousQuestion);
+		$("#questionnaire-no-photo").on("click", function(){
+			answers_.photoVisible = false;
+			api_.finish();
+		});
 
 		// Set the 'Show Comments' button handlers. One event handler loads the Disqus thread once and is disabled.
 		// The next handler simply makes the #disqus_thread div visible.
@@ -65,6 +69,7 @@
 
 		// Initialize the answers_ object's properties. A property is located in each
 		// element with the 'answer' class, that has a non-empty 'key' data attribute.
+		answers_.photoVisible = true;
 		$(".answer").each(function(){
 			var property = $.trim($(this).data("key"));
 			if (property)
@@ -161,8 +166,11 @@
             updateStatus();
 
             // Disable the rewind button if there're no more previous questions.
-            if (progress_.length === 1)
+            if (progress_.length === 1){
                 $("#questionnaire-rewind").prop("disabled", true);
+				$("#questionnaire-no-photo").prop("disabled", false);
+				answers_.photoVisible = true;
+			}
 
             // Hide the current question and show the previous.
             getQuestionElement(previous).removeClass("hide");
@@ -453,6 +461,7 @@
 			getCurrentQuestionElement().addClass("hide");
 
 		$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
+		$("#questionnaire-no-photo").prop("disabled", hasAnsweredQuestion);
 
 		if (question >= initialQuestion_){
 			// Update the progress stack.

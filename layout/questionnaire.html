@@ -27,7 +27,8 @@
 		</main>
 		<footer><div id="questionnaire-progress"><div id="questionnaire-progress-bar"></div></div></footer>
 	</div>
-	<button id="questionnaire-rewind" class="btn btn-sm btn-default btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
+	<button id="questionnaire-no-photo" class="btn btn-sm btn-block btn-danger show-on-task-loaded"><i class="fa fa-fw fa-lg fa-warning"></i>&nbsp;I do not see a photo</button>
+	<button id="questionnaire-rewind" class="btn btn-sm btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
 	{% if questions %}
 	{% for question in questions -%}
 	<div id="questionnaire-question-{{question.id}}" class="question hide" data-type="{{question.type}}" data-id="{{question.id}}">

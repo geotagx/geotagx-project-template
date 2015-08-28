@@ -120,11 +120,14 @@ input:checked + .other-input
 #questionnaire-section
 {
 }
-    #questionnaire-rewind
+    #questionnaire-rewind,
+    #questionnaire-no-photo
     {
         margin:1em 0;
+        color:#FFF !important;
     }
-    #questionnaire-rewind:disabled
+    #questionnaire-rewind:disabled,
+    #questionnaire-no-photo:disabled
     {
         display:none !important;
     }
