@@ -43,8 +43,8 @@
 						element:".question[data-id='1'] > .answer button[value='NotClear']",
 						onShow:syncStepElement,
 						placement:"bottom",
-						title:"Image not clear",
-						content:"If the image is not clear, blurry or its quality is too poor, you can skip it by selecting this."
+						title:"Image not clear enough",
+						content:"Certain factors may limit how much information you can take away from an image. For instance, it is almost impossible to deduce the color of the sky from a black and white photo, or discern a person's facial features from a blurry photo. Select this if you can not answer a question based on what you see in the image."
 					},
 					{
 						element:".question[data-id='1'] > .title",
