@@ -30,6 +30,45 @@
 	<button id="questionnaire-no-photo" class="btn btn-sm btn-block btn-danger show-on-task-loaded"><i class="fa fa-fw fa-lg fa-warning"></i>&nbsp;I do not see a photo</button>
 	<button id="questionnaire-rewind" class="btn btn-sm btn-block btn-primary show-on-task-loaded" disabled><i class="fa fa-fw fa-lg fa-arrow-circle-left"></i>&nbsp;Go to previous question</button>
 	{% if questions %}
+
+	{% call questions_helper.modal("geotagging-help-modal", "How to geotag a location") %}
+		<h4>Locating a region</h4>
+		<p>
+			If you are unsure of the region where the photo was taken, we recommended perusing the
+			source article for any hints. If you do find the name of the location where the photo
+			was taken, you can use <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-search"></i></button>
+			(the Search tool) to quickly zoom in on it.
+		</p>
+		<h4>Changing the view mode</h4>
+		<p>
+			By default, you are presented with a street view however this may not be very useful in cases where you would
+			like to have a somewhat clear view of the terrain. In these instances, it is possible to switch to either satellite
+			imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>S</strong></button> (the Satellite Imagery toggle)
+			or aerial imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>A</strong></button>
+			(the Aerial Imagery toggle). There is a downside to both satellite and aerial imagery: data may not always
+			be available. This is particularly common for satellite imagery, however in almost all cases, aerial imagery
+			can be used as a complement to satellite imagery.<br>
+			To switch back to the street view, you can use <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>M</strong></button>
+			(the Map View toggle).
+		</p>
+		<h4>Selecting a region</h4>
+		<p>
+			To outline a region, start by clicking an initial point on the map. This will toggle the
+			geometry-draw mode, allowing you to plot a polygon around a region of interest.
+			To finish drawing, click the initial point to close the polygon loop.<br>
+			<em>
+				Please remember that only one polygon can be drawn at a time. If you restart the process,
+				any previously rendered polygon will be removed.<br>You can also remove any polygons by
+				using <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-eraser"></i></button> (the Eraser tool).
+			</em>
+		</p>
+		<h4>Full-screen mode</h4>
+		<p>
+			For times where the viewport is too small, you can switch to full-screen with <button disabled class="btn btn-primary" style="padding:0 0.25em"><big>&#8596;</big></button>
+			(the Full-screen toggle). This tool is not visible if your browser does not support full-screen mode!
+		</p>
+	{% endcall %}
+
 	{% for question in questions -%}
 	<div id="questionnaire-question-{{question.id}}" class="question hide" data-type="{{question.type}}" data-id="{{question.id}}">
 		<header class="title">{{question.title}}</header>
@@ -39,7 +78,11 @@
 		{% endif %}
 
 		{% set has_help = True if question.help else False %}
-		{% if has_help %}
+		{% if question.type == "geotagging" %}
+		<section class="help">
+			If you do not know how to answer this question, get some <button class="help-toggle btn-link" rel="nofollow" data-toggle="modal" data-target="#geotagging-help-modal"><strong>help.</strong></button>
+		</section>
+		{% elif question.type != "geotagging" and has_help %}
 		{% call questions_helper.help_modal(question.title) %}
 		{{question.help}}
 		{% endcall %}
@@ -57,7 +100,7 @@
 			{% elif question.type == "datetime"                    %}{{questions_helper.datetime_answer(question.id, question.answer, has_help)}}
 			{% elif question.type == "date"                        %}{{questions_helper.date_answer(question.id, question.answer, has_help)}}
 			{% elif question.type == "url"                         %}{{questions_helper.url_answer(question.id, question.answer, has_help)}}
-			{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, has_help)}}
+			{% elif question.type == "geotagging"                  %}{{questions_helper.geotagging_answer(question.id, question.answer, True)}}
 			{% elif question.type == "custom"                      %}{{questions_helper.custom_answer(question.id, question.answer, has_help)}}
 			{% endif %}
 		</div>
