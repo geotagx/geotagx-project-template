@@ -14,7 +14,7 @@
 		<p id="polygon"></p>
 	</div>
 	<div class="geotagx-ol-help">
-		<h2>How to geotag a location</h2>
+		<h2>How to geolocalize an image</h2>
 		<h4>Locating a region</h4>
 		<p>
 			If you are unsure of the region where the photo was taken, we recommended perusing the
@@ -24,31 +24,30 @@
 		</p>
 		<h4>Changing the view mode</h4>
 		<p>
-			By default, you are presented with a street view however this may not be very useful in cases where you would
-			like to have a somewhat clear view of the terrain. In these instances, it is possible to switch to either satellite
+			By default, you are presented with a map view that may not be useful in cases where you would
+			like to have a clearer view of the terrain. In these instances, it is possible to switch to either satellite
 			imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>S</strong></button> (the Satellite Imagery toggle)
 			or aerial imagery with <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>A</strong></button>
-			(the Aerial Imagery toggle). There is a downside to both satellite and aerial imagery: data may not always
-			be available. This is particularly common for satellite imagery, however in almost all cases, aerial imagery
-			can be used as a complement to satellite imagery.<br>
-			To switch back to the street view, you can use <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>M</strong></button>
+			(the Aerial Imagery toggle). The downside to both satellite and aerial views is that imagery data may not always
+			be available. While this is particularly apparent for satellite imagery, in almost all cases, aerial imagery
+			can be used as a complement. In other words, try switching to the aerial view when no satellite imagery is available.<br>
+			To switch back to the map view, you can use <button disabled class="btn btn-primary" style="padding:0 0.35em"><strong>M</strong></button>
 			(the Map View toggle).
 		</p>
-		<h4>Selecting a region</h4>
+		<h4>Selecting an area of interest</h4>
 		<p>
-			To outline a region, start by clicking an initial point on the map. This will toggle the
-			geometry-draw mode, allowing you to plot a polygon around a region of interest.
-			To finish drawing, click the initial point to close the polygon loop.<br>
-			<em>
-				Please remember that only one polygon can be drawn at a time. If you restart the process,
-				any previously rendered polygon will be removed.<br>You can also remove any polygons by
-				using <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-eraser"></i></button> (the Eraser tool).
-			</em>
+			Once you have located an area you would like to geolocalize, the goal is to draw an outline around it
+			as accurately as possible. To begin, start by clicking a point on the map to toggle draw mode.
+			This mode will allow you to draw a polygon around your area of interest. To finish drawing, you can
+			either double-click the last point of the outline, or click its first point to close the loop.<br><br>
+			Please remember that only one outline can be drawn at a time. If the process is restarted, any
+			existing polygons will be deleted.<br>You can also remove any drawings by
+			using <button disabled class="btn btn-primary" style="padding:0 0.15em"><i class="fa fa-fw fa-eraser"></i></button> (the Eraser tool).
 		</p>
 		<h4>Full-screen mode</h4>
 		<p>
-			For times where the viewport is too small, you can switch to full-screen with <button disabled class="btn btn-primary" style="padding:0 0.25em"><big>&#8596;</big></button>
-			(the Full-screen toggle). This tool is not visible if your browser does not support full-screen mode!
+			If your viewport is too small, you can switch to full-screen with <button disabled class="btn btn-primary" style="padding:0 0.25em"><big>&#8596;</big></button>
+			(the Full-screen toggle). This tool is not available if your browser does not support full-screen mode!
 		</p>
 	</div>
 	<script src="js/jquery.js"></script>
