@@ -451,7 +451,7 @@
 						openLayersMap.beforeRender(pan);
 					}
 					view.setCenter(center);
-					view.setZoom(7);
+					view.setZoom(6);
 
 					// If an input field was specified, replace its value with the location's full name.
 					if (input)
