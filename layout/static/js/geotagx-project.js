@@ -24,7 +24,7 @@
 			geotagx.analytics.onStartTutorial(shortName);
 		}
 		else {
-			geotagx.questionnaire.onGetNextQuestion(getNextQuestion);
+			geotagx.questionnaire.setControlFlow(getNextQuestion);
 
 			pybossa.taskLoaded(onTaskLoaded);
 			pybossa.presentTask(onTaskPresented);
@@ -115,8 +115,6 @@
 						$message.addClass("hide");
 					}
 					else {
-						console.log(response);
-
 						$message.removeClass("hide");
 						$submitButton.one("click", function(){
 							$message.addClass("hide");

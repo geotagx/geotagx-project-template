@@ -8,15 +8,15 @@
 	var answers_ = {}; // The questionnaire's answers.
 	var $questions_ = null; // The set of questions.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
-	var initialQuestion_ = 0; // The questionnaire's initial question.
+	var initialQuestionKey_ = null; // The key to the questionnaire's initial question.
 	var questionChanged_ = function(question){}; // A handler that is called each time a question changes.
-    var percentageComplete_ = 0; // The percentage of questions completed.
     var progress_ = []; // A stack used to track the user's progress throughout the questionnaire. It also allows a user to rewind to a previous question.
+	var controlFlow_ = null; // An object that contains the questionnaire's control flow.
 
 	$(document).ready(function(){
 		$questions_ = $(".question");
 		numberOfQuestions_ = $questions_.length;
-		initialQuestion_ = $questions_.first().data("id");
+		initialQuestionKey_ = $questions_.first().data("key");
 
 		$("#questionnaire-rewind").on("click", showPreviousQuestion);
 		$("#questionnaire-no-photo").on("click", function(){
@@ -56,33 +56,15 @@
 		// Set answer button handlers.
 		$(".btn-answer").on("click.questionnaire", function(){
 			var $submitter = $(this);
-			var question = api_.getCurrentQuestion();
-			var answer = parseAnswer(api_.getQuestionType(question), $submitter);
+			var key = getCurrentQuestionKey();
+			var answer = parseAnswer(getQuestionType(key), $submitter);
 
-			// Save the answer.
-			var storageKey = getStorageKey(question);
-			if (storageKey)
-				saveAnswer(storageKey, answer);
-
-			showNextQuestion(question, answer, $submitter);
+			saveAnswer(key, answer);
+			showNextQuestion(key, answer);
 		});
 
-		// Initialize the answers_ object's properties. A property is located in each
-		// element with the 'answer' class, that has a non-empty 'key' data attribute.
-		answers_.photoVisible = true;
-		$(".answer").each(function(){
-			var property = $.trim($(this).data("key"));
-			if (property)
-				answers_[property] = null;
-		});
-
-		// Initialize maps if any exist.
-		$(".geotagx-ol-map").each(function(){
-			var $map = $(this);
-			var targetId = $.trim($map.attr("id"));
-			if (targetId.length > 0)
-				geotagx.ol.createMap(targetId, $.trim($map.data("location")));
-		});
+		initializeAnswers();
+		initializeOpenLayers();
 
 		// Set image zoom button handler.
 		function zoom(image, delta){
@@ -131,58 +113,197 @@
 		}
 	});
 	/**
-	 * Returns the identifier of the next question to display. This function
-	 * can be overwritten by a user-defined implementation via the
-	 * onGetNextQuestion API call.
-	 * @param question the current question identifier.
+	 * Initializes the answers object.
 	 */
-	function getNextQuestion(question){
-		return question + 1;
+	function initializeAnswers(){
+		answers_["photoVisible"] = true;
+
+		// The object property names are stored as a data attribute in each
+		// element with the 'answer' class.
+		$(".answer").each(function(){
+			var key = $.trim($(this).data("key"));
+			if (key.length > 0)
+				answers_[key] = null;
+		});
 	}
 	/**
-	 * A function that determines the next question based on the current question
-	 * and its answer. This function can be overwritten by a user-defined
-	 * implementation via the onShowNextQuestion API call.
-	 * @param question the current question identifier.
-	 * @param answer the current question's answer.
-	 * @param $submitter the HTML element that submitted the answer to the specified question.
+	 * Initializes any OpenLayers maps.
 	 */
-	function showNextQuestion(question, answer, $submitter){
-		api_.showQuestion(getNextQuestion(question, answer, $submitter));
+	function initializeOpenLayers(){
+		// Maps can only be created iff the OpenLayers wrapper exists.
+		if (!$.isEmptyObject(geotagx.ol)){
+			// Initialize maps if any exist.
+			$(".geotagx-ol-map").each(function(){
+				var $map = $(this);
+				var targetId = $.trim($map.attr("id"));
+				if (targetId.length > 0)
+					geotagx.ol.createMap(targetId, $.trim($map.data("location")));
+			});
+		}
+	}
+	/**
+	 * Returns true if the specified question key is valid, false otherwise.
+	 */
+	function isValidQuestionKey(key){
+		return $.type(key) === "string" && $.trim(key).length > 0 && (key === "end" || key in answers_);
+	}
+	/**
+	 * Returns the previous question's key. If no previous question exists, null is returned.
+	 */
+	function getPreviousQuestionKey(){
+		return progress_.length > 1 ? progress_[progress_.length - 2] : null;
+	}
+	/**
+	 * Returns the current question's key. If no question exists, null is returned.
+	 */
+	function getCurrentQuestionKey(){
+		return progress_.length > 0 ? progress_[progress_.length - 1] : null;
+	}
+	/**
+	 * Returns the key to the question that succeeds the question with the specified
+	 * key, and based on the answer. If there's no successor then null is returned.
+	 * @param key the key to the question for which we wish to find a successor.
+	 * @param answer an answer to the question with the specified key.
+	 */
+	function getNextQuestionKey(key, answer){
+		var nextKey = null;
+
+		if (controlFlow_ && key in controlFlow_){
+			var branch = controlFlow_[key];
+			var branchType = $.type(branch);
+			if (branchType === "string")
+				nextKey = $.trim(branch);
+			else if (branchType === "object"){
+				// Convert the answer to lower-case for a case-insensitive comparison.
+				answer = $.trim(answer.toLowerCase());
+
+				// Binary questions are a bit special: If the user clicks "No",
+				// "I don't know" or "Image not clear", then this is considered a "No".
+				if (getQuestionType(key) === "binary")
+					answer = answer === "yes" ? "yes" : "no";
+
+				// Get the question key based on the answer.
+				if (answer in branch)
+					nextKey = branch[answer];
+			}
+		}
+		// If the next question could not be determined from the control flow,
+		// then it is implied that the next question is the successor to the
+		// question with the specified key.
+		if (!isValidQuestionKey(nextKey)){
+			var $node = getQuestionNode(key);
+			if ($node)
+				nextKey = $node.next().data("key") || null;
+		}
+		// If the key is null then there're no more questions to display, so
+		// logically the end of the questionnaire has been reached.
+		return nextKey || "end";
 	}
 	/**
 	 * Displays the previous question, iff it exists.
 	 */
 	function showPreviousQuestion(){
-		// We can only rewind if we've completed at least two questions.
-        if (progress_.length >= 2){
-            var current  = progress_[progress_.length - 1];
-            var previous = progress_[progress_.length - 2];
+		// We can only rewind if we've completed at least one question, which
+		// means the progress stack contains at least two keys, one to the
+		// current question and another to the previous.
+        if (progress_.length > 1){
+			// Hide the current question, and destroy its result.
+			var current = getCurrentQuestionKey();
+			hideQuestion(current);
+			saveAnswer(current, null);
+			progress_.pop();
 
-            // Destroy the current result before loading the previous question.
-            saveAnswer(getStorageKey(current), null);
+			// Since the current question's key was removed from the progress
+			// stack, the previous question is now the current question.
+			var previous = getCurrentQuestionKey();
+			var $node = getQuestionNode(previous);
+			if ($node && $node.length > 0)
+				$node.removeClass("hide").hide().fadeIn(300);
 
-            // Update the progress stack and status panel.
-            progress_.pop();
-            updateStatus();
-
-            // Disable the rewind button if there're no more previous questions.
+            // Disable the rewind button and enable the 'no photo' button if
+			// there're no more previous questions.
             if (progress_.length === 1){
                 $("#questionnaire-rewind").prop("disabled", true);
 				$("#questionnaire-no-photo").prop("disabled", false);
 				answers_.photoVisible = true;
 			}
 
-            // Hide the current question and show the previous.
-            getQuestionElement(previous).removeClass("hide");
-			getQuestionElement(current).addClass("hide");
-
-			// Update analytics parameters.
-			geotagx.analytics.onQuestionChanged(previous);
+			var i = $node.data("index");
+			updateStatusPanel(progress_.length > 0 ? getPercentageComplete(i - 1) : 0); // Note that for the index i, we have completed (i - 1) questions.
+			questionChanged_(previous);
+			geotagx.analytics.onQuestionChanged(i);
         }
         else
-            console.log("[geotagx::questionnaire::showPrevQuestion] Error! Could not load the previous question!");
-	};
+            console.log("[geotagx::questionnaire::showPreviousQuestion] Error! Could not load the previous question!");
+	}
+	/**
+	 * Displays the questions with the specified key, iff it exists.
+	 * If the key is 'end', the the submission form is shown.
+	 */
+	function showQuestion(key){
+		if (isValidQuestionKey(key)){
+			var questionIndex = getQuestionIndex(key);
+
+			// If at least one question has been answered, hide the current question
+			// before moving onto the next.
+			var hasAnsweredQuestion = progress_.length > 0;
+			if (hasAnsweredQuestion)
+				hideQuestion(getCurrentQuestionKey());
+
+			$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
+			$("#questionnaire-no-photo").prop("disabled", hasAnsweredQuestion);
+
+			progress_.push(key);
+
+			if (key === "end")
+				updateStatusPanel(100);
+			else if (questionExists(key)){
+				var $node = getQuestionNode(key);
+				if ($node && $node.length > 0){
+					$node.removeClass("hide").hide().fadeIn(300, function(){
+						var questionType = $node.data("type");
+						if (questionType === "geotagging"){
+							// If the question type is geotagging, we need to resize the
+							// map viewport only when the question is made visible so
+							// that the OpenLayers API uses the correct dimensions.
+							var $map = $(".geotagx-ol-map", $node);
+							if ($map.length > 0){
+								var targetId = $map.attr("id");
+								if (targetId){
+									var map = geotagx.ol.findMap(targetId);
+									if (map)
+										map.updateSize();
+								}
+							}
+						}
+					});
+				}
+				updateStatusPanel(hasAnsweredQuestion ? getPercentageComplete(questionIndex - 1) : 0); // Note that for the index i, we have completed (i - 1) questions.
+			}
+			questionChanged_(key);
+			geotagx.analytics.onQuestionChanged(questionIndex);
+		}
+		else
+			console.log("[geotagx::questionnaire::showQuestion] Error! Invalid question key '" + key + "'.");
+	}
+	/**
+	 * Displays the next question based on the answer to the question with the
+	 * specified key. This function can be overwritten with user-defined behavior
+	 * via the onShowNextQuestion call.
+	 * @param key the current question's key.
+	 * @param answer the current question's answer.
+	 */
+	function showNextQuestion(key, answer){
+		showQuestion(getNextQuestionKey(key, answer));
+	}
+	/**
+	 * Hides the question with the specified key.
+	 */
+	function hideQuestion(key){
+		var $node = getQuestionNode(key);
+		if ($node && $node.length > 0)
+			$node.addClass("hide");
+	}
 	/**
 	 * Returns the answer submitted by the specified submitter.
 	 */
@@ -200,7 +321,7 @@
 					var $otherInput = $("#" + otherInputId);
 					if ($otherInput.length > 0){
 						var value = $.trim($otherInput.val());
-						output = value.length > 0 ? value : "Other";
+						output = "Other" + (value.length > 0 ? ("[" + value + "]") : "");
 					}
 				}
 				else
@@ -240,10 +361,12 @@
 					var value = itemValuesToString($checkedItems);
 					return value.length > 0 ? value : "None";
 				case "illustrative-checklist":
-					var $illustrations = $(".illustration", $submitter.parent().siblings(".illustrations"));
+					var $illustrations = $(".illustration", $submitter.siblings(".illustrations"));
 					var $input = $("input[type='checkbox']:checked", $illustrations);
-
-					answer = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
+					var other = $.trim($("input[type='text']", $illustrations).val()); // The user's unlisted answer.
+					if (other.length > 0)
+						other = "Other[" + other + "]";
+					answer = other;
 					return answer
 					     ? ($input.length === 0 ? answer : answer + ", " + itemValuesToString($input))
 					     : ($input.length === 0 ? "None" : itemValuesToString($input));
@@ -279,45 +402,51 @@
 	}
 	/**
 	 * Saves the specified answer.
-	 * @param storageKey the name of the key used to store the answer.
+	 * @param key the name of the key used to store the answer.
 	 * @param answer the answer to save.
 	 */
-	function saveAnswer(storageKey, answer){
-		if (storageKey)
-			answers_[storageKey] = $.type(answer) === "undefined" ? null : answer;
+	function saveAnswer(key, answer){
+		if (isValidQuestionKey(key) && key !== "end")
+			answers_[key] = $.type(answer) === "undefined" ? null : answer;
 	};
 	/**
-	 * Returns the specified question's HTML node.
+	 * Returns true if a question with the specified key exists, false otherwise.
 	 */
-	function getQuestionElement(question){
-		return $(".question[data-id='" + question + "']");
+	function questionExists(key){
+		// The answers object contains a reference for each question key
+		// with a value that was input by the user. As such, if the key we're
+		// looking for is part of this object, the question exists.
+		return key in answers_;
+	}
+	/**
+	 * Returns the HTML node of the question with the specified key.
+	 */
+	function getQuestionNode(key){
+		return questionExists(key) ? $(".question[data-key='" + key + "']") : null;
+	}
+	/**
+	 * Returns the type of the question with the specified key.
+	 */
+	function getQuestionType(key){
+		return key === "end" ? null : getQuestionNode(key).data("type");
+	}
+	/**
+	 * Returns the index of the question with the specified key.
+	 */
+	function getQuestionIndex(key){
+		return key === "end" ? -1 : getQuestionNode(key).data("index");
 	}
 	/**
 	 * Returns the current question's HTML node.
 	 */
-	function getCurrentQuestionElement(){
-		return getQuestionElement(api_.getCurrentQuestion());
+	function getCurrentQuestionNode(){
+		var node = null;
+		var key = getCurrentQuestionKey();
+		if (key)
+			node = getQuestionNode(key);
+
+		return node;
 	}
-	/**
-	 * Updates the questionnaire status, which includes information such
-	 * as the user's progress.
-	 */
-	function updateStatus(){
-		// Having sequential question identifiers implies that the user has
-		// completed (Q - 1) questions where Q is the current question identifier.
-		percentageComplete_ = progress_.length > 0
-		                    ? Math.max(0, Math.min(100, (((api_.getCurrentQuestion() - 1) / numberOfQuestions_) * 100).toFixed(0)))
-							: 0;
-
-		$("#current-analysis-progress").html(percentageComplete_);
-		$("#questionnaire-progress-bar").css("width", percentageComplete_ + "%");
-
-		var $panel = $("#questionnaire-status-panel");
-		if (percentageComplete_ == 100)
-			$panel.addClass("analysis-complete");
-		else
-			$panel.removeClass("analysis-complete");
-	};
 	/**
 	 * Resets all user input.
 	 */
@@ -335,24 +464,32 @@
 		geotagx.ol.resetAllMaps();
 	}
 	/**
-	 * Returns the storage key for the specified question, or null if it doesn't exist.
-	 * A storage key is stored in the question's answer div as the "key" data attribute.
+	 * Returns the percentage complete based on the specified question index.
 	 */
-	function getStorageKey(question){
-		var storageKey = null;
-		var $node = $("div.answer", getQuestionElement(question));
-		if ($node){
-			var key = $node.data("key");
-			if (key)
-				storageKey = key;
-		}
-		return storageKey;
+	function getPercentageComplete(index){
+		return Math.max(0, Math.min(100, ((index / numberOfQuestions_) * 100).toFixed(0)));
 	}
 	/**
-	 * Starts the questionnaire from the specified question.
-	 * If an initial question is not specified, then it is determined automatically.
+	 * Updates the status panel. If the user has reached 100%, then a submit
+	 * button is displayed.
 	 */
-	api_.start = function(question){
+	function updateStatusPanel(percentageComplete){
+		if (percentageComplete === 100){
+			$("#current-analysis-progress").html(100);
+			$("#questionnaire-progress-bar").css("width", "100%");
+			$("#questionnaire-status-panel").addClass("analysis-complete");
+		}
+		else {
+			$("#current-analysis-progress").html(percentageComplete);
+			$("#questionnaire-progress-bar").css("width", percentageComplete + "%");
+			$("#questionnaire-status-panel").removeClass("analysis-complete");
+		}
+	}
+	/**
+	 * Starts the questionnaire from the question with the specified key.
+	 * If no key is specified, then the initial question is determined automatically.
+	 */
+	api_.start = function(key){
 		$questions_.addClass("hide");
 
 		resetInput();
@@ -369,14 +506,30 @@
 		wheelzoom($("#image"));
 
 		// Override the initial question identifier, if need be.
-		if (question && $.type(question) === "number")
-			initialQuestion_ = question;
+		// Remember that it is initially determined in the 'ready' event handler.
+		if (isValidQuestionKey(key))
+			initialQuestionKey_ = key;
 
-		api_.showQuestion(initialQuestion_);
+		api_.showQuestion(initialQuestionKey_);
 
 		// Start a questionnaire tour, if one hasn't already been completed.
 		if (!geotagx.tour.questionnaireTourEnded())
 			setTimeout(geotagx.tour.startQuestionnaireTour, 1000);
+	};
+	/**
+	 * Ends the questionnaire.
+	 */
+	api_.finish = function(){
+		api_.showQuestion("end");
+	};
+	/**
+	 * Sets the questionnaire's control flow.
+	 * The control flow maps a question key to an object that itself maps an
+	 * answer to another question key. This allows the questionnaire to branch
+	 * to a specific question based on an answer to the current question.
+	 */
+	api_.setControlFlow = function(controlFlow){
+		controlFlow_ = controlFlow;
 	};
 	/**
 	 * Returns the number of questions.
@@ -385,21 +538,20 @@
 		return numberOfQuestions_;
 	};
 	/**
-	 * Returns the type of the specified question.
+	 * Returns the type of the question with the specified key.
 	 */
-	api_.getQuestionType = function(question){
-		return getQuestionElement(question).data("type");
+	api_.getQuestionType = function(key){
+		return getQuestionType($.trim(key));
 	};
 	/**
-	 * Returns the current answer for the specified question.
+	 * Returns the current answer for the question with the specified key.
 	 */
-	api_.getAnswer = function(question){
+	api_.getAnswer = function(key){
 		var answer = null;
-		var key = getStorageKey(question);
-		if (key)
+		if (questionExists(key))
 			answer = answers_[key];
 		else
-			console.log("[geotagx::questionnaire::getAnswer] Warning! Could not find a storage key for question #" + question + ".");
+			console.log("[geotagx::questionnaire::getAnswer] Warning! Could not find a storage key for the question with the key '" + key + "'.");
 
 		return answer;
 	};
@@ -418,19 +570,9 @@
 			answerSubmitted = handler;
 	};
 	/**
-	 * Returns the current question's identifier.
+	 * Returns the current question's key.
 	 */
-	api_.getCurrentQuestion = function(){
-		return progress_[progress_.length - 1];
-	};
-	/**
-	 * Set a user-defined function that returns the identifier of the next question to present.
-	 * @param hanlder a user-defined function that determines the questionnaire flow.
-	 */
-	api_.onGetNextQuestion = function(handler){
-		if (handler && $.type(handler) === "function")
-			getNextQuestion = handler;
-	};
+	api_.getCurrentQuestionKey = getCurrentQuestionKey;
 	/**
 	 * Set a user-defined function that displays the next question.
 	 * @param hanlder a user-defined function that displays the next question.
@@ -448,66 +590,26 @@
 			questionChanged_ = handler;
 	};
 	/**
-	 * Displays the specified question.
-	 * Note that since question IDs are sequential, we assume the questionnaire
-	 * is completed when the specified question ID is greater than the number
-	 * questions, at which point a submit button is displayed.
-	 * @param question a positive integer used to identify a question.
+	 * Displays the previous question.
 	 */
-	api_.showQuestion = function(question){
-		// If at least one question has been answered, hide the current question
-		// before moving onto the next. Update the rewind button too.
-		var hasAnsweredQuestion = progress_.length > 0;
-		if (hasAnsweredQuestion)
-			getCurrentQuestionElement().addClass("hide");
-
-		$("#questionnaire-rewind").prop("disabled", !hasAnsweredQuestion);
-		$("#questionnaire-no-photo").prop("disabled", hasAnsweredQuestion);
-
-		if (question >= initialQuestion_){
-			// Update the progress stack.
-			progress_.push(question);
-
-			// Update the status panel. Remember that when the questionnaire is
-			// complete, a submit button is displayed in the status panel.
-			updateStatus();
-
-			// If we haven't completed the questionnaire yet, display the next question.
-			if (question < (initialQuestion_ + numberOfQuestions_)){
-				var $element = getQuestionElement(question);
-				$element.removeClass("hide").hide().fadeIn(300, function(){
-					// If the question type is geotagging, then we need to resize the map only when the question is
-					// made visible, so that the OpenLayers API uses the correct dimensions.
-					if ($element.data("type") === "geotagging"){
-						var $mapContainer = $(".geotagx-ol-map", $element);
-						if ($mapContainer.length > 0){
-							var targetId = $mapContainer.attr("id");
-							if (targetId){
-								var map = geotagx.ol.findMap(targetId);
-								if (map)
-									map.updateSize();
-							}
-						}
-					}
-				});
-
-				questionChanged_(question);
-				geotagx.analytics.onQuestionChanged(question);
-			}
-		}
-		else
-			console.log("[geotagx::questionnaire::showQuestion] Error! Invalid question identifier '" + question + "'.");
+	api_.showPreviousQuestion = showPreviousQuestion;
+	/**
+	 * Displays the question with the specified key.
+	 * Note that if the key is 'end', then the questionnaire is considered
+	 * complete, at which point a submit button is displayed.
+	 * @param key a string used to identify a question.
+	 */
+	api_.showQuestion = function(key){
+		showQuestion($.trim(key));
 	};
 	/**
-	 * Finishes a project task.
-	 * This function will skip any remaining questions and display the user's input summary, their current statistics, as well as a submit button.
+	 * Displays the next question based on the answer to the question with the
+	 * specified key.
 	 */
-	api_.finish = function(){
-		// Since the question IDs are distributed sequentially, the questionnaire
-		// is considered finished when the current question  ID is greater than
-		// or equal to the total number of questions plus the initial question's ID.
-		api_.showQuestion(initialQuestion_ + numberOfQuestions_);
+	api_.showNextQuestion = function(key, answer){
+		showNextQuestion($.trim(key), answer);
 	};
 
+	// Expose the questionnaire API.
 	geotagx.questionnaire = api_;
 })(window.geotagx = window.geotagx || {}, jQuery);
