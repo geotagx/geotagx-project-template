@@ -1,7 +1,7 @@
 # GeoTag-X project template
 
-This is the template off which all projects for the [GeoTag-X](http://geotagx.org) platform are based. To build and
-use it, you'll need to download it first
+This is the template off which all projects for the [GeoTag-X](http://geotagx.org) platform are based. To use it,
+you'll need to download it first
 ```
 git clone https://github.com/geotagx/geotagx-project-template.git
 cd geotagx-project-template/
@@ -100,7 +100,7 @@ extended to include a few requirements to help create a project's task presenter
 In addition to the `name`, `short_name` and `description` fields required by PyBossa,
 you will need to specify the following fields:
 - `why`: a reminder to volunteers about the importance of their contribution to the project.
-- `questions`: a set of one or more questions asked to volunteers.
+- `questionnaire`: a set of one or more questions asked to volunteers.
 
 #### The tutorial configuration (tutorial.json/tutorial.yaml)
 
