@@ -84,35 +84,8 @@ or [command line](http://pybossa.readthedocs.org/en/latest/user/pbs.html) interf
 ## Building your own project
 
 While it is not necessary to build your project with this template, it does
-greatly simplify the process.
+greatly simplify and quicken the process. Furthermore, it provides your project
+with the same consistent look-and-feel as other GeoTag-X projects, making it
+less confusing for volunteers who are already familiar with the platform.
 
-To build your project using this template, we have added a few more requirements
-that you will need to specify in your project configuration. We have also added
-the possibility of defining a tutorial configuration that allows you to create
-one or more tutorials to go alongside your project.
-
-The aforementioned configurations can be written in both JSON and YAML formats.
-
-#### The project configuration (project.json/project.yaml)
-
-The project configuration -- based on the classic PyBossa configuration -- has been
-extended to include a few requirements to help create a project's task presenter.
-In addition to the `name`, `short_name` and `description` fields required by PyBossa,
-you will need to specify the following fields:
-- `why`: a reminder to volunteers about the importance of their contribution to the project.
-- `questionnaire`: a set of one or more questions asked to volunteers.
-
-#### The tutorial configuration (tutorial.json/tutorial.yaml)
-
-Project tutorials are a great way of introducing volunteers to your project and
-while optional, it is highly recommended that you include a few in your project.
-
-The tutorial configuration is comprised of one or more tutorials where each one
-contains the following fields:
-- `image`: a direct link to an image to analyse.
-- `image_source`: a link to a web page that provides contextual information about `image`.
-- `assertions`: a set of assertions about `image`.
-
-
-For more information on how to create your project's questionnaire and tutorial,
-please refer to the [**creation guide**](GUIDE.md).
+We have written a detailed [**creation guide**](GUIDE.md) to help you get started.
