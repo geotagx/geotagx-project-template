@@ -31,7 +31,7 @@ The builder tool depends on other libraries that will need to be installed.
 It is highly recommended, but not necessary, that you install the builder tool's
 requirements in an isolated environment to prevent any possible conflicts with
 your system. If you do not wish to create an isolated environment, head on over
-to the [Installing the requirements](#installing-requirements) chapter.
+to the [Installing the requirements](#ib-installing-the-requirements) chapter.
 
 First off, you will need to install [`virtualenv`](https://virtualenv.pypa.io/en/latest/) on your system
 ```
