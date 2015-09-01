@@ -1,9 +1,9 @@
-# Using the template builder
+# Building your GeoTag-X project
 
-To build your project using this template, we have added a few more requirements
-that you will need to specify in your project configuration. We have also added
-the possibility of defining a tutorial configuration that allows you to create
-one or more tutorials to complement your project.
+To build your project using the builder tool, we have added a few more
+requirements that you will need to specify in your project configuration. We
+have also added the possibility of defining a tutorial configuration that allows
+you to create one or more tutorials to complement your project.
 
 Both of the aforementioned configurations can be written in either **JSON** or
 **YAML** formats although to keep things simple, the examples in this guide
@@ -86,9 +86,9 @@ file named `waterColor.html` in the `help` directory.
 
 ![Figure 2 - Help caption](doc/figure.2.png)
 
-Where did the help go? That's right, the help is presented to a volunteer only
-when it is requested. Since the help can be as long as you would like it to be,
-it is instead presented to the user in the form of a modal.
+Wait, where did the help go? That's right, the help is presented to a volunteer
+only when it is requested. Since the help can be as long as you would like it to
+be, it is instead presented to the user in the form of a modal.
 
 ![Figure 2 - Help modal](doc/figure.3.png)
 

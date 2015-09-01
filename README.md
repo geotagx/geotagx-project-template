@@ -8,11 +8,30 @@ cd geotagx-project-template/
 ```
 
 
-## Setting up an isolated environment
+## I. The project builder
 
-It is highly recommended, but not necessary, that you install the template's
-requirements in an isolated environment to prevent any possible conflicts with your system.
-If you do not wish to create an isolated environment, head on over to the [Installing requirements](#installing-requirements) chapter.
+In the PyBossa platform (and by extension GeoTag-X), a project requires a task
+presenter `template.html` and optionally a tutorial `tutorial.html`. This means
+that you will need to be familiar with HTML, a language that is relatively
+simple to learn, albeit particularly prone to human error.
+
+Included with this template is the project builder tool `build.py` that does a
+lot of the heavy-lifting by generating the HTML, CSS and JavaScript required by
+a project. Not only does it simplify the project creation process, it allows
+creators to concentrate more on the content of their projects without having to
+worry about the more technical details. Furthermore, it provides your project
+with the same consistent look-and-feel as other GeoTag-X projects, making it
+less confusing for volunteers who are already familiar with the platform.
+
+The builder tool depends on other libraries that will need to be installed.
+
+
+### I.a. Setting up an isolated environment
+
+It is highly recommended, but not necessary, that you install the builder tool's
+requirements in an isolated environment to prevent any possible conflicts with
+your system. If you do not wish to create an isolated environment, head on over
+to the [Installing the requirements](#installing-requirements) chapter.
 
 First off, you will need to install [`virtualenv`](https://virtualenv.pypa.io/en/latest/) on your system
 ```
@@ -31,61 +50,58 @@ source env/bin/activate
 ```
 
 Upon successful execution, the environment's directory (encased in parentheses)
-should be appended to your prompt, e.g. `(env)name@domain:~$`.
+should be prepended to your prompt, e.g. `(env)name@domain:~$`. Remember that
+you will have to activate this virtual environment each time you wish to use the
+builder tool.
 
+### I.b. Installing the requirements
 
-
-## Installing requirements
-
-To install the template requirements, run
+To install the requirements, run
 ```
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-If you are not installing the requirements in an isolated environment, you will
-need to run the previous command as a super-user
+The first command upgrades your `pip` installation while the second installs
+the actual requirements. If you are not installing the requirements in an
+isolated environment, you will need to run the commands as a superuser
 ```
+sudo pip install --upgrade pip
 sudo pip install -r requirements.txt
 ```
 
 To make sure the requirements have been correctly installed, run
 ```
-python build.py
+python build.py --help
 ```
 which should display the script's instruction manual.
 
-PS. If you are using a virtual environment, you must activate it each time you
-you wish to run the `build.py` script.
 
+### I.c. Building the sample project
 
+With the builder tool installed, it should be pretty straightforward creating
+your own GeoTag-X project, provided you have the required files in place.
 
-## Building the sample project
-
-With the template requirements installed, it should be pretty straightforward
-building your own GeoTag-X project, provided you have the required files in place.
-
-The [sample project](https://github.com/geotagx/geotagx-project-sample/) is
-included as a submodule so you will need to fetch it before it can be used
+A [sample project](https://github.com/geotagx/geotagx-project-sample/) has been
+provided and can be used as a foundation for you project. It is included as a
+submodule so you will need to fetch it first
 ```
 git submodule update --init
 ```
-The `sample` directory should now contain the entire sample project. To build it, run
+The `sample` directory should now contain the entire sample project. To build
+it, run
 ```
 python build.py sample/
 ```
 
-The `build.py` script should produce a task presenter `template.html`, and
-tutorial `tutorial.html` in the project's folder. The sample project is now ready
-to be uploaded to your server via PyBossa's [web](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface)
+The tool should produce a task presenter `template.html`, and tutorial
+`tutorial.html` in the project's folder. The sample project is now ready
+to be deployed to your server via PyBossa's [web](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface)
 or [command line](http://pybossa.readthedocs.org/en/latest/user/pbs.html) interface.
 
 
+### I.d. Building your own project
 
-## Building your own project
-
-While it is not necessary to build your project with this template, it does
-greatly simplify and quicken the process. Furthermore, it provides your project
-with the same consistent look-and-feel as other GeoTag-X projects, making it
-less confusing for volunteers who are already familiar with the platform.
-
-We have written a detailed [**creation guide**](GUIDE.md) to help you get started.
+While it is most certainly not a requirement to use the builder tool, it will
+most likely quicken the project creation process. We have written a complete
+[**creation guide**](GUIDE.md) to help you get started.
