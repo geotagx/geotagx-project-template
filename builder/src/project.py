@@ -1,5 +1,5 @@
-# This module is part of the GeoTag-X template builder.
-# Copyright (C) 2015 UNITAR, Jeremy Othieno.
+# This module is part of the GeoTag-X project builder.
+# Copyright (C) 2015 UNITAR.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
