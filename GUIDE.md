@@ -38,7 +38,8 @@ the rest are optional.
 #### I.1.a. Keys
 
 A key is a non-empty string that identifies each questionnaire entry. It is
-composed of alphanumeric characters, dashes, and/or underscores; but no spaces.
+composed of alphanumeric characters, dashes, and/or underscores; and no
+whitespace.
 
 A key is used in the following ways:
 - The flow in a questionnaire is not necessarily linear. It is possible to jump

@@ -192,3 +192,15 @@ class HtmlWriter:
 				output.extend([(root + f) for f in files if f.endswith(".js")])
 
 		return output
+
+
+	@staticmethod
+	def isreservedkeyword(keyword):
+		"""isreservedkeyword(keyword:string)
+		Returns true if the specified keyword is reserved for internal use by
+		the HtmlWriter, false otherwise.
+		"""
+		return keyword in [
+			"end",
+			"photoVisible",
+		]

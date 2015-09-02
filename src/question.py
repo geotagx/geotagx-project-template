@@ -26,7 +26,7 @@ class Question:
 		"""__init__(key:string, configuration:dict)
 		Instantiates a Question object with the given key, from the specified configuration.
 		"""
-		self.key        = key.strip() if isinstance(key, basestring) else None
+		self.key        = key
 
 		self.type       = configuration.get("type")
 		self.type       = self.type.strip() if isinstance(self.type, basestring) else None
@@ -66,15 +66,26 @@ class Question:
 	@staticmethod
 	def iskey(key):
 		"""iskey(key:string)
-		Returns true if the key is valid, false otherwise.
-		A key is considered valid if it is a non-empty string and not a reserved keyword.
+		Returns true if the specified key is valid, false otherwise.
+		A key is considered valid if it is a non-empty string that is strictly
+		composed of alphanumeric characters, hypens or underscores, and no
+		whitespace. It must also not be a reserved keyword.
 		"""
+		from src.htmlwriter import HtmlWriter
+		from re import match
+
+		valid, message = False, None
+
 		if not isinstance(key, basestring) or len(key) < 1:
-			return (False, "Error! A question key must be a non-empty string.")
-		elif key == "end":
-			return (False, "Error! The string 'end' is a reserved keyword and can not be used as a question key.")
+			message = "Error! A question key must be a non-empty string."
+		elif match(r"[\w-]*", key).group() != key:
+			message = "Error! The key '{}' contains an illegal character. A key may only contain letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). It must not contain any whitespace.".format(key)
+		elif HtmlWriter.isreservedkeyword(key):
+			message = "Error! The string '{}' is a reserved keyword and can not be used as a question key.".format(key)
 		else:
-			return (True, None)
+			valid = True
+
+		return (valid, message)
 
 
 	@staticmethod
