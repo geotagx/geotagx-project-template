@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from builder.src.project import Project
+from src.project import Project
 
 def summarize(path):
 	"""summarize(path:string)
@@ -53,7 +53,7 @@ def write(writer, path):
 
 
 def main(argv):
-	from builder.src._argparse import CustomArgumentParser, CustomHelpFormatter
+	from src._argparse import CustomArgumentParser, CustomHelpFormatter
 
 	parser = CustomArgumentParser(
 		description="builds the task presenter and tutorial for the GeoTag-X projects located in the specified directories.",
@@ -85,7 +85,7 @@ def main(argv):
 				summarize(path)
 		else:
 			import os
-			from builder.src.htmlwriter import HtmlWriter
+			from src.htmlwriter import HtmlWriter
 
 			layout = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
 			writer = HtmlWriter(layout, args.compress, args.force, args.inline)
