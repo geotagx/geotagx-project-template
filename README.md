@@ -1,5 +1,8 @@
 # GeoTag-X project template
 
+[![Build Status](https://travis-ci.org/geotagx/geotagx-project-template.svg?branch=master)](https://travis-ci.org/geotagx/geotagx-project-template)
+
+
 This is the template off which all projects for the [GeoTag-X](http://geotagx.org) platform are based. To use it,
 you'll need to download it first
 ```
