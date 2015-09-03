@@ -9,108 +9,24 @@
 	var $questions_ = null; // The set of questions.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
 	var initialQuestionKey_ = null; // The key to the questionnaire's initial question.
-	var questionChanged_ = function(question){}; // A handler that is called each time a question changes.
     var progress_ = []; // A stack used to track the user's progress throughout the questionnaire. It also allows a user to rewind to a previous question.
 	var controlFlow_ = null; // An object that contains the questionnaire's control flow.
+	var beforeShowQuestion_ = function(){}; // A user-defined function that is called before a question is displayed.
 
 	$(document).ready(function(){
 		$questions_ = $(".question");
 		numberOfQuestions_ = $questions_.length;
 		initialQuestionKey_ = $questions_.first().data("key");
 
-		$("#questionnaire-rewind").on("click", showPreviousQuestion);
-		$("#questionnaire-no-photo").on("click", function(){
-			answers_.photoVisible = false;
-			api_.finish();
-		});
-
-		// Set the 'Show Comments' button handlers. One event handler loads the Disqus thread once and is disabled.
-		// The next handler simply makes the #disqus_thread div visible.
-		$("#questionnaire-show-comments").on("click.loadDisqus", function(){
-			var disqus_shortname = 'geotagx'; (function(){var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();
-			$(this).off("click.loadDisqus");
-		}).click(function(){
-			$(this).fadeOut(100, function(){
-				$(this).addClass("hide");
-				$("#questionnaire-hide-comments").removeClass("hide").hide().fadeIn();
-				$("#disqus_thread").removeClass("hide").hide().fadeIn(100);
-			});
-		});
-
-		// Set the 'Hide Comments' button handler.
-		$("#questionnaire-hide-comments").click(function(){
-			$(this).fadeOut(100, function(){
-				$(this).addClass("hide");
-				$("#questionnaire-show-comments").removeClass("hide").hide().fadeIn();
-				$("#disqus_thread").fadeOut(100, function(){ $(this).addClass("hide"); });
-			});
-		});
-
-		// Set help modal trigger handlers.
-		$(".help-toggle").click(function(){
-			var siblings = $(this).siblings("div.modal");
-			if (siblings.length > 0)
-				$(siblings[0]).modal(); // The first (and most likely only) sibling should be a modal div; toggle its visibility.
-		});
-
-		// Set answer button handlers.
-		$(".btn-answer").on("click.questionnaire", function(){
-			var $submitter = $(this);
-			var key = getCurrentQuestionKey();
-			var answer = parseAnswer(getQuestionType(key), $submitter);
-
-			saveAnswer(key, answer);
-			showNextQuestion(key, answer);
-		});
-
 		initializeAnswers();
 		initializeOpenLayers();
+		initializeDisqus();
+		initializeDatetimePickers();
+		initializeImageControls();
 
-		// Set image zoom button handler.
-		function zoom(image, delta){
-			// Create a wheel event with a pre-calculated point of interest
-			// for the zoom algorithm.
-			var e = new WheelEvent("wheel", {deltaY:delta});
-			e.zoomAt = {
-				x:image.width / 2,
-				y:image.height / 2
-			};
-
-			// Fire the event which should be picked up by the wheelzoom library.
-			if (document.dispatchEvent)
-				image.dispatchEvent(e);
-			else
-				image.fireEvent("onwheel", e);
-		}
-		$("#image-zoom-in").click(function(){ zoom($("#image")[0], -1); });
-		$("#image-zoom-out").click(function(){ zoom($("#image")[0], 1); });
-
-		// Initialize date, time and datetime pickers.
-		var $datetimePickers = $(".datetime-picker");
-		if ($datetimePickers.length > 0){
-			$datetimePickers.datetimepicker({
-				format:"YYYY/MM/DD HH:mm:ss",
-				inline:true,
-				sideBySide:true,
-				icons:{
-					up:"fa fa-2x fa-chevron-up",
-					down:"fa fa-2x fa-chevron-down",
-					next:"fa fa-chevron-right",
-					previous:"fa fa-chevron-left"
-				}
-			});
-		}
-		var $datePickers = $(".date-picker");
-		if ($datePickers.length > 0){
-			$datePickers.datetimepicker({
-				format:"YYYY-MM-DD",
-				inline:true,
-				icons:{
-					next:"fa fa-chevron-right",
-					previous:"fa fa-chevron-left"
-				}
-			});
-		}
+		$(".btn-answer").on("click.questionnaire", onQuestionAnswered);
+		$("#questionnaire-no-photo").on("click", onNoPhotoVisible);
+		$("#questionnaire-rewind").on("click", showPreviousQuestion);
 	});
 	/**
 	 * Initializes the answers object.
@@ -140,6 +56,110 @@
 					geotagx.ol.createMap(targetId, $.trim($map.data("location")));
 			});
 		}
+	}
+	/**
+	 * Initialize Disqus.
+	 */
+	function initializeDisqus(){
+		var $thread = $("#disqus_thread");
+		var $showCommentsButton = $("#questionnaire-show-comments");
+		var $hideCommentsButton = $("#questionnaire-hide-comments");
+
+		// Lazy-initialize Disqus the first time the 'Show comments'
+		// button is pressed.
+		$showCommentsButton.one("click.questionnaire", function(){
+			var disqus_shortname = "geotagx"; (function(){var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);})();
+		}).on("click.questionnaire", function(){
+			$(this).fadeOut(100, function(){
+				$(this).addClass("hide");
+				$hideCommentsButton.removeClass("hide").hide().fadeIn(150);
+				$thread.removeClass("hide").hide().fadeIn(100);
+			});
+		});
+
+		$hideCommentsButton.on("click.questionnaire", function(){
+			$(this).fadeOut(100, function(){
+				$(this).addClass("hide");
+				$showCommentsButton.removeClass("hide").hide().fadeIn(150);
+				$thread.fadeOut(100, function(){ $(this).addClass("hide"); });
+			});
+		});
+	}
+	/**
+	 * Initialize date, time and datetime pickers, if any exist.
+	 */
+	function initializeDatetimePickers(){
+		if ($.prototype.datetimepicker){
+			var $datetimePickers = $(".datetime-picker");
+			if ($datetimePickers.length > 0){
+				$datetimePickers.datetimepicker({
+					format:"YYYY/MM/DD HH:mm:ss",
+					inline:true,
+					sideBySide:true,
+					icons:{
+						up:"fa fa-2x fa-chevron-up",
+						down:"fa fa-2x fa-chevron-down",
+						next:"fa fa-chevron-right",
+						previous:"fa fa-chevron-left"
+					}
+				});
+			}
+			var $datePickers = $(".date-picker");
+			if ($datePickers.length > 0){
+				$datePickers.datetimepicker({
+					format:"YYYY-MM-DD",
+					inline:true,
+					icons:{
+						next:"fa fa-chevron-right",
+						previous:"fa fa-chevron-left"
+					}
+				});
+			}
+		}
+	}
+	/**
+	 * Initialize the image controls.
+	 */
+	function initializeImageControls(){
+		$("#image-zoom-in").on("click.questionnaire", function(){ zoom($("#image"), -1); });
+		$("#image-zoom-out").on("click.questionnaire", function(){ zoom($("#image"), 1); });
+
+		// Set image zoom button handler.
+		function zoom($image, delta){
+			var image = $image[0];
+
+			// Create a wheel event with a pre-calculated point of interest
+			// for the zoom algorithm.
+			var e = new WheelEvent("wheel", {deltaY:delta});
+			e.zoomAt = {
+				x:image.width / 2,
+				y:image.height / 2
+			};
+
+			// Fire the event which should be picked up by the wheelzoom library.
+			if (document.dispatchEvent)
+				image.dispatchEvent(e);
+			else
+				image.fireEvent("onwheel", e);
+		}
+	}
+	/**
+	 *
+	 */
+	function onQuestionAnswered(){
+		var $submitter = $(this);
+		var key = getCurrentQuestionKey();
+		var answer = parseAnswer(getQuestionType(key), $submitter);
+
+		saveAnswer(key, answer);
+		showNextQuestion(key, answer);
+	}
+	/**
+	 *
+	 */
+	function onNoPhotoVisible(){
+		answers_.photoVisible = false;
+		api_.finish();
 	}
 	/**
 	 * Returns true if the specified question key is valid, false otherwise.
@@ -217,8 +237,10 @@
 			// stack, the previous question is now the current question.
 			var previous = getCurrentQuestionKey();
 			var $node = getQuestionNode(previous);
-			if ($node && $node.length > 0)
+			if ($node && $node.length > 0){
+				beforeShowQuestion_(previous);
 				$node.removeClass("hide").hide().fadeIn(300);
+			}
 
             // Disable the rewind button and enable the 'no photo' button if
 			// there're no more previous questions.
@@ -230,7 +252,6 @@
 
 			var i = $node.data("index");
 			updateStatusPanel(progress_.length > 0 ? getPercentageComplete(i - 1) : 0); // Note that for the index i, we have completed (i - 1) questions.
-			questionChanged_(previous);
 			geotagx.analytics.onQuestionChanged(i);
         }
         else
@@ -260,6 +281,7 @@
 			else if (questionExists(key)){
 				var $node = getQuestionNode(key);
 				if ($node && $node.length > 0){
+					beforeShowQuestion_(key);
 					$node.removeClass("hide").hide().fadeIn(300, function(){
 						var questionType = $node.data("type");
 						if (questionType === "geotagging"){
@@ -280,7 +302,6 @@
 				}
 				updateStatusPanel(hasAnsweredQuestion ? getPercentageComplete(questionIndex - 1) : 0); // Note that for the index i, we have completed (i - 1) questions.
 			}
-			questionChanged_(key);
 			geotagx.analytics.onQuestionChanged(questionIndex);
 		}
 		else
@@ -532,6 +553,13 @@
 		controlFlow_ = controlFlow;
 	};
 	/**
+	 * Returns the key to the next question based on the specified answer to the
+	 * question with the specified key.
+	 */
+	api_.getNextQuestionKey = function(key, answer){
+		return getNextQuestionKey($.trim(key), answer);
+	};
+	/**
 	 * Returns the number of questions.
 	 */
 	api_.getNumberOfQuestions = function(){
@@ -562,14 +590,6 @@
 		return answers_;
 	};
 	/**
-	 * Set a user-defined function that is called each time an answer is submitted.
-	 * @param hanlder a user-defined function that is called each time an answer is submitted.
-	 */
-	api_.onAnswerSubmitted = function(handler){
-		if (handler && $.type(handler) === "function")
-			answerSubmitted = handler;
-	};
-	/**
 	 * Returns the current question's key.
 	 */
 	api_.getCurrentQuestionKey = getCurrentQuestionKey;
@@ -580,14 +600,6 @@
 	api_.onShowNextQuestion = function(handler){
 		if (handler && $.type(handler) === "function")
 			showNextQuestion = handler;
-	};
-	/**
-	 * Set a user-defined function that is called each time the user switches questions.
-	 * @param handler a user-defined function that is called each time the current question changes.
-	 */
-	api_.onQuestionChanged = function(handler){
-		if (handler && $.type(handler) === "function")
-			questionChanged_ = handler;
 	};
 	/**
 	 * Displays the previous question.
@@ -608,6 +620,13 @@
 	 */
 	api_.showNextQuestion = function(key, answer){
 		showNextQuestion($.trim(key), answer);
+	};
+	/**
+	 * Set a user-defined function that is called before a new question is displayed.
+	 * @param handler a user-defined function that is called before a new question is displayed.
+	 */
+	api_.onBeforeShowQuestion = function(handler){
+		beforeShowQuestion_ = $.type(handler) === "function" ? handler : function(){};
 	};
 
 	// Expose the questionnaire API.
