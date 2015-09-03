@@ -15,7 +15,6 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from src.questionnaire import Questionnaire
-from src.tutorial      import Tutorial
 
 class Project:
 	path = None
