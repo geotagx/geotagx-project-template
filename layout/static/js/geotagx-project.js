@@ -10,26 +10,24 @@
 	/**
 	 * Begins the project.
 	 * @param shortName the project's short name.
-	 * @param getNextQuestion a user-defined function that returns the id of the next question to present to the user.
+	 * @param controlFlow a dictionary that maps an answer to a question key.
 	 */
-	api_.start = function(shortName, getNextQuestion, isTutorial, tutorial){
+	api_.start = function(shortName, controlFlow, isTutorial, tutorials){
 		if ($.type(shortName) !== "string"){
 			console.log("[geotagx::project::start] Error! Invalid project slug.");
 			return;
 		}
 		shortName_ = shortName;
+		geotagx.questionnaire.setControlFlow(controlFlow);
 
 		if (isTutorial){
-			geotagx.tutorial.start(shortName, getNextQuestion, tutorial);
-			geotagx.analytics.onStartTutorial(shortName);
+			geotagx.tutorial.start(shortName, tutorials);
+			geotagx.analytics.onStartTutorial(shortName_);
 		}
 		else {
-			geotagx.questionnaire.setControlFlow(getNextQuestion);
-
 			pybossa.taskLoaded(onTaskLoaded);
 			pybossa.presentTask(onTaskPresented);
 			pybossa.run(shortName_);
-
 			geotagx.analytics.onStartProject(shortName_);
 		}
 	};
