@@ -102,7 +102,7 @@ class HtmlWriter:
 			"description":project.description,
 			"why":project.why,
 			"questionnaire":project.questionnaire,
-			"tutorial":None,
+			"istutorial":False,
 			"js":js,
 			"css":css
 		}
@@ -112,9 +112,10 @@ class HtmlWriter:
 		if project.tutorial is not None:
 			with open(os.path.join(project.path, "tutorial.html"), "w") as output:
 				# FIXME Set correct js and css
-				context["js"]       = None
-				context["css"]      = None
+				# context["js"] = None
+				# context["css"] = None
 				context["tutorial"] = project.tutorial
+				context["istutorial"] = True
 
 				self.__render(context, output)
 
@@ -136,9 +137,11 @@ class HtmlWriter:
 	def __preprocess(project):
 		# TODO Document me.
 		if project is not None:
-			# Convert the control-flow dictionary into a Javascript map object.
+			# Convert the tutorial and control-flow dictionaries into Javascript
+			# map objects.
 			import json
 			project.questionnaire.controlflow = json.dumps(project.questionnaire.controlflow)
+			project.tutorial = json.dumps(project.tutorial.get("tutorial"))
 
 			# Load questionnaire help.
 			helpdir = os.path.join(project.path, "help")

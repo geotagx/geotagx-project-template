@@ -47,7 +47,7 @@ class Project:
 			self.description = project["description"].strip()
 			self.why = project["why"].strip()
 			self.questionnaire = Questionnaire(project["questionnaire"])
-			self.tutorial = Tutorial(tutorial) if tutorial is not None else None
+			self.tutorial = tutorial
 
 			valid, message = Project.isvalid(self)
 			if not valid:
@@ -126,42 +126,61 @@ class Project:
 		the specified path. If a tutorial configuration exists, then it is
 		also returned.
 		"""
-		configuration = None
+		project, tutorial = None, None
 		if path is not None and len(path) > 0:
+			import json, yaml
 			parsers = {
 				".json":lambda file: json.loads(file.read()),
 				".yaml":lambda file: yaml.load(file)
 			}
+			project = Project.getprojectconfiguration(path, parsers)
+			if project is not None:
+				tutorial = Project.gettutorialconfiguration(path, parsers)
 
-			for filename in ["project.json", "project.yaml"]:
-				filename = os.path.join(path, filename)
-				if os.access(filename, os.F_OK | os.R_OK):
-					extension = os.path.splitext(filename)[1]
-					parser = parsers.get(extension)
-					if parser:
-						with open(filename) as file:
-							import json, yaml
-							configuration = parser(file)
-							if configuration is not None:
-								break
-					else: print "Error! Could not find a suitable configuration file parser for the extension '{}'.".format(extension)
-
-		return (configuration, None)
+		return (project, tutorial)
 
 
 	@staticmethod
-	def getprojectconfiguration(path):
-		"""getprojectconfiguration(path:string)
-		Returns the project configuration for the project located at the specified path.
+	def getprojectconfiguration(path, parsers):
+		"""getprojectconfiguration(path:string, parsers:dict)
+		Returns the project configuration for the project located at the
+		specified path.
 		"""
+		for filename in ["project.json", "project.yaml"]:
+			filename = os.path.join(path, filename)
+			if os.access(filename, os.F_OK | os.R_OK):
+				extension = os.path.splitext(filename)[1]
+				parser = parsers.get(extension)
+				if parser:
+					with open(filename) as file:
+						configuration = parser(file)
+						if configuration is not None:
+							return configuration
+				else:
+					print "Error! Could not find a suitable configuration file parser for the extension '{}'.".format(extension)
+
 		return None
 
 
 	@staticmethod
-	def gettutorialconfiguration(path):
-		"""gettutorialconfiguration(path:string)
-		Returns the tutorial configuration for the project located at the specified path.
+	def gettutorialconfiguration(path, parsers):
+		"""gettutorialconfiguration(path:string, parsers:dict)
+		Returns the tutorial configuration for the project located at the
+		specified path.
 		"""
+		for filename in ["tutorial.json", "tutorial.yaml"]:
+			filename = os.path.join(path, filename)
+			if os.access(filename, os.F_OK | os.R_OK):
+				extension = os.path.splitext(filename)[1]
+				parser = parsers.get(extension)
+				if parser:
+					with open(filename) as file:
+						configuration = parser(file)
+						if configuration is not None:
+							return configuration
+				else:
+					print "Error! Could not find a suitable configuration file parser for the extension '{}'.".format(extension)
+
 		return None
 
 
@@ -170,12 +189,13 @@ class Project:
 		"""isvalid(project:Project)
 		Returns true if this project is valid, false otherwise.
 		"""
-		# Note that Questionnaire and Tutorial objects are validated upon instantiation.
+		# Note that the Questionnaire object is validated upon instantiation.
 		validations = [
 			(Project.isname,        project.name),
 			(Project.isslug,        project.slug),
 			(Project.isdescription, project.description),
-			(Project.iswhy,         project.why)
+			(Project.iswhy,         project.why),
+			(Project.istutorial,    project.tutorial)
 		]
 		for validator, field in validations:
 			valid, message = validator(field)
@@ -213,5 +233,13 @@ class Project:
 	def iswhy(why):
 		"""iswhy(why:string)
 		Returns true if the specified reason is valid, false otherwise.
+		"""
+		return (True, None)
+
+
+	@staticmethod
+	def istutorial(tutorial):
+		"""iswhy(tutorial:dict)
+		Returns true if the specified tutorial is valid, false otherwise.
 		"""
 		return (True, None)
