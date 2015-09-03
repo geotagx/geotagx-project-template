@@ -13,10 +13,10 @@
 {%- endmacro %}
 
 
-{% macro help(title) -%}
+{% macro help(id, title) -%}
 <section class="help">
-	If you do not know how to answer this question, get some <button class="help-toggle btn-link" rel="nofollow" data-toggle="modal"><strong>help.</strong></button>
-	<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	If you do not know how to answer this question, get some <button class="help-toggle btn-link" rel="nofollow" data-toggle="modal" data-target="#{{id}}-help-modal"><strong>help.</strong></button>
+	<div id="{{id}}-help-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<header class="modal-header"><h4 class="modal-title">{{title}}</h4></header>
