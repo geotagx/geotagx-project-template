@@ -41,6 +41,11 @@ class Project:
 		if project is None:
 			raise IOError("The directory '{}' does not contain a GeoTag-X project configuration file or you may not have sufficient access permissions.".format(path))
 		else:
+			# Check for mandatory keys.
+			for field in ["name", "short_name", "description", "why", "questionnaire"]:
+				if field not in project:
+					raise Exception("Error! The project configuration is missing the field '{}'.".format(field))
+
 			self.path = os.path.realpath(path)
 			self.name = project["name"].strip()
 			self.slug = project["short_name"].strip()
@@ -51,7 +56,7 @@ class Project:
 
 			valid, message = Project.isvalid(self)
 			if not valid:
-				raise IOError(message)
+				raise Exception(message)
 
 
 	def __str__(self):

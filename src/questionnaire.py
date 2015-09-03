@@ -38,6 +38,11 @@ class Questionnaire:
 			for configuration in questions:
 				assert isinstance(configuration, dict), "Error! A question entry must be a dictionary."
 
+				# Check for mandatory keys.
+				for field in ["key", "type", "question"]:
+					if field not in configuration:
+						raise Exception("Error! A questionnaire entry is missing the field '{}'.".format(field))
+
 				key = configuration["key"]
 				key = str(key).strip() if isinstance(key, basestring) else None
 
