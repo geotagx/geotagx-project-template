@@ -36,6 +36,9 @@
 		$("#project-task-presenter.tutorial #image-source").on("click.analytics", onShowTutorialImageSource);
 		$("#project-task-presenter.analysis #image-source").on("click.analytics", onShowImageSource);
 
+		$("#project-task-presenter.tutorial #questionnaire-no-photo").on("click.analytics", onNoTutorialImage);
+		$("#project-task-presenter.analysis #questionnaire-no-photo").on("click.analytics", onNoImage);
+
 		$("#project-task-presenter.tutorial #questionnaire-rewind").on("click.analytics", onShowPreviousTutorialQuestion);
 		$("#project-task-presenter.analysis #questionnaire-rewind").on("click.analytics", onShowPreviousQuestion);
 
@@ -179,6 +182,28 @@
 			"taskId":taskId_
 		};
 		analytics.fireEvent("action.showImageSource", data);
+	}
+	/**
+	 * Fires an event when the user does not see an image during a tutorial.
+	 */
+	function onNoTutorialImage(){
+		var data = {
+			"projectId":projectId_,
+			"imageUrl":$("#image").data("src"),
+			"imageSource":$("#image-source").attr("href")
+		};
+		analytics.fireEvent("action.noTutorialImage", data);
+	}
+	/**
+	 * Fires an event when the user does not see an image during an analysis.
+	 */
+	function onNoImage(){
+		var data = {
+			"projectId":projectId_,
+			"imageUrl":$("#image").data("src"),
+			"imageSource":$("#image-source").attr("href")
+		};
+		analytics.fireEvent("action.noImage", data);
 	}
 	/**
 	 * Fires an event when a user goes back to a previous question during a tutorial.
