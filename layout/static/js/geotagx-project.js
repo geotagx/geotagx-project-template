@@ -60,15 +60,7 @@
 				$("#project-task-count").text(data.done + "/" + data.total);
 			});
 
-			// Initialize the image to analyze.
-			var $image = $("#image");
-			if ($image.length > 0){
-				$image.attr("src", task.info.image_url);
-
-				$("#image-source").attr("href", task.info.source_uri);
-			}
-			else
-				console.log("[geotagx::project::onTaskPresented] Error! Could not find image to analyze.");
+			geotagx.questionnaire.setImage(task.info.image_url, task.info.source_uri);
 
 			// Set the submission button's handler. Note that off().on() removes the previous handler
 			// and sets a new one, every time a new task is loaded. This prevents a chain of events

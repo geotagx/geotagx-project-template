@@ -43,14 +43,7 @@
 	};
 
 	function setTutorial(tutorial){
-		var $image = $("#image");
-		if ($image.length > 0){
-			$image.attr("src", tutorial.image);
-			$("#image-source").attr("href", tutorial.image_source);
-		}
-		else
-			console.log("[geotagx::tutorial::start::setTutorial] Error! Could not set image to analyze!");
-
+		geotagx.questionnaire.setImage(tutorial.image, tutorial.image_source);
 		assertions_ = tutorial.assertions;
 	}
 	/**

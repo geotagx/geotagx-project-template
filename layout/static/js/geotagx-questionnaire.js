@@ -553,6 +553,23 @@
 		controlFlow_ = controlFlow;
 	};
 	/**
+	 * Sets the image to analyze.
+	 * @param imageUrl the direct link to the image.
+	 * @param imageSource the link to the page where the image was found.
+	 */
+	api_.setImage = function(imageUrl, imageSource){
+		// Initialize the image to analyze.
+		var $image = $("#image");
+		if ($image.length > 0){
+			$image.attr("src", imageUrl);
+			$image.data("src", imageUrl); // The image's src attribute is overwritten with raw data by the wheelzoom library.
+
+			$("#image-source").attr("href", imageSource);
+		}
+		else
+			console.warn("[geotagx::questionnaire::setImage] Error! Could not set the image to analyze.");
+	};
+	/**
 	 * Returns the key to the next question based on the specified answer to the
 	 * question with the specified key.
 	 */
