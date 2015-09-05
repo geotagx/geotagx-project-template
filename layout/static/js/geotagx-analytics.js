@@ -30,8 +30,8 @@
 
 		$("#project-task-presenter.analysis .btn-answer").on("click.analytics", onAnswerQuestion);
 
-		$("#project-task-presenter.tutorial #image").on("scroll.analytics", _debounce(onTutorialImageZoom, 350));
-		$("#project-task-presenter.analysis #image").on("scroll.analytics", _debounce(onImageZoom, 350));
+		$("#project-task-presenter.tutorial #image").on("zoom.analytics", _debounce(onTutorialImageZoom, 350));
+		$("#project-task-presenter.analysis #image").on("zoom.analytics", _debounce(onImageZoom, 350));
 
 		$("#project-task-presenter.tutorial #image-source").on("click.analytics", onShowTutorialImageSource);
 		$("#project-task-presenter.analysis #image-source").on("click.analytics", onShowImageSource);

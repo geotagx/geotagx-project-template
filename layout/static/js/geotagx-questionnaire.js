@@ -6,6 +6,7 @@
 
 	var api_ = {}; // The questionnaire API.
 	var answers_ = {}; // The questionnaire's answers.
+	var image_ = null; // The image to analyze.
 	var $questions_ = null; // The set of questions.
     var numberOfQuestions_ = 0; // The number of questions asked in this project, including the spam filter.
 	var initialQuestionKey_ = null; // The key to the questionnaire's initial question.
@@ -22,7 +23,7 @@
 		initializeOpenLayers();
 		initializeDisqus();
 		initializeDatetimePickers();
-		initializeImageControls();
+		initializeImage();
 
 		$(".btn-answer").on("click.questionnaire", onQuestionAnswered);
 		$("#questionnaire-no-photo").on("click", onNoPhotoVisible);
@@ -118,30 +119,13 @@
 		}
 	}
 	/**
-	 * Initialize the image controls.
+	 * Initialize the image.
 	 */
-	function initializeImageControls(){
-		$("#image-zoom-in").on("click.questionnaire", function(){ zoom($("#image"), -1); });
-		$("#image-zoom-out").on("click.questionnaire", function(){ zoom($("#image"), 1); });
+	function initializeImage(){
+		image_ = new geotagx.Image("image");
 
-		// Set image zoom button handler.
-		function zoom($image, delta){
-			var image = $image[0];
-
-			// Create a wheel event with a pre-calculated point of interest
-			// for the zoom algorithm.
-			var e = new WheelEvent("wheel", {deltaY:delta});
-			e.zoomAt = {
-				x:image.width / 2,
-				y:image.height / 2
-			};
-
-			// Fire the event which should be picked up by the wheelzoom library.
-			if (document.dispatchEvent)
-				image.dispatchEvent(e);
-			else
-				image.fireEvent("onwheel", e);
-		}
+		$("#image-zoom-in").on("click.questionnaire", function(){ image_.zoomIn(); });
+		$("#image-zoom-out").on("click.questionnaire", function(){ image_.zoomOut(); });
 	}
 	/**
 	 *
@@ -555,17 +539,8 @@
 	 * @param imageSource the link to the page where the image was found.
 	 */
 	api_.setImage = function(imageUrl, imageSource){
-		var $image = $("#image");
-		if ($image.length > 0){
-			$image.attr("src", imageUrl);
-			$image.data("src", imageUrl); // The image's src attribute is overwritten with raw data by the wheelzoom library, so we keep a copy as a data attribute.
-
-			$("#image-source").attr("href", imageSource);
-
-			wheelzoom($image);
-		}
-		else
-			console.warn("[geotagx::questionnaire::setImage] Error! Could not set the image to analyze.");
+		image_.setSource(imageUrl);
+		$("#image-source").attr("href", imageSource);
 	};
 	/**
 	 * Returns the key to the next question based on the specified answer to the
