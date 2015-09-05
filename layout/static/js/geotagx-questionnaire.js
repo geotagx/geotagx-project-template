@@ -523,9 +523,6 @@
 		for (var property in answers_)
 			answers_[property] = null;
 
-		// Toggle wheelzoom on the image.
-		wheelzoom($("#image"));
-
 		// Override the initial question identifier, if need be.
 		// Remember that it is initially determined in the 'ready' event handler.
 		if (isValidQuestionKey(key))
@@ -558,13 +555,14 @@
 	 * @param imageSource the link to the page where the image was found.
 	 */
 	api_.setImage = function(imageUrl, imageSource){
-		// Initialize the image to analyze.
 		var $image = $("#image");
 		if ($image.length > 0){
 			$image.attr("src", imageUrl);
-			$image.data("src", imageUrl); // The image's src attribute is overwritten with raw data by the wheelzoom library.
+			$image.data("src", imageUrl); // The image's src attribute is overwritten with raw data by the wheelzoom library, so we keep a copy as a data attribute.
 
 			$("#image-source").attr("href", imageSource);
+
+			wheelzoom($image);
 		}
 		else
 			console.warn("[geotagx::questionnaire::setImage] Error! Could not set the image to analyze.");

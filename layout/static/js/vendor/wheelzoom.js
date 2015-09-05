@@ -11,7 +11,7 @@
     var canvas = document.createElement('canvas');
 
     function setSrcToBackground(img){
-        img.style.backgroundImage = "url('"+img.src+"')";
+        img.style.backgroundImage = 'url("' + img.src + '")';
         img.style.backgroundRepeat = 'no-repeat';
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
