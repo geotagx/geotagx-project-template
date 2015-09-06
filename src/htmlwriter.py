@@ -141,7 +141,8 @@ class HtmlWriter:
 			# map objects.
 			import json
 			project.questionnaire.controlflow = json.dumps(project.questionnaire.controlflow)
-			project.tutorial = json.dumps(project.tutorial.get("tutorial"))
+			if project.tutorial is not None:
+				project.tutorial = json.dumps(project.tutorial.get("tutorial"))
 
 			# Load questionnaire help.
 			helpdir = os.path.join(project.path, "help")
