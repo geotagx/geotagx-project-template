@@ -144,16 +144,16 @@ class HtmlWriter:
 			if project.tutorial is not None:
 				project.tutorial = json.dumps(project.tutorial.get("tutorial"))
 
-			# Load questionnaire help.
+			# Load questionnaire help, if it exists.
 			helpdir = os.path.join(project.path, "help")
-			filenames = [os.path.join(helpdir, f) for f in os.listdir(helpdir) if f.endswith(".html") and len(f) > 5]
-			for filename in filenames:
-				key = os.path.splitext(os.path.basename(filename))[0]
-				if key in project.questionnaire.questions:
-					with open(filename) as file:
-						help = file.read().strip()
-						if len(help) > 0:
-							project.questionnaire.questions[key].help = help
+			if os.path.isdir(helpdir) and os.access(helpdir, os.R_OK):
+				for filename in [os.path.join(helpdir, f) for f in os.listdir(helpdir) if f.endswith(".html") and len(f) > 5]:
+					key = os.path.splitext(os.path.basename(filename))[0]
+					if key in project.questionnaire.questions:
+						with open(filename) as file:
+							help = file.read().strip()
+							if len(help) > 0:
+								project.questionnaire.questions[key].help = help
 
 		return project
 
