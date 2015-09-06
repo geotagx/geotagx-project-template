@@ -47,19 +47,26 @@
         var context = this;
 
         $(context.image).fadeOut(100, function(){
-            // The 'src' attribute is overwritten by design, so we store a copy
-            // as a data attribute.
-            $(context.image).attr("src", source).data("src", source);
+            if ($(context.image).data("src") == source){
+                // If the new source is the same as the older one, there's no need to
+                // change the image. Instead, we reset its zoom level.
+                Image.prototype.zoomReset.call(context);
+                $(context.image).fadeIn();
+            }
+            else {
+                // The 'src' attribute is overwritten by design, so we store a copy.
+                $(context.image).attr("src", source).data("src", source);
 
-            // Wait for the image to complete before we set it up.
-            var interval = setInterval(function(){
-                if (context.image.complete){
-                    clearInterval(interval);
-                    $(context.image).fadeIn(0, function(){
-                        onLoaded(context.image, context.attributes);
-                    });
-                }
-            }, 300);
+                // Wait for the image to complete before we set it up.
+                var interval = setInterval(function(){
+                    if (context.image.complete){
+                        clearInterval(interval);
+                        $(context.image).fadeIn(0, function(){
+                            onLoaded(context.image, context.attributes);
+                        });
+                    }
+                }, 300);
+            }
         });
     };
     /**
