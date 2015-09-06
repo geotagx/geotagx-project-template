@@ -109,8 +109,8 @@ class HtmlWriter:
 		with open(os.path.join(project.path, "template.html"), "w") as output:
 			self.__render(context, output)
 
-		if project.tutorial is not None:
-			with open(os.path.join(project.path, "tutorial.html"), "w") as output:
+		with open(os.path.join(project.path, "tutorial.html"), "w") as output:
+			if project.tutorial is not None:
 				# FIXME Set correct js and css
 				# context["js"] = None
 				# context["css"] = None
