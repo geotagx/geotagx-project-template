@@ -132,8 +132,7 @@ parameters:{
 ```
 type:illustrative-checklist
 parameters:{
-	options:array,
-	size:number
+	options:array
 }
 ```
 
