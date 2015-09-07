@@ -20,6 +20,55 @@ class Question:
 	hint = None
 	help = None
 	parameters = None
+	__default_parameters = {
+		"binary":{},
+		"dropdown-list":{
+			"options":None,
+			"prompt":"Please select an item",
+			"size":1
+		},
+		"select":{
+			"options":None
+		},
+		"checklist":{
+			"options":None,
+			"size":8
+		},
+		"illustrative-checklist":{
+			"options":None
+		},
+		"text":{
+			"placeholder":None,
+			"maxlength":128
+		},
+		"longtext":{
+			"placeholder":None,
+			"maxlength":512
+		},
+		"number":{
+			"placeholder":"Please enter a number",
+			"min":None,
+			"max":None,
+			"maxlength":1024
+		},
+		"datetime":{
+			"mindate":None,
+			"maxdate":None,
+			"mintime":None,
+			"maxtime":None
+		},
+		"date":{
+			"min":None,
+			"max":None
+		},
+		"url":{
+			"placeholder":"Please enter a URL e.g. www.example.com",
+			"maxlength":512
+		},
+		"geotagging":{
+			"location":None
+		},
+	}
 
 
 	def __init__(self, key, configuration):
@@ -37,7 +86,7 @@ class Question:
 		self.hint       = configuration.get("hint")
 		self.hint       = self.hint.strip() if isinstance(self.hint, basestring) else None
 
-		self.parameters = configuration.get("parameters")
+		self.parameters = Question.getparameters(self.type, configuration.get("parameters"))
 
 		valid, message = Question.isvalid(self)
 		if not valid:
@@ -145,3 +194,20 @@ class Question:
 			return (True, None)
 		else:
 			return (False, "Error! Question parameters must be a dictionary.")
+
+
+	@staticmethod
+	def getparameters(type, defaults=None):
+		"""getparameters(type:string, defaults:dict)
+		Returns the parameters for the specified type of question. If the
+		defaults object is not empty, then any parameter found in it will be
+		used as a default value.
+		"""
+		parameters = Question.__default_parameters[type].copy()
+
+		# Set the user-defined default values.
+		if defaults is not None:
+			for key in [k for k in defaults if defaults[k] is not None]:
+				parameters[key] = defaults[key]
+
+		return parameters
