@@ -161,7 +161,8 @@ type:number
 parameters:{
 	placeholder:string,
 	min:number,
-	max:number
+	max:number,
+	maxlength:number
 }
 ```
 
@@ -189,7 +190,8 @@ parameters:{
 ```
 type:url
 parameters:{
-	placeholder:string
+	placeholder:string,
+	maxlength:number
 }
 ```
 
