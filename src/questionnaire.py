@@ -55,6 +55,13 @@ class Questionnaire:
 				else:
 					raise Exception(message)
 
+			# Convert the strings used as conditions in conditional branches to
+			# lowercase. This will allow the template scripts to perform
+			# case-insensitive string comparisons.
+			for branch in [b for b in self.controlflow.values() if b is not None and isinstance(b, dict)]:
+				for key in branch.keys():
+					branch[key.lower()] = branch.pop(key)
+
 			valid, message = Questionnaire.isvalid(self)
 			if not valid:
 				raise Exception(message)
