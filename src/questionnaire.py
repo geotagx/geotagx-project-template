@@ -84,6 +84,29 @@ class Questionnaire:
 		return (True, None)
 
 
+	def isbranchablekey(self, key):
+		"""isbranchablekey(key:string|dict)
+		Returns true if the specified key is valid, false otherwise.
+		A branch key is valid if
+
+		a iff it branches to an existing or predefined key. As
+		such, this method is best used when the entire questionnaire has been
+		parsed.
+		"""
+		valid, message = True, None
+		if not (isinstance(key, basestring) or isinstance(key, dict)):
+			valid, message = False, "Error! The key is not a string or dictionary."
+		elif isinstance(key, basestring) and not (key in self.questions or key == "end"):
+			valid, message = False, "Error! The key '{}' does not correspond to a question.".format(key)
+		elif isinstance(key, dict):
+			for subkey in key.values():
+				valid, message = self.isbranchablekey(subkey)
+				if not valid:
+					break
+
+		return (valid, message)
+
+
 	def __len__(self):
 		"""
 		Returns the number of questions in the questionnaire.
@@ -107,17 +130,23 @@ class Questionnaire:
 		"""isvalid(questionnaire:Questionnaire)
 		Returns true if the questionnaire is valid, false otherwise.
 		"""
-		# TODO Add more verification checks.
+		valid, message = True, None
 		if questionnaire is not None:
-			questions = questionnaire.questions
-			if questions is not None:
-				for question in questions.values():
+			if questionnaire.questions is not None:
+				for question in questionnaire.questions.values():
 					valid, message = Question.isvalid(question)
 					if not valid:
-						return (False, message)
+						break
 
-				return (True, None)
+				# If the questionnaire entries are valid, validate the control flow.
+				if valid and questionnaire.controlflow is not None:
+					for k in [k for k in questionnaire.controlflow.values() if k is not None]:
+						valid, message = questionnaire.isbranchablekey(k)
+						if not valid:
+							break
 			else:
-				return (False, "Error! Empty questionnaire. A questionnaire must contain at least one question.")
+				valid, message = False, "Error! Empty questionnaire. A questionnaire must contain at least one question."
 		else:
-			return (False, "Error! A 'NoneType' object is not considered a questionnaire.")
+			valid, message = False, "Error! A 'NoneType' object is not considered a questionnaire."
+
+		return (valid, message)
