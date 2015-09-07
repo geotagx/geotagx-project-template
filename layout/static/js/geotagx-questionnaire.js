@@ -461,6 +461,7 @@
 		$("input[type='text']").val("");
 		$("input[type='url']").val("");
 		$("input[type='number']").val("");
+		$("select > option:eq(0)").prop("selected", true);
 		$([".datetime-picker", ".date-picker"]).each(function(){
 			var $picker = $(this);
 			if ($picker.length > 0 && $picker.data("DateTimePicker"))
