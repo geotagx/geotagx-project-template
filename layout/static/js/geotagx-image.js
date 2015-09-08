@@ -18,7 +18,6 @@
         this.busyIcon.className = "fa fa-3x fa-cog fa-spin";
         this.busyIcon.style.color = "#FFF";
         this.busyIcon.style.position = "absolute";
-        this.busyIcon.style.left = (($(this.frame).width() - $(this.busyIcon).width()) / 2) + "px";
         this.busyIcon.style.display = "none";
 
         this.image = this.frame.appendChild(document.createElement("img"));
@@ -77,6 +76,7 @@
                         context.busyIcon.style.display = "none";
                         $(context.image).fadeIn(0, function(){
                             context.frame.style.height = context.image.height + "px";
+                            context.busyIcon.style.left = (($(context.frame).width() - $(context.busyIcon).width()) / 2) + "px";
                             context.busyIcon.style.top = (($(context.frame).height() - $(context.busyIcon).height()) / 2) + "px";
                             onLoaded(context.image, context.attributes);
                         });
