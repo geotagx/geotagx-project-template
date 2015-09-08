@@ -9,12 +9,28 @@
     /**
      * Instantiate an Image object on the HTML element with the specified id.
      */
-    var Image = function(id){
-        this.image = document.getElementById(id);
-        if (!this.image || !this.image.nodeName || this.image.nodeName !== "IMG"){
-            this.image = null;
-            return;
-        }
+    var Image = function(id, options){
+        this.frame = document.getElementById(id);
+        this.frame.style.overflow = "hidden";
+        this.frame.style.backgroundColor = "rgba(0, 0, 0, 0.25)";
+
+        this.busyIcon = this.frame.appendChild(document.createElement("i"));
+        this.busyIcon.className = "fa fa-3x fa-cog fa-spin";
+        this.busyIcon.style.color = "#FFF";
+        this.busyIcon.style.position = "absolute";
+        this.busyIcon.style.left = (($(this.frame).width() - $(this.busyIcon).width()) / 2) + "px";
+        this.busyIcon.style.display = "none";
+
+        this.image = this.frame.appendChild(document.createElement("img"));
+        this.image.style.width = "100%";
+        this.image.addEventListener("wheel", onWheel.bind(this));
+        this.image.addEventListener("mousedown", onMouseDown.bind(this));
+
+        this.settings = $.extend({
+            zoomFactor:0.15,
+            discreetZoomFactor:0.45
+        }, options);
+
         this.attributes = {
             x:0,   // The image's horizontal position.
             y:0,   // The image's vertical position.
@@ -24,12 +40,6 @@
             bgh:0, // The background height.
             e:null // The previous event.
         };
-        this.settings = {
-            zoomFactor:0.15,
-            discreetZoomFactor:0.45
-        };
-        this.image.addEventListener("wheel", onWheel.bind(this));
-        this.image.addEventListener("mousedown", onMouseDown.bind(this));
     };
     /**
      * Returns the URL to the image.
@@ -54,6 +64,9 @@
                 $(context.image).fadeIn();
             }
             else {
+                // Show the 'busy' icon.
+                context.busyIcon.style.display = "block";
+
                 // The 'src' attribute is overwritten by design, so we store a copy.
                 $(context.image).attr("src", source).data("src", source);
 
@@ -61,7 +74,10 @@
                 var interval = setInterval(function(){
                     if (context.image.complete){
                         clearInterval(interval);
+                        context.busyIcon.style.display = "none";
                         $(context.image).fadeIn(0, function(){
+                            context.frame.style.height = context.image.height + "px";
+                            context.busyIcon.style.top = (($(context.frame).height() - $(context.busyIcon).height()) / 2) + "px";
                             onLoaded(context.image, context.attributes);
                         });
                     }

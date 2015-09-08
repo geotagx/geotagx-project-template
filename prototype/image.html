@@ -9,7 +9,7 @@
 <body>
 	<section id="image-section" class="col-xs-6 show-on-task-loaded">
 	    <div id="image-container" class="row">
-	        <img id="image" class="highlight img-responsive">
+			<div id="image"></div>
 	        <button id="image-zoom-in"      class="image-control btn btn-primary btn-xs"><i class="fa fa-search-plus"></i></button>
 	        <button id="image-zoom-out"     class="image-control btn btn-primary btn-xs"><i class="fa fa-search-minus"></i></button>
 	<!--
@@ -59,7 +59,6 @@
 		var image = new geotagx.Image("image");
 		if (image)
 			setImage(currentImageIndex);
-
 
 		$("#image").on("zoom", function(e, delta){ console.log("Zoomed", delta); });
 
