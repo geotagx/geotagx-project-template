@@ -189,7 +189,7 @@
 	function onNoTutorialImage(){
 		var data = {
 			"projectId":projectId_,
-			"imageUrl":$("#image").data("src"),
+			"imageUrl":$("#image > img").data("src"),
 			"imageSource":$("#image-source").attr("href")
 		};
 		analytics.fireEvent("action.noTutorialImage", data);
@@ -200,7 +200,7 @@
 	function onNoImage(){
 		var data = {
 			"projectId":projectId_,
-			"imageUrl":$("#image").data("src"),
+			"imageUrl":$("#image > img").data("src"),
 			"imageSource":$("#image-source").attr("href")
 		};
 		analytics.fireEvent("action.noImage", data);
