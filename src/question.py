@@ -24,7 +24,7 @@ class Question:
 		"binary":{},
 		"dropdown-list":{
 			"options":None,
-			"prompt":"Please select an item",
+			"prompt":"Please select an option",
 			"size":1
 		},
 		"select":{
