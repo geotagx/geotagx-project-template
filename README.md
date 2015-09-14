@@ -107,4 +107,4 @@ or [command line](http://pybossa.readthedocs.org/en/latest/user/pbs.html) interf
 
 While it is most certainly not a requirement to use the builder tool, it will
 most likely quicken the project creation process. We have written a complete
-[**creation guide**](GUIDE.md) to help you get started.
+[**creation guide**](GUIDE.pdf) to help you get started.
