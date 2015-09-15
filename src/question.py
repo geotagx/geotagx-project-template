@@ -28,7 +28,8 @@ class Question:
 			"size":1
 		},
 		"select":{
-			"options":None
+			"options":None,
+			"size":8
 		},
 		"checklist":{
 			"options":None,
@@ -49,7 +50,7 @@ class Question:
 			"placeholder":"Please enter a number",
 			"min":None,
 			"max":None,
-			"maxlength":1024
+			"maxlength":256
 		},
 		"datetime":{
 			"mindate":None,
@@ -62,8 +63,8 @@ class Question:
 			"max":None
 		},
 		"url":{
-			"placeholder":"Please enter a URL e.g. www.example.com",
-			"maxlength":512
+			"placeholder":"Please enter a URL e.g. http://www.example.com",
+			"maxlength":2000
 		},
 		"geotagging":{
 			"location":None
