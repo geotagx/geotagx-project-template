@@ -435,25 +435,23 @@
 			// Query OpenStreetMap for the location's coordinates.
 			$.getJSON("http://nominatim.openstreetmap.org/search/" + location + "?format=json&limit=1", function(results){
 				if (results.length > 0){
-					var result = results[0];
-					var latitude = parseFloat(result.lat);
-					var longitude = parseFloat(result.lon);
-					var center = ol.proj.transform([longitude, latitude], "EPSG:4326", "EPSG:3857");
 					var view = openLayersMap.getView();
+					var result = results[0];
+					var bbox = $.map(result.boundingbox, parseFloat);
+					var extent = ol.proj.transformExtent([
+						// Nominatim returns a [miny, maxy, minx, maxx] bounding
+						// box, but we require a [minx, miny, maxx, maxy].
+						bbox[2],
+						bbox[0],
+						bbox[3],
+						bbox[1]
+					], "EPSG:4326", "EPSG:3857");
 
-					if (animate){
-						var duration = 2000;
-						var pan = ol.animation.pan({
-							duration:2000,
-							source:view.getCenter(),
-							start:Number(new Date())
-						});
-						openLayersMap.beforeRender(pan);
-					}
-					view.setCenter(center);
-					view.setZoom(6);
+					// Center the map around the location's bounding box.
+					view.fit(extent, openLayersMap.getSize());
 
-					// If an input field was specified, replace its value with the location's full name.
+					// If an input field was specified, replace its value with
+					// the location's full name.
 					if (input)
 						input.value = result.display_name;
 				}
