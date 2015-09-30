@@ -59,7 +59,7 @@ builder tool.
 
 ### I.a.2 Windows
 
-* Install Git from https://git-scm.com/download/win
+* Install Github Desktop from https://desktop.github.com 
 * Install Win-Python from http://winpython.sourceforge.net
 * Clone this repository **INTO** the Win-Python directory (Select Recursive Clone)
 * Open the Win-Python Command Prompt by double - clicking the respective icon via Windows explorer
