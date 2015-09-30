@@ -30,7 +30,7 @@ The builder tool depends on other libraries that will need to be installed.
 
 
 ### I.a. Setting up an isolated environment
-
+#### I.a.1 Linux/MacOSx
 It is highly recommended, but not necessary, that you install the builder tool's
 requirements in an isolated environment to prevent any possible conflicts with
 your system. If you do not wish to create an isolated environment, head on over
@@ -56,6 +56,16 @@ Upon successful execution, the environment's directory (encased in parentheses)
 should be prepended to your prompt, e.g. `(env)name@domain:~$`. Remember that
 you will have to activate this virtual environment each time you wish to use the
 builder tool.
+
+### I.a.2 Windows
+
+* Install Git from https://git-scm.com/download/win
+* Install Win-Python from http://winpython.sourceforge.net
+* Clone this repository **INTO** the Win-Python directory (Select Recursive Clone)
+* Open the Win-Python Command Prompt by double - clicking the respective icon via Windows explorer
+* Navigate into the Cloned repository via the command prompt. Refer http://computerhope.com/issues/chusedos.htm for help if you are not used to the command prompt
+* Follow the steps mentioned in the following sections
+
 
 ### I.b. Installing the requirements
 
