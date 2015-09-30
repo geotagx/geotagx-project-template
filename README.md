@@ -61,6 +61,8 @@ builder tool.
 
 * Install Github Desktop from https://desktop.github.com 
 * Install Win-Python from http://winpython.sourceforge.net
+* `Fork` the repository to your personal project account on Github Web Interface
+* Log into Github from the Github Desktop client
 * Clone this repository **INTO** the Win-Python directory (Select Recursive Clone)
 * Open the Win-Python Command Prompt by double - clicking the respective icon via Windows explorer
 * Navigate into the Cloned repository via the command prompt. Refer http://computerhope.com/issues/chusedos.htm for help if you are not used to the command prompt
