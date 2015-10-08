@@ -15,6 +15,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 from src.questionnaire import Questionnaire
+from src.tutorial import Tutorial
 
 class Project:
 	path = None
@@ -36,22 +37,22 @@ class Project:
 		if not os.path.isdir(path) or not os.access(path, os.R_OK):
 			raise IOError("The path '{}' does not point to a readable directory.".format(path))
 
-		project, tutorial = Project.getconfigurations(path)
-		if project is None:
+		config = Project.getconfiguration(path)
+		if config is None:
 			raise IOError("The directory '{}' does not contain a GeoTag-X project configuration file or you may not have sufficient access permissions.".format(path))
 		else:
 			# Check for mandatory keys.
 			for field in ["name", "short_name", "description", "why", "questionnaire"]:
-				if field not in project:
+				if field not in config:
 					raise Exception("Error! The project configuration is missing the field '{}'.".format(field))
 
 			self.path = os.path.realpath(path)
-			self.name = project["name"].strip()
-			self.slug = project["short_name"].strip()
-			self.description = project["description"].strip()
-			self.why = project["why"].strip()
-			self.questionnaire = Questionnaire(project["questionnaire"])
-			self.tutorial = tutorial
+			self.name = config["name"].strip()
+			self.slug = config["short_name"].strip()
+			self.description = config["description"].strip()
+			self.why = config["why"].strip()
+			self.questionnaire = Questionnaire(config["questionnaire"])
+			self.tutorial = None if "tutorial" not in config else Tutorial(config["tutorial"])
 
 			valid, message = Project.isvalid(self)
 			if not valid:
@@ -124,24 +125,24 @@ class Project:
 
 
 	@staticmethod
-	def getconfigurations(path):
+	def getconfiguration(path):
 		"""getconfigurations(path:string)
 		Returns the project configuration for the GeoTag-X project located at
-		the specified path. If a tutorial configuration exists, then it is
-		also returned.
+		the specified path. If a tutorial configuration exists, it is included
+		in the returned object.
 		"""
-		project, tutorial = None, None
+		configuration = None
 		if path is not None and len(path) > 0:
 			import json, yaml
 			parsers = {
 				".json":lambda file: json.loads(file.read()),
 				".yaml":lambda file: yaml.load(file)
 			}
-			project = Project.getprojectconfiguration(path, parsers)
-			if project is not None:
-				tutorial = Project.gettutorialconfiguration(path, parsers)
+			configuration = Project.getprojectconfiguration(path, parsers)
+			if configuration is not None:
+				configuration["tutorial"] = Project.gettutorialconfiguration(path, parsers)
 
-		return (project, tutorial)
+		return configuration
 
 
 	@staticmethod
@@ -181,7 +182,7 @@ class Project:
 					with open(filename) as file:
 						configuration = parser(file)
 						if configuration is not None:
-							return configuration
+							return configuration.get("tutorial")
 				else:
 					print "Error! Could not find a suitable configuration file parser for the extension '{}'.".format(extension)
 
@@ -246,4 +247,4 @@ class Project:
 		"""iswhy(tutorial:dict)
 		Returns true if the specified tutorial is valid, false otherwise.
 		"""
-		return (True, None)
+		return Tutorial.isvalid(tutorial)
