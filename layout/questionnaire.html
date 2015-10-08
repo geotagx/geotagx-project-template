@@ -8,11 +8,11 @@
 		</header>
 		<main>
 			<div class="show-on-analysis-complete">
-				{% if istutorial %}
-				<p>You have successfully completed the tutorial and are are now ready to begin working on the project however if you feel like you are not quite ready, you can <a id="take-another-tutorial" class="clickable">retake</a> the tutorial!</p>
-				{#<p>You have successfully completed one of the project's tutorials however if you feel like you are not quite ready, we highly recommend <a id="take-another-tutorial" class="clickable">taking another</a>.</p>#}
+			{% if istutorial %}
+				{%   if tutorial_len == 1 %}<p>You have successfully completed the tutorial and are are now ready to begin working on the project however if you feel like you are not quite ready, you can <a id="take-another-tutorial" class="clickable">retake</a> the tutorial!</p>
+				{% elif tutorial_len  > 1 %}<p>You have successfully completed one of the project's tutorials however if you feel like you are not quite ready, we highly recommend <a id="take-another-tutorial" class="clickable">taking another</a>.</p>{% endif %}
 				<a id="start-contributing" class="btn btn-success btn-block" href="/project/{{slug}}/newtask">START CONTRIBUTING</a>
-				{% else %}
+			{% else %}
 				<div style="position:relative">
 					<button id="submit-analysis" class="btn btn-block btn-success">
 						<span class="show-on-busy">SUBMITTING ANALYSIS ...</span>
@@ -23,7 +23,7 @@
 				<p id="submit-message-failure" class="animated fadeIn hide">Hmmm, there was an error submitting your analysis. Please try again.</p>
 				<br>
 				<p>Thank you very much for your analysis! We appreciate any feedback you may have for us so get on <a target="_blank" href="https://github.com/geotagx/pybossa/issues">GitHub</a> or <a href="mailto:geotag-x@cern.ch?Subject=GeoTag-X feedback" target="_top">send us an email</a>.</p>
-				{% endif %}
+			{% endif %}
 			</div>
 		</main>
 		<footer><div id="questionnaire-progress"><div id="questionnaire-progress-bar"></div></div></footer>

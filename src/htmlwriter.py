@@ -115,6 +115,7 @@ class HtmlWriter:
 				# context["js"] = None
 				# context["css"] = None
 				context["tutorial"] = str(project.tutorial)
+				context["tutorial_len"] = len(project.tutorial)
 				context["istutorial"] = True
 
 				self.__render(context, output)
