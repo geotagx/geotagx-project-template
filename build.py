@@ -40,8 +40,8 @@ def write(writer, path):
 		exitval = 0
 		writable, message = writer.iswritabledir(path)
 		if writable:
-				project = Project(path)
-				writer.write(project)
+			project = Project(path)
+			writer.write(project)
 		else:
 			print message
 			exitval = 1
