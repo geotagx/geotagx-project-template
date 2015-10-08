@@ -82,7 +82,7 @@ class CustomHelpFormatter(argparse.RawTextHelpFormatter):
 		Adds an epilogue to the help.
 		"""
 		self.add_text(
-			"{authors_label}\n\tWritten by Jeremy Othieno.\n\n"
+			"{authors_label}\n\tWritten by Jeremy Othieno and S.P. Mohanty.\n\n"
 			"{report_label}\n\tReport bugs or any issues at https://github.com/geotagx/geotagx-project-template/issues.\n\n"
 			"{copyright_label}\n\t{copyright_notice}".format(
 				# epilogue, #TODO Add me.
