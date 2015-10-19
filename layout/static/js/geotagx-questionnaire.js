@@ -124,8 +124,10 @@
 	function initializeImage(){
 		image_ = new geotagx.Image("image");
 
-		$("#image-zoom-in").on("click.questionnaire", function(){ image_.zoomIn(); });
-		$("#image-zoom-out").on("click.questionnaire", function(){ image_.zoomOut(); });
+		$("#image-zoom-in").on("click.questionnaire", image_.zoomIn.bind(image_));
+		$("#image-zoom-out").on("click.questionnaire", image_.zoomOut.bind(image_));
+		$("#image-rotate-left").on("click.questionnaire", image_.rotateLeft.bind(image_));
+		$("#image-rotate-right").on("click.questionnaire", image_.rotateRight.bind(image_));
 	}
 	/**
 	 *

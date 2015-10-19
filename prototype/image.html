@@ -12,10 +12,8 @@
             <div id="image"></div>
             <button id="image-zoom-in"      class="image-control btn btn-primary btn-xs"><i class="fa fa-search-plus"></i></button>
             <button id="image-zoom-out"     class="image-control btn btn-primary btn-xs"><i class="fa fa-search-minus"></i></button>
-<!--
             <button id="image-rotate-left"  class="image-control btn btn-primary btn-xs"><i class="fa fa-rotate-left"></i></button>
             <button id="image-rotate-right" class="image-control btn btn-primary btn-xs"><i class="fa fa-rotate-right"></i></button>
--->
         </div>
         <div class="row">
             <center>
@@ -30,6 +28,7 @@
     <script>
     $(document).ready(function(){
         var images = [
+            ["http://isiforums.net/f/showthread.php/723-Horizon-Line-You-re-doing-it-wrong/page3", "http://img.photobucket.com/albums/v504/F12Bwth2/Calibration/CustomPattern.png"],
             ["http://www.marsnjak.com/sergej/?menu=yemen&zoom=1&pic=344&type=pic", "http://www.marsnjak.com/sergej/yemen/highres/344%20-%20Shabwah.jpg"],
             ["http://www.marsnjak.com/sergej/?menu=yemen&zoom=1&pic=344&type=pic", "http://www.marsnjak.com/sergej/yemen/highres/344%20-%20Shabwah.jpg"],
             ["http://www.marsnjak.com/sergej/?menu=yemen&zoom=1&pic=344&type=pic", "http://www.marsnjak.com/sergej/yemen/highres/344%20-%20Shabwah.jpg"],
@@ -64,6 +63,8 @@
 
         $("#image-zoom-in").on("click", function(){ image.zoomIn(); });
         $("#image-zoom-out").on("click", function(){ image.zoomOut(); });
+        $("#image-rotate-left").on("click", function(){ image.rotateLeft(); });
+        $("#image-rotate-right").on("click", function(){ image.rotateRight(); });
         $("#change-image").on("click", function(){
             currentImageIndex = (currentImageIndex + 1) % images.length;
             setImage(currentImageIndex);
