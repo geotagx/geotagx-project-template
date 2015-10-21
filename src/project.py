@@ -52,7 +52,7 @@ class Project:
 			self.description = config["description"].strip()
 			self.why = config["why"].strip()
 			self.questionnaire = Questionnaire(config["questionnaire"])
-			self.tutorial = None if "tutorial" not in config else Tutorial(config["tutorial"])
+			self.tutorial = None if config["tutorial"] is None else Tutorial(config["tutorial"])
 
 			valid, message = Project.isvalid(self)
 			if not valid:
