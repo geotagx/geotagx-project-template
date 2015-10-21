@@ -204,5 +204,6 @@ class HtmlWriter:
 		"""
 		return keyword in [
 			"end",
+			"photoAccessible",
 			"photoVisible",
 		]
