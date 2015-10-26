@@ -114,10 +114,8 @@
 		taskRun.photoVisible = taskRun.photoAccessible && taskRun.photoVisible;
 
 		if (task.photoAccessible === false){
-			function onResolve(){
-				deferred.resolve();
-			}
 			// If the photo is not accessible, submit the task and load another.
+			var onResolve = deferred.resolve.bind(deferred);
 			pybossa.saveTask(task.id, taskRun).done(onResolve).fail(onResolve);
 		}
 		else if (task.photoAccessible === true){
