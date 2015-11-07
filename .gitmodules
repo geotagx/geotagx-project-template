@@ -1,3 +1,6 @@
 [submodule "sample"]
 	path = sample
 	url = https://github.com/geotagx/geotagx-project-sample
+[submodule "doc/community-guidelines"]
+	path = doc/community-guidelines
+	url = https://github.com/geotagx/community-guidelines.git
