@@ -86,7 +86,7 @@ class Project:
 		"""
 		Returns the project's custom javascript, if it exists.
 		"""
-		js = None
+		js = ""
 		try:
 			with open(os.path.join(self.path, "project.js"), "r") as file:
 				data = file.read()
@@ -108,7 +108,7 @@ class Project:
 		"""
 		Returns the project's custom stylesheet, if it exists.
 		"""
-		css = None
+		css = ""
 		try:
 			with open(os.path.join(self.path, "project.css"), "r") as file:
 				data = file.read()
@@ -122,6 +122,13 @@ class Project:
 			pass
 
 		return css
+
+
+	def get_required_assets(self):
+		"""
+		Returns the names of asset bundles required by this project.
+		"""
+		return set(["datetime", "geolocation"])
 
 
 	@staticmethod

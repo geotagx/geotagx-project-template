@@ -19,21 +19,17 @@ import os, jinja2
 import sys, locale, codecs; sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout)
 
 class HtmlWriter:
-	templatedir = None
-	template    = None
-	js          = {"core":None, "geotagging":None, "datetime":None}
-	css         = {"core":None, "geotagging":None, "datetime":None}
-	compress    = None
-	overwrite   = None
-	inline      = None
+	theme     = None
+	compress  = None
+	overwrite = None
+	verbose   = None
 
 
-	def __init__(self, templatedir, compress, overwrite, inline):
-		self.templatedir = templatedir.strip()
-		self.template    = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=self.templatedir)).get_template("base.html")
-		self.compress    = compress
-		self.overwrite   = overwrite
-		self.inline      = inline
+	def __init__(self, theme, compress, overwrite, verbose):
+		self.theme     = theme
+		self.compress  = compress
+		self.overwrite = overwrite
+		self.verbose   = verbose
 
 
 	def iswritabledir(self, path):
@@ -53,41 +49,18 @@ class HtmlWriter:
 			return (True, None)
 
 
-	def getjs(self, project):
-		"""getjs(project:Project)
-		Returns the concatenated template and project javascript files for the
-		specified project.
+	def getassets(self, project):
+		"""getassets(project:Project)
+		Returns the assets for the specified project.
 		"""
-		# TODO Filter out unnecessary javascript files.
-		js = ""
+		# Get theme assets required by the project.
+		css, js = self.theme.getassets(project.get_required_assets())
 
-		for root, __, filenames in os.walk(os.path.join(self.templatedir, *["static","js"]), topdown=False):
-			for filename in filter(lambda f: f.endswith(".js"), filenames):
-				js += open(os.path.join(root, filename), "r").read()
+		# Append project-specific assets to the theme assets.
+		css += project.getcss()
+		js  += project.getjs()
 
-		projectjs = project.getjs()
-		if projectjs is not None:
-			js += projectjs
-
-		return js if len(js) > 0 else None
-
-
-	def getcss(self, project):
-		"""getcss(project:Project)
-		Returns the concatenated template and project stylesheets for the specified project.
-		"""
-		# TODO Filter out unnecessary stylesheets.
-		css = ""
-
-		for root, __, filenames in os.walk(os.path.join(self.templatedir, *["static","css"]), topdown=False):
-			for filename in filter(lambda f: f.endswith(".css"), filenames):
-				css += open(os.path.join(root, filename), "r").read()
-
-		projectcss = project.getcss()
-		if projectcss is not None:
-			css += projectcss
-
-		return css if len(css) > 0 else None
+		return css, js
 
 
 	def write(self, project):
@@ -95,7 +68,7 @@ class HtmlWriter:
 		Writes the specified project's task presenter and tutorial.
 		"""
 		project = HtmlWriter.__preprocess(project)
-		js, css = self.getjs(project), self.getcss(project)
+		css, js = self.getassets(project)
 		context = {
 			"name":project.name,
 			"slug":project.slug,
@@ -110,13 +83,15 @@ class HtmlWriter:
 			self.__render(context, output)
 
 		with open(os.path.join(project.path, "tutorial.html"), "w") as output:
+			# Note that in the event of a non-existent project tutorial configuration,
+			# an empty tutorial.html file is created.
 			if project.tutorial is not None:
-				# FIXME Set correct js and css
-				# context["js"] = None
-				# context["css"] = None
+				css, js = self.theme.getasset("tutorial")
 				context["tutorial"] = str(project.tutorial)
 				context["tutorial_len"] = len(project.tutorial)
 				context["istutorial"] = True
+				context["css"] += css
+				context["js"] += js
 
 				self.__render(context, output)
 
@@ -125,7 +100,7 @@ class HtmlWriter:
 		"""__render(context:dict, f:file)
 		Renders a Jinja2 template in the given context, to the specified file in HTML format.
 		"""
-		html = self.template.render(context)
+		html = self.theme.template.render(context)
 		if html is not None and len(html) > 0:
 			if self.compress:
 				import htmlmin
@@ -154,46 +129,6 @@ class HtmlWriter:
 								project.questionnaire.questions[key].help = help
 
 		return project
-
-
-	@staticmethod
-	def findcss(path):
-		"""findcss(path:string)
-		Returns an array of paths to all the stylesheets contained in the
-		parent directory specified by the given path.
-		"""
-		output = None
-		if path is not None and len(path) > 0:
-			output = []
-			for root, __, files in os.walk(path):
-				output.extend([(root + f) for f in files if f.endswith(".css")])
-
-		return output
-
-
-	@staticmethod
-	def findjs(path):
-		"""findjs(path:string)
-		Returns an array of paths to all the javascript files contained in the
-		parent directory specified by the given path.
-		"""
-
-		# js = ""
-		# for root, dirs, filenames in os.walk(JS_DIR, topdown=False):
-		# 	for filename in filter(lambda f: f.endswith(".js"), filenames):
-		# 		js += open(os.path.join(root, filename), "r").read()
-		#
-		# return js if not compress else minify(js)
-
-
-
-		output = None
-		if path is not None and len(path) > 0:
-			output = []
-			for root, __, files in os.walk(path):
-				output.extend([(root + f) for f in files if f.endswith(".js")])
-
-		return output
 
 
 	@staticmethod

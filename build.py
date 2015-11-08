@@ -17,82 +17,63 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 from src.project import Project
 
-def summarize(path):
-	"""summarize(path:string)
-	Prints a summary of the GeoTag-X project at the directory pointed to by the specified path.
-	"""
-	try:
-		print Project(path)
-		exitval = 0
-	except Exception as e:
-		print e
-		exitval = 1
-	finally:
-		sys.exit(exitval)
-
-
-def write(writer, path):
-	"""write(writer:HtmlWriter, path:string)
-	For the project located at the specified path, this method will write its
-	task presenter and tutorial, if the respective configurations exist.
-	"""
-	try:
-		exitval = 0
-		writable, message = writer.iswritabledir(path)
-		if writable:
-			project = Project(path)
-			writer.write(project)
-		else:
-			print message
-			exitval = 1
-	except Exception as e:
-		print e
-		exitval = 1
-	finally:
-		sys.exit(exitval)
-
-
 def main(argv):
-	from src._argparse import CustomArgumentParser, CustomHelpFormatter
+	exitval = 0
+	try:
+		from src._argparse import CustomArgumentParser, CustomHelpFormatter
 
-	parser = CustomArgumentParser(
-		description="builds the task presenter and tutorial for the GeoTag-X projects located in the specified directories.",
-		formatter_class=CustomHelpFormatter,
-		add_help=False
-	)
-	parser.add_argument("path", metavar="PATH", nargs='+')
-	parser.add_argument("-c", "--compress",  action="store_true", help="compresses the generated files, effectively generating smaller, albeit less readable, task presenters and tutorials.")
-	parser.add_argument("-f", "--force",     action="store_true", help="overwrites any existing task presenter and/or tutorial in the specified directory.")
-	parser.add_argument("-h", "--help",      action="help",       help="prints this help message and exits.")
+		parser = CustomArgumentParser(
+			description="builds the task presenter and tutorial for the GeoTag-X projects located in the specified directories.",
+			formatter_class=CustomHelpFormatter,
+			add_help=False
+		)
+		parser.add_argument("path", metavar="PATH", nargs='+')
+		parser.add_argument("-c", "--compress",  action="store_true", help="compresses the generated files, effectively generating smaller, albeit less readable, task presenters and tutorials.")
+		parser.add_argument("-f", "--force",     action="store_true", help="overwrites any existing task presenter and/or tutorial in the specified directory.")
+		parser.add_argument("-h", "--help",      action="help",       help="prints this help message and exits.")
+		parser.add_argument("-s", "--summarize", action="store_true", help="prints a project's overview.")
+		parser.add_argument("-t", "--theme",     nargs=1, metavar="THEME", help="sets the path to a user-defined theme.")
+		parser.add_argument("-v", "--verbose",   action="store_true", help="explains what is being done.")
 
-	# TODO This is a work in progress so it's hidden from users by suppressing the help.
-	import argparse # TODO Remove this import when '-i' is implemented, i.e. when argparse.SUPPRESS is no longer required.
-	parser.add_argument("-i", "--inline",    action="store_true", help=argparse.SUPPRESS)#help="inlines static cascading stylsheets and scripts in the task presenters and tutorials. Inlining external resources is not recommended, however it may be useful in cases where you would like to test your project on a platform other than GeoTag-X, such as crowdcrafting.org, while maintaining the same look-and-feel.")
-	parser.add_argument("-s", "--summarize", action="store_true", help="prints a project's overview.")
-
-	if len(sys.argv) < 2:
-		parser.print_usage()
-		sys.exit(1)
-	else:
-		args = parser.parse_args()
-
-		# Remove duplicate absolute paths.
-		import os
-		args.path = set([os.path.realpath(path) for path in args.path])
-
-		if args.summarize:
-			for path in args.path:
-				summarize(path)
+		if len(sys.argv) < 2:
+			parser.print_usage()
+			exitval = 1
 		else:
+			args = parser.parse_args()
+
+			# Ignore all duplicate paths, including symbolic links.
 			import os
-			from src.htmlwriter import HtmlWriter
+			args.path = set([os.path.realpath(path) for path in args.path])
 
-			layout = os.path.join(os.path.dirname(os.path.realpath(__file__)), "layout")
-			writer = HtmlWriter(layout, args.compress, args.force, args.inline)
+			if args.summarize:
+				for path in args.path:
+					print Project(path)
+			else:
+				from src.theme import Theme
+				from src.htmlwriter import HtmlWriter
 
-			# TODO Thread this for a large number of projects.
-			for path in args.path:
-				write(writer, path)
+				# If no path to a custom theme is specified, use the default theme.
+				if args.theme is None:
+					args.theme = os.path.join(os.path.dirname(os.path.realpath(__file__)), "theme")
+				else:
+					args.theme = args.theme[0]
+
+				theme = Theme(args.theme)
+				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
+
+				for path in args.path:
+					writable, message = writer.iswritabledir(path)
+					if writable:
+						project = Project(path)
+						writer.write(project)
+					else:
+						print message
+
+	except Exception as e:
+		print e
+		exitval = 1
+	finally:
+		sys.exit(exitval)
 
 
 if __name__ == "__main__":
