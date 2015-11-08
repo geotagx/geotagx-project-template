@@ -4,3 +4,6 @@
 [submodule "doc/community-guidelines"]
 	path = doc/community-guidelines
 	url = https://github.com/geotagx/community-guidelines.git
+[submodule "theme"]
+	path = theme
+	url = https://github.com/geotagx/geotagx-project-theme.git
