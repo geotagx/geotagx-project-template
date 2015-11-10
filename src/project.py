@@ -128,7 +128,14 @@ class Project:
 		"""
 		Returns the names of asset bundles required by this project.
 		"""
-		return set(["datetime", "geolocation"])
+		requirements = set()
+		for t in self.questionnaire.questiontypes:
+			if t in {"geotagging"}:
+				requirements.add("geolocation")
+			elif t in {"date", "datetime"}:
+				requirements.add("datetime")
+
+		return requirements
 
 
 	@staticmethod
