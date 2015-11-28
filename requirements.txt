@@ -4,7 +4,6 @@ click==4.1
 colorama==0.3.3
 coverage==3.7.1
 funcsigs==0.4
-functools32==3.2.3.post2
 htmlmin==0.1.5
 jsonschema==2.5.1
 mock==1.2.0
