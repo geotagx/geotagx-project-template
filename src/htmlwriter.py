@@ -124,7 +124,7 @@ class HtmlWriter:
 					key = os.path.splitext(os.path.basename(filename))[0]
 					if key in project.questionnaire.questions:
 						with open(filename) as file:
-							help = file.read().strip()
+							help = file.read().decode('utf-8').strip()
 							if len(help) > 0:
 								project.questionnaire.questions[key].help = help
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # The GeoTag-X project builder.
 # Copyright (C) 2015 UNITAR.

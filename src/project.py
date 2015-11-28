@@ -89,7 +89,7 @@ class Project:
 		js = ""
 		try:
 			with open(os.path.join(self.path, "project.js"), "r") as file:
-				data = file.read()
+				data = file.read().decode('utf-8')
 				if data is not None:
 					import slimit
 					data = slimit.minify(data, mangle=True)
@@ -111,7 +111,7 @@ class Project:
 		css = ""
 		try:
 			with open(os.path.join(self.path, "project.css"), "r") as file:
-				data = file.read()
+				data = file.read().decode('utf-8')
 				if data is not None:
 					import rcssmin
 					data = rcssmin.cssmin(data)
