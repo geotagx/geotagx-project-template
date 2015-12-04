@@ -33,8 +33,8 @@ class TestQuestion(unittest.TestCase):
 		self.assertFalse(Question.iskey("  key")[0], "Leading whitespace")
 		self.assertFalse(Question.iskey("end\t")[0], "Traling tabulation")
 		self.assertFalse(Question.iskey("*$/\\")[0], "Non-alphanumeric characters")
-		self.assertFalse(Question.iskey("end")[0], "Reserved keyword")
-		self.assertFalse(Question.iskey("photoVisible")[0], "Reserved keyword")
+		self.assertFalse(Question.iskey("end")[0], "Reserved key")
+		self.assertFalse(Question.iskey("photoVisible")[0], "Reserved key")
 		self.assertFalse(Question.iskey(32768)[0], "Not a string")
 		self.assertFalse(Question.iskey("\n")[0], "Illegal escape character")
 

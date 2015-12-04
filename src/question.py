@@ -119,9 +119,8 @@ class Question:
 		Returns true if the specified key is valid, false otherwise.
 		A key is considered valid if it is a non-empty string that is strictly
 		composed of alphanumeric characters, hypens or underscores, and no
-		whitespace. It must also not be a reserved keyword.
+		whitespace. It must also not be reserved for internal use.
 		"""
-		from src.htmlwriter import HtmlWriter
 		from re import match
 
 		valid, message = False, None
@@ -130,12 +129,24 @@ class Question:
 			message = "Error! A question key must be a non-empty string."
 		elif match(r"[\w-]*", key).group() != key:
 			message = "Error! The key '{}' contains an illegal character. A key may only contain letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). It must not contain any whitespace.".format(key)
-		elif HtmlWriter.isreservedkeyword(key):
-			message = "Error! The string '{}' is a reserved keyword and can not be used as a question key.".format(key)
+		elif Question.isreservedkey(key):
+			message = "Error! The string '{}' is reserved for internal use and can not be used as a question key.".format(key)
 		else:
 			valid = True
 
 		return (valid, message)
+
+
+	@staticmethod
+	def isreservedkey(key):
+		"""isreservedkey(key:string)
+		Returns true if the specified key is reserved for internal use, false otherwise.
+		"""
+		return key in [
+			"end",
+			"photoAccessible",
+			"photoVisible",
+		]
 
 
 	@staticmethod
