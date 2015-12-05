@@ -19,39 +19,39 @@ class Questionnaire:
 	questions = None
 	questiontypes = None
 	controlflow = None
+	languages = None
+	default_language = "en"
 
 
-	def __init__(self, questions):
-		"""__init__(questions:list)
-		Instantiates a Questionnaire object from the list of specified questions.
+	def __init__(self, entries):
+		"""__init__(entries:list)
+		Instantiates a Questionnaire object from the list of specified entries.
 		"""
-		assert isinstance(questions, list), "Error! The 'questions' field must be a list."
-		if len(questions) < 1:
-			raise Exception("Error! A questionnaire requires one or more questions.")
+		assert isinstance(entries, list), "Error! The 'entries' field must be a list."
+		if len(entries) < 1:
+			raise Exception("Error! A questionnaire requires one or more entries.")
 		else:
 			import collections
 
 			self.questions = collections.OrderedDict()
 			self.controlflow = {}
 			self.questiontypes = set()
+			self.languages = set()
 
-			for configuration in questions:
-				assert isinstance(configuration, dict), "Error! A question entry must be a dictionary."
+			for entry in entries:
+				valid, message = Questionnaire.isvalidentry(entry)
+				if not valid:
+					raise Exception(message)
 
-				# Check for mandatory keys.
-				for field in ["key", "type", "question"]:
-					if field not in configuration:
-						raise Exception("Error! A questionnaire entry is missing the field '{}'.".format(field))
-
-				key = configuration["key"]
+				key = entry["key"]
 				key = str(key).strip() if isinstance(key, basestring) else None
-
-				valid, message = self.iskey(key, configuration["question"])
+				valid, message = self.iskey(key, entry["question"])
 				if valid:
-					question = Question(key, configuration)
+					question = Question(key, entry)
 					self.questions[key] = question
-					self.controlflow[key] = configuration.get("branch")
+					self.controlflow[key] = entry.get("branch")
 					self.questiontypes.add(question.type)
+					self.languages.update(question.question.keys())
 				else:
 					raise Exception(message)
 
@@ -140,10 +140,8 @@ class Questionnaire:
 		valid, message = True, None
 		if questionnaire is not None:
 			if questionnaire.questions is not None:
-				for question in questionnaire.questions.values():
-					valid, message = Question.isvalid(question)
-					if not valid:
-						break
+				# Note: Questions are not validated here since they are already validated upon creation.
+				# See Question.__init__ for more information.
 
 				# If the questionnaire entries are valid, validate the control flow.
 				if valid and questionnaire.controlflow is not None:
@@ -155,5 +153,23 @@ class Questionnaire:
 				valid, message = False, "Error! Empty questionnaire. A questionnaire must contain at least one question."
 		else:
 			valid, message = False, "Error! A 'NoneType' object is not considered a questionnaire."
+
+		return (valid, message)
+
+
+	@staticmethod
+	def isvalidentry(entry):
+		"""isvalidentry(entry:dict)
+		Returns true if the questionnaire entry is valid, false otherwise.
+		"""
+		valid, message = isinstance(entry, dict), None
+		if not valid:
+			message = "Error! A questionnaire entry must be a dictionary."
+		else:
+			# Check for mandatory entry keys.
+			for field in ["key", "type", "question"]:
+				if field not in entry:
+					valid, message = False, "Error! A questionnaire entry is missing the field '%s'." % field
+					break
 
 		return (valid, message)

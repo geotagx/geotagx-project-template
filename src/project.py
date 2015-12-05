@@ -135,6 +135,9 @@ class Project:
 			elif t in {"date", "datetime"}:
 				requirements.add("datetime")
 
+		if self.questionnaire.languages is not None and len(self.questionnaire.languages) > 1:
+			requirements.add("i18n")
+
 		return requirements
 
 

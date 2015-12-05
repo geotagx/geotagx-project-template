@@ -77,6 +77,7 @@ class HtmlWriter:
 			"description":project.description,
 			"why":project.why,
 			"questionnaire":project.questionnaire,
+			"default_language":project.questionnaire.default_language,
 			"istutorial":False,
 			"js":js,
 			"css":css,
