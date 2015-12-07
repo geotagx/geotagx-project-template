@@ -20,7 +20,6 @@ class Questionnaire:
 	questiontypes = None
 	controlflow = None
 	languages = None
-	default_language = "en"
 
 
 	def __init__(self, entries):

@@ -25,6 +25,7 @@ class Project:
 	why = None
 	questionnaire = None
 	tutorial = None
+	default_language = "en"
 
 
 	def __init__(self, path):
