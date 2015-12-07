@@ -41,6 +41,8 @@ class Project:
 		if config is None:
 			raise IOError("The directory '{}' does not contain a GeoTag-X project configuration file or you may not have sufficient access permissions.".format(path))
 		else:
+			from src.i18n import i18nify
+
 			# Check for mandatory keys.
 			for field in ["name", "short_name", "description", "why", "questionnaire"]:
 				if field not in config:
@@ -50,7 +52,7 @@ class Project:
 			self.name = config["name"].strip()
 			self.slug = config["short_name"].strip()
 			self.description = config["description"].strip()
-			self.why = config["why"].strip()
+			self.why = i18nify(config["why"])
 			self.questionnaire = Questionnaire(config["questionnaire"])
 			self.tutorial = None if config["tutorial"] is None else Tutorial(config["tutorial"])
 

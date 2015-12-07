@@ -76,11 +76,13 @@ class Question:
 		"""__init__(key:string, entry:dict)
 		Instantiates a Question object with the given key, from the specified questionnaire entry.
 		"""
+		from src.i18n import i18nify
+
 		self.key        = key
 		self.type       = entry.get("type")
 		self.type       = self.type.strip() if isinstance(self.type, basestring) else None
-		self.question   = Question.i18nify(entry.get("question"))
-		self.hint       = Question.i18nify(entry.get("hint"))
+		self.question   = i18nify(entry.get("question"))
+		self.hint       = i18nify(entry.get("hint"))
 		self.parameters = Question.getparameters(self.type, entry.get("parameters"))
 		valid, message  = Question.isvalid(self)
 		if not valid:
@@ -180,54 +182,6 @@ class Question:
 
 
 	@staticmethod
-	def isISO6391(code):
-		"""isISO6391(code:string)
-		Returns true if the specified code is an ISO 639-1 code, false otherwise.
-		ISO 639-1 language codes are two-letter lowercase strings, examples of
-		which can be found at https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-		"""
-		valid, message = True, None
-		if isinstance(code, basestring):
-			if len(code.strip()) == 0:
-				valid, message = False, "Error! A language code must be a non-empty string."
-			else:
-				from re import match
-
-				matches = match(r"[a-z]{2}", code)
-				if matches is None or matches.group() != code:
-					valid, message = False, "Error! The ISO code '%s' is invalid. An ISO 639-1 code is a two-character string comprised of lowercase letters only, e.g. 'en', 'fr', or 'de'." % code
-		else:
-			valid, message = False, "Error! Language code is not a string."
-
-		return (valid, message)
-
-
-	@staticmethod
-	def isi18nified(input, isvalid):
-		"""isi18nified(input:dict, isvalid:function)
-		Returns true if the specified input is a dictionary where each value
-		is associated to an ISO 639-1 language code and is considered valid
-		by the isvalid function, false otherwise.
-		"""
-		valid, message = True, None
-		if not input:
-			valid, message = False, "Error! No input value is specified."
-		elif isinstance(input, dict):
-			for code, value in input.items():
-				valid, message = Question.isISO6391(code)
-				if valid:
-					valid, message = isvalid(value)
-					if not valid:
-						break
-				else:
-					break
-		else:
-			valid, message = False, "Error! The input must be a dictionary!"
-
-		return (valid, message)
-
-
-	@staticmethod
 	def isquestion(question):
 		"""isquestion(question:dict)
 		Returns true if the question is an i18nified object, false otherwise.
@@ -235,6 +189,8 @@ class Question:
 		language code, for instance {"en":"What is the answer to life?"}. Please
 		also note that questions strings must not be empty.
 		"""
+		from src.i18n import isi18nified
+
 		def isvalid(input):
 			"""isvalid(input:string)
 			Returns true if the string is non-empty, false otherwise.
@@ -248,7 +204,7 @@ class Question:
 
 			return (valid, message)
 
-		return Question.isi18nified(question, isvalid)
+		return isi18nified(question, isvalid)
 
 
 	@staticmethod
@@ -271,19 +227,6 @@ class Question:
 			return (True, None)
 		else:
 			return (False, "Error! Question parameters must be a dictionary.")
-
-
-	@staticmethod
-	def i18nify(input, language="en"):
-		"""i18nify(input:none|string|dict, language:string)
-		Returns the input as an i18nified object, a dictionary that assigns each
-		value to an ISO 639-1 language code.
-		"""
-		if isinstance(input, basestring):
-			input = input.strip()
-			return None if len(input) == 0 else {language:input}
-		else:
-			return input
 
 
 	@staticmethod
