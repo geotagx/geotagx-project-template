@@ -25,7 +25,7 @@ class Project:
 	why = None
 	questionnaire = None
 	tutorial = None
-	default_language = "en"
+	default_language = None
 
 
 	def __init__(self, path):
@@ -42,7 +42,7 @@ class Project:
 		if config is None:
 			raise IOError("The directory '{}' does not contain a GeoTag-X project configuration file or you may not have sufficient access permissions.".format(path))
 		else:
-			from src.i18n import i18nify
+			from src.i18n import i18nify, isiso6391
 
 			# Check for mandatory keys.
 			for field in ["name", "short_name", "description", "why", "questionnaire"]:
@@ -56,6 +56,7 @@ class Project:
 			self.why = i18nify(config["why"])
 			self.questionnaire = Questionnaire(config["questionnaire"])
 			self.tutorial = None if config["tutorial"] is None else Tutorial(config["tutorial"])
+			self.default_language = config["default_language"] if "default_language" in config and isiso6391(config["default_language"]) else "en"
 
 			valid, message = Project.isvalid(self)
 			if not valid:
