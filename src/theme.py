@@ -39,7 +39,7 @@ class Theme:
 		import os
 		from jinja2 import Environment, FileSystemLoader
 
-		valid, message = Theme.isvalidpath(path)
+		valid, message = Theme.hastheme(path)
 		if not valid:
 			raise Exception(message)
 
@@ -104,8 +104,8 @@ class Theme:
 		return css, js
 
 	@staticmethod
-	def isvalidpath(path):
-		"""isvalidpath(path:string)
+	def hastheme(path):
+		"""hastheme(path:string)
 		Returns true if the specified path contains a valid theme, false otherwise.
 		"""
 		return (True, None)

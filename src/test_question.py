@@ -50,16 +50,16 @@ class TestQuestion(unittest.TestCase):
 	def test_illegal_questions(self):
 		self.assertFalse(Question.isquestion(None)[0], "No value")
 		self.assertFalse(Question.isquestion({})[0], "Empty dict")
-		self.assertFalse(Question.isquestion("")[0], "Not a dict (string value)")
-		self.assertFalse(Question.isquestion(32)[0], "Not a dict (numeric value)")
+		self.assertFalse(Question.isquestion("")[0], "Not a dictionary (empty string value)")
+		self.assertFalse(Question.isquestion(32)[0], "Not a dictionary (numeric value)")
 		self.assertFalse(Question.isquestion("What is the answer to life?")[0], "Not a dictionary")
-		self.assertFalse(Question.isquestion({"":"What is the answer to life?"})[0], "No language code")
-		self.assertFalse(Question.isquestion({"en":""})[0], "Empty question with a valid language code")
-		self.assertFalse(Question.isquestion({"en":None})[0], "No question value with a valid language code")
+		self.assertFalse(Question.isquestion({"":"What is the answer to life?"})[0], "No ISO 639-1 language code")
+		self.assertFalse(Question.isquestion({"en":""})[0], "Empty question with a valid ISO 639-1 language code")
+		self.assertFalse(Question.isquestion({"en":None})[0], "Valid ISO 639-1 language code but no question value")
 		self.assertFalse(Question.isquestion({"en":"\n"})[0], "Illegal escape character")
 		self.assertFalse(Question.isquestion({"en":"What is your name?", "fr":""})[0], "Missing question for a given translation")
-		self.assertFalse(Question.isquestion({42:"What is your name?", "fr":""})[0], "Language code not a string")
-		self.assertFalse(Question.isquestion({"en 12":"What is your name?", "fr":""})[0], "Invalid language code")
+		self.assertFalse(Question.isquestion({42:"What is your name?", "fr":""})[0], "Invalid ISO 639-1 language code (not a string)")
+		self.assertFalse(Question.isquestion({"en 12":"What is your name?", "fr":""})[0], "Invalid ISO 639-1 language code (longer than 2 characters)")
 
 if __name__ == "__main__":
 	unittest.main()
