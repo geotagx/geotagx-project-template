@@ -133,4 +133,18 @@ class HtmlWriter:
 							if len(help) > 0:
 								project.questionnaire.questions[key].help = help
 
+			# i18nify multilingual questionnaire parameters.
+			from src.i18n import i18nify
+			for question in project.questionnaire.questions.values():
+				parameters = question.parameters
+				# Select, checklist and illustrative checklist labels.
+				if question.type in ["select", "checklist", "illustrative-checklist"]:
+					for option in parameters["options"]:
+						option["label"] = i18nify(option["label"])
+
+				# Placeholders
+				if "placeholder" in question.parameters:
+					parameters["placeholder"] = i18nify(parameters["placeholder"])
+
+
 		return project
