@@ -59,7 +59,7 @@ builder tool.
 
 ### I.a.2 Windows
 
-* Install Github Desktop from https://desktop.github.com 
+* Install Github Desktop from https://desktop.github.com
 * Install Win-Python from http://winpython.sourceforge.net
 * `Fork` the repository to your personal project account on Github Web Interface
 * Log into Github from the Github Desktop client
@@ -114,9 +114,24 @@ The tool should produce a task presenter `template.html`, and tutorial
 to be deployed to your server via PyBossa's [web](http://pybossa.readthedocs.org/en/latest/user/overview.html#using-the-web-interface)
 or [command line](http://pybossa.readthedocs.org/en/latest/user/pbs.html) interface.
 
-
 ### I.d. Building your own project
 
 While it is most certainly not a requirement to use the builder tool, it will
 most likely quicken the project creation process. We have written a complete
 [**creation guide**](GUIDE.pdf) to help you get started.
+
+### I.e. Building in PDF mode
+
+The PDF mode lets GeoTag-X projects analyse PDF files instead of images. The PDF mode can be used
+by passing a `-pm` flag to `build.py`. For example :
+```
+python build.py sample/ -pm
+```
+or
+```
+python build.py sample/ --pdf
+```
+The structure of the `project.json` file, `tutorial.json` file, etc all remain exactly the same. The only difference now is `tasks.csv` expects PDF files in the `image_url` column, and the corresponding source in `image_source` column. These PDF files should be publicly hosted, and the server where they are hosted should set the following header when serving the files :
+```
+Access-Control-Allow-Origin "http://mozilla.github.io"
+```
