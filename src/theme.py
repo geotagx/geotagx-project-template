@@ -31,7 +31,6 @@ class Theme:
 	}
 	template = None
 
-
 	def __init__(self, path):
 		"""__init__(path:string)
 		Instantiates a Theme object from the content of the directory located at

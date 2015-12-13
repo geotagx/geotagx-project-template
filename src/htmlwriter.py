@@ -23,12 +23,14 @@ class HtmlWriter:
 	compress  = None
 	overwrite = None
 	verbose   = None
+	pdfmode   = False
 
 
-	def __init__(self, theme, compress, overwrite, verbose):
+	def __init__(self, theme, compress, overwrite, pdfmode, verbose):
 		self.theme     = theme
 		self.compress  = compress
 		self.overwrite = overwrite
+		self.pdfmode   = pdfmode
 		self.verbose   = verbose
 
 
@@ -77,7 +79,8 @@ class HtmlWriter:
 			"questionnaire":project.questionnaire,
 			"istutorial":False,
 			"js":js,
-			"css":css
+			"css":css,
+			"pdfmode" : self.pdfmode
 		}
 		with open(os.path.join(project.path, "template.html"), "w") as output:
 			self.__render(context, output)
@@ -90,6 +93,7 @@ class HtmlWriter:
 				context["tutorial"] = str(project.tutorial)
 				context["tutorial_len"] = len(project.tutorial)
 				context["istutorial"] = True
+				context["pdfmode"] = self.pdfmode
 				context["css"] += css
 				context["js"] += js
 
