@@ -140,7 +140,7 @@ class Project:
 				requirements.add("datetime")
 
 		if self.questionnaire.languages is not None and len(self.questionnaire.languages) > 1:
-			requirements.add("i18n")
+			requirements.add("multilanguage")
 
 		return requirements
 
