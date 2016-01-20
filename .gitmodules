@@ -7,3 +7,6 @@
 [submodule "theme"]
 	path = theme
 	url = https://github.com/geotagx/geotagx-project-theme.git
+[submodule "demos/geotagx-project-demo-multilingual"]
+	path = demos/geotagx-project-demo-multilingual
+	url = https://github.com/geotagx/geotagx-project-demo-multilingual.git
