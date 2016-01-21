@@ -79,8 +79,8 @@ class Theme:
 						# the script will keep searching for the missing file.
 						bundle[key] = ""
 
-			css = bundle["css"]
-			js  = bundle["js"]
+			css = unicode(bundle["css"].strip(), "UTF-8")
+			js  = unicode(bundle["js"].strip(),  "UTF-8")
 
 		return css, js
 
