@@ -19,7 +19,6 @@ class Questionnaire:
 	questions = None
 	questiontypes = None
 	controlflow = None
-	languages = None
 
 
 	def __init__(self, entries):
@@ -35,7 +34,6 @@ class Questionnaire:
 			self.questions = collections.OrderedDict()
 			self.controlflow = {}
 			self.questiontypes = set()
-			self.languages = set()
 
 			for entry in entries:
 				valid, message = Questionnaire.isvalidentry(entry)
@@ -50,7 +48,6 @@ class Questionnaire:
 					self.questions[key] = question
 					self.controlflow[key] = entry.get("branch")
 					self.questiontypes.add(question.type)
-					self.languages.update(question.question.keys())
 				else:
 					raise Exception(message)
 

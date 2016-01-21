@@ -25,7 +25,7 @@ class Project:
 	why = None
 	questionnaire = None
 	tutorial = None
-	default_language = None
+	language = None
 
 
 	def __init__(self, path):
@@ -42,7 +42,7 @@ class Project:
 		if config is None:
 			raise IOError("The directory '{}' does not contain a GeoTag-X project configuration file or you may not have sufficient access permissions.".format(path))
 		else:
-			from src.i18n import i18nify, isiso6391
+			from src.i18n import i18nify
 
 			# Check for mandatory keys.
 			for field in ["name", "short_name", "description", "why", "questionnaire"]:
@@ -56,7 +56,7 @@ class Project:
 			self.why = i18nify(config["why"])
 			self.questionnaire = Questionnaire(config["questionnaire"])
 			self.tutorial = None if config["tutorial"] is None else Tutorial(config["tutorial"])
-			self.default_language = config["default_language"] if "default_language" in config and isiso6391(config["default_language"]) else "en"
+			self.language = config["language"] if "language" in config else {"default":"en", "available":{"en":"English"}}
 
 			valid, message = Project.isvalid(self)
 			if not valid:
@@ -134,12 +134,12 @@ class Project:
 		"""
 		requirements = set()
 		for t in self.questionnaire.questiontypes:
-			if t in {"geotagging"}:
+			if "geolocation" not in requirements and t in {"geotagging"}:
 				requirements.add("geolocation")
-			elif t in {"date", "datetime"}:
+			elif "datetime" not in requirements and t in {"date", "datetime"}:
 				requirements.add("datetime")
 
-		if self.questionnaire.languages is not None and len(self.questionnaire.languages) > 1:
+		if len(self.language["available"]) > 1:
 			requirements.add("multilanguage")
 
 		return requirements
@@ -221,7 +221,8 @@ class Project:
 			(Project.isslug,        project.slug),
 			(Project.isdescription, project.description),
 			(Project.iswhy,         project.why),
-			(Project.istutorial,    project.tutorial)
+			(Project.istutorial,    project.tutorial),
+			(Project.islanguage,    project.language)
 		]
 		for validator, field in validations:
 			valid, message = validator(field)
@@ -269,3 +270,36 @@ class Project:
 		Returns true if the specified tutorial is valid, false otherwise.
 		"""
 		return Tutorial.isvalid(tutorial)
+
+
+	@staticmethod
+	def islanguage(language):
+		"""islanguage(language:dict)
+		Returns true if the specified language configuration is valid, false otherwise.
+		"""
+		if language is not None:
+			from src.i18n import isiso6391
+
+			# Check for mandatory keys.
+			for key in ["default", "available"]:
+				if key not in language:
+					return (False, "Error! The language configuration is missing the '%s' key." % key)
+
+			# Make sure each available language has a valid ISO 639-1 code, and a human-readable name.
+			available_languages = language["available"]
+			for key in available_languages:
+				if not isiso6391(key):
+					return (False, "Error! '%s' is not a valid ISO 639-1 code. Please correct your project's language configuration." % key)
+				elif not available_languages[key].strip():
+					return (False, "Error! The language '%s' does not have a human-readable name. Please correct your project's language configuration." % key)
+
+			# Make sure the default language value is part of the available languages.
+			default_language = language["default"].strip()
+			if default_language and default_language not in available_languages:
+				return (False, "Error! There is no language with the code '%s' in the project's available languages." % default_language)
+			elif not default_language:
+				return (False, "Error! The project's language configuration is missing a default language.")
+
+			return (True, None)
+		else:
+			return (False, "Error! The project's language configuration is empty.")
