@@ -1,5 +1,5 @@
 # This module is part of the GeoTag-X project builder.
-# Copyright (C) 2015 UNITAR.
+# Copyright (C) 2016 UNITAR.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -25,6 +25,10 @@ class Theme:
 			"css":None
 		},
 		"datetime":{
+			"js":None,
+			"css":None
+		},
+		"multilanguage":{
 			"js":None,
 			"css":None
 		},
@@ -88,7 +92,7 @@ class Theme:
 		try: assert type(bundles) is set, "[Theme::getassets] Error! 'bundles' parameter is not a set!"
 		except AssertionError as error: raise Exception(error)
 
-		# The core bundle is always returned, however it is explicitly added to
+		# The core bundle is always returned, however if it is explicitly added to
 		# the bundle set, it needs to be removed or it will be concatenated to
 		# the result twice.
 		if "core" in bundles:
