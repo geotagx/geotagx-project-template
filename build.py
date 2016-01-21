@@ -32,7 +32,6 @@ def main(argv):
 		parser.add_argument("-c", "--compress",  action="store_true", help="compresses the generated files, effectively generating smaller, albeit less readable, task presenters and tutorials.")
 		parser.add_argument("-f", "--force",     action="store_true", help="overwrites any existing task presenter and/or tutorial in the specified directory.")
 		parser.add_argument("-h", "--help",      action="help",       help="prints this help message and exits.")
-		parser.add_argument("-pm", "--pdf",      action="store_true",       help="prepares a template for analysing PDF files (instead of Image files)")
 		parser.add_argument("-s", "--summarize", action="store_true", help="prints a project's overview.")
 		parser.add_argument("-t", "--theme",     nargs=1, metavar="THEME", help="sets the path to a user-defined theme.")
 		parser.add_argument("-v", "--verbose",   action="store_true", help="explains what is being done.")
@@ -61,7 +60,7 @@ def main(argv):
 					args.theme = args.theme[0]
 
 				theme = Theme(args.theme)
-				writer = HtmlWriter(theme, args.compress, args.force, args.pdf, args.verbose)
+				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
 
 				for path in args.path:
 					writable, message = writer.iswritabledir(path)

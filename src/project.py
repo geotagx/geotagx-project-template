@@ -26,6 +26,7 @@ class Project:
 	questionnaire = None
 	tutorial = None
 	language = None
+	subjecttype = None
 
 
 	def __init__(self, path):
@@ -57,6 +58,7 @@ class Project:
 			self.questionnaire = Questionnaire(config["questionnaire"])
 			self.tutorial = None if config["tutorial"] is None else Tutorial(config["tutorial"])
 			self.language = config["language"] if "language" in config else {"default":"en", "available":{"en":"English"}}
+			self.subjecttype = str(config["subject-type"]).lower() if "subject-type" in config else "image"
 
 			valid, message = Project.isvalid(self)
 			if not valid:
@@ -222,7 +224,8 @@ class Project:
 			(Project.isdescription, project.description),
 			(Project.iswhy,         project.why),
 			(Project.istutorial,    project.tutorial),
-			(Project.islanguage,    project.language)
+			(Project.islanguage,    project.language),
+			(Project.issubjecttype, project.subjecttype)
 		]
 		for validator, field in validations:
 			valid, message = validator(field)
@@ -303,3 +306,12 @@ class Project:
 			return (True, None)
 		else:
 			return (False, "Error! The project's language configuration is empty.")
+
+
+	@staticmethod
+	def issubjecttype(type):
+		"""iswhy(type:string)
+		Returns true if the specified type is a recognized subject type, false otherwise.
+		"""
+		types = {"image", "pdf"}
+		return (True, None) if type in types else (False, "Error! The subject type '%s' is not recognized. Please check your project's 'subject-type' configuration." % type)
