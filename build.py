@@ -72,8 +72,12 @@ def main(argv):
 						print message
 
 	except Exception as e:
-		print e
 		exitval = 1
+		if args.verbose:
+			import traceback
+			traceback.print_exc()
+		else:
+			print e
 	finally:
 		sys.exit(exitval)
 
