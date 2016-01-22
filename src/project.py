@@ -69,11 +69,16 @@ class Project:
 		"""
 		Returns the object in the form of a string.
 		"""
-		return (
+		default_language = self.language["default"]
+		available_languages = self.language["available"]
+		return unicode(
 			"{name}\n"
 			"{underline}\n"
 			"Short name: {slug}\n"
 			"Description: {description}\n"
+			"Subject type: {subject_type}\n"
+			"Default language: {default_language_name}\n"
+			"Available languages: {available_language_names}\n"
 			"Why: {why}\n"
 			"Tutorial included: {has_tutorial}\n"
 			"Questionnaire:\n{questionnaire}"
@@ -82,10 +87,13 @@ class Project:
 			underline = ("-" * len(self.name)),
 			slug = self.slug,
 			description = self.description,
-			why = self.why,
+			subject_type = Project.getsubjecttypename(self.subjecttype),
+			default_language_name = available_languages[default_language],
+			available_language_names = ", ".join(available_languages.itervalues()),
+			why = self.why[default_language],
 			has_tutorial = "Yes" if self.tutorial is not None and len(self.tutorial) > 0 else "No",
 			questionnaire = self.questionnaire
-		)
+		).encode("utf-8")
 
 
 	def getjs(self):
@@ -210,6 +218,17 @@ class Project:
 					print "Error! Could not find a suitable configuration file parser for the extension '{}'.".format(extension)
 
 		return None
+
+
+	@staticmethod
+	def getsubjecttypename(subjecttype):
+		"""getsubjecttypename(subjecttype:string)
+		Returns the human-readable name for the specified subject type.
+		"""
+		return {
+			"image":"Image",
+			"pdf":"Portable Document Format (PDF)"
+		}.get(subjecttype, "Unknown")
 
 
 	@staticmethod

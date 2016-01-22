@@ -121,11 +121,22 @@ class Questionnaire:
 		"""
 		Returns the list of questions in string format.
 		"""
-		output = []
-		for i, entry in enumerate(self.questions.values(), start=1):
-			output.append("{}. {} ({})".format(i, entry.question, entry.key))
+		from math import log10
 
-		return "\n".join(output) if len(output) > 0 else "Empty questionnaire."
+		output = []
+		for i, entry in enumerate(self.questions.itervalues(), start=1):
+			# Each question entry is an <ISO 639-1 code, string> map that contains a
+			# translation of the question in a certain language.
+			translations = entry.question.iteritems()
+			(iso_code, question) = translations.next()
+			output.append("%d. (%s) %s [%s]" % (i, iso_code, question, entry.key))
+
+			# Output all remaining translations.
+			for iso_code, question in translations:
+				whitespace = " " * (int(log10(i)) + 1) # Number of digits in N == log10(N) + 1
+				output.append("%s  (%s) %s" % (whitespace, iso_code, question))
+
+		return unicode("\n".join(output)).encode("UTF-8") if len(output) > 0 else "Empty questionnaire."
 
 
 	@staticmethod
