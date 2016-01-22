@@ -76,7 +76,7 @@ def main(argv):
 			import traceback
 			traceback.print_exc()
 		else:
-			print e
+			print "%s: %s" % (e.__class__.__name__, e)
 	finally:
 		sys.exit(exitval)
 
