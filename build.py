@@ -76,7 +76,7 @@ def main(argv):
 			import traceback
 			traceback.print_exc()
 		else:
-			print "%s: %s" % (e.__class__.__name__, e)
+			print e.__class__.__name__ if not str(e) else "%s: %s" % (e.__class__.__name__, e)
 	finally:
 		sys.exit(exitval)
 
