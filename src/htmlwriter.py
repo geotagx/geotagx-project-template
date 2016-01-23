@@ -79,6 +79,7 @@ class HtmlWriter:
 			"default_language":project.language["default"],
 			"available_languages":project.language["available"],
 			"subject_type":project.subjecttype,
+			"pdfmode":(project.subjecttype == "pdf"), # TODO Remove this when it is no longer used in the project theme.
 			"istutorial":False,
 			"js":js,
 			"css":css,
