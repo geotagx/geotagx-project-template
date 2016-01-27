@@ -16,8 +16,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from src.project import Project
-
 def main(argv):
 	exitval = 0
 	try:
@@ -40,11 +38,11 @@ def main(argv):
 			parser.print_usage()
 			exitval = 1
 		else:
-			args = parser.parse_args()
-
-			# Ignore all duplicate paths, including symbolic links.
+			from src.project import Project
 			import os
-			args.path = set([os.path.realpath(path) for path in args.path])
+
+			args = parser.parse_args()
+			args.path = set([os.path.realpath(path) for path in args.path]) # Remove all duplicate paths, including symbolic links.
 
 			if args.summarize:
 				for path in args.path:
@@ -54,10 +52,7 @@ def main(argv):
 				from src.htmlwriter import HtmlWriter
 
 				# If no path to a custom theme is specified, use the default theme.
-				if args.theme is None:
-					args.theme = os.path.join(os.path.dirname(os.path.realpath(__file__)), "theme")
-				else:
-					args.theme = args.theme[0]
+				args.theme = args.theme[0] if args.theme else os.path.join(os.path.dirname(os.path.realpath(__file__)), "theme")
 
 				theme = Theme(args.theme)
 				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
