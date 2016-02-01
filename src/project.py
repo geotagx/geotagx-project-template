@@ -1,5 +1,5 @@
 # This module is part of the GeoTag-X project builder.
-# Copyright (C) 2015 UNITAR.
+# Copyright (C) 2016 UNITAR-UNOSAT.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
-from src.questionnaire import Questionnaire
-from src.tutorial import Tutorial
+from questionnaire import Questionnaire
+from tutorial import Tutorial
 
 class Project:
 	path = None
@@ -334,3 +334,99 @@ class Project:
 		"""
 		types = {"image", "pdf"}
 		return (True, None) if type in types else (False, "Error! The subject type '%s' is not recognized. Please check your project's 'subject-type' configuration." % type)
+
+
+
+
+class ProjectValidator:
+	@staticmethod
+	def is_valid_configuration(configuration):
+		"""is_valid_configuration(configuration:dict)
+		Returns true if the specified configuration is valid, false otherwise.
+		"""
+		# Check for mandatory keys.
+		for field in ["name", "short_name", "description"]:
+			if field not in configuration:
+				return (False, "the project configuration is missing the field '%s'." % field)
+
+		validations = [
+			(ProjectValidator.is_valid_name,        configuration["name"]),
+			(ProjectValidator.is_valid_short_name,  configuration["short_name"]),
+			(ProjectValidator.is_valid_description, configuration["description"])
+		]
+		for validator, field in validations:
+			valid, message = validator(field)
+			if not valid:
+				return (False, message)
+
+
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid(project):
+		"""is_valid(project:Project)
+		Returns true if the specified project is valid, false otherwise.
+		"""
+		raise NotImplementedError("Please implement ProjectValidator.is_valid")
+
+		if project is None:
+			return (False, "NoneType object passed to validator.")
+
+
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid_name(name):
+		"""is_valid_name(name:string)
+		Returns true if the specified project name is valid, false otherwise.
+		"""
+		if not isinstance(name, basestring):
+			return (False, "the project name is not a string.")
+		else:
+			if not name.strip():
+				return (False, "the project name is empty.")
+			else:
+				return (True, None)
+
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid_short_name(short_name):
+		"""isslug(short_name:string)
+		Returns true if the specified project short name is valid, false otherwise.
+		"""
+		if not isinstance(short_name, basestring):
+			return (False, "the project short name is not a string.")
+		else:
+			if not short_name.strip():
+				return (False, "the project short name is empty.")
+			else:
+				from re import match
+				matches = match(r"[a-zA-Z0-9-_]+", short_name)
+				if matches is None or matches.group() != short_name:
+					return (False, "the project short name contains an invalid character. A short name may only be comprised of alphanumeric characters (a-z, 0-9), hyphens (-) and underscores (_).")
+
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid_description(description):
+		"""is_valid_description(description:string)
+		Returns true if the specified project description is valid, false otherwise.
+		"""
+		if not isinstance(description, basestring):
+			return (False, "the project description is not a string.")
+		else:
+			if not description.strip():
+				return (False, "the project description is empty.")
+
+		return (True, None)
+
+
+
+
+class ProjectError(Exception):
+	pass
