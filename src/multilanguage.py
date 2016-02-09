@@ -40,7 +40,7 @@ def is_normalized(value):
 	valid, message = True, None
 	if isinstance(value, dict):
 		for locale_id, string in value.items():
-			if not is_locale_id(locale_id):
+			if not is_locale_identifier(locale_id):
 				valid, message = False, "the locale identifier '%s' is not valid." % locale_id
 				break
 			elif not isinstance(string, basestring):
@@ -52,8 +52,8 @@ def is_normalized(value):
 	return (valid, message)
 
 
-def is_locale_id(identifier):
-	"""is_locale(identifier:string)
+def is_locale_identifier(identifier):
+	"""is_locale_identifier(identifier:string)
 	Returns true if the specified locale identifier is valid, false otherwise.
 	"""
 	if isinstance(identifier, basestring):
