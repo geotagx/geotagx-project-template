@@ -383,7 +383,7 @@ class ProjectX:
 
 	@staticmethod
 	def load_configuration(filename):
-		"""get_configuration(filename:string)
+		"""load_configuration(filename:string)
 		Returns a project configuration from the file with the specified filename.
 		If the file does not contain a valid configuration, a ProjectError exception is raised.
 		"""
