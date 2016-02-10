@@ -447,20 +447,6 @@ class ProjectValidator:
 
 
 	@staticmethod
-	def is_valid(project):
-		"""is_valid(project:Project)
-		Returns true if the specified project is valid, false otherwise.
-		"""
-		raise NotImplementedError("Please implement ProjectValidator.is_valid")
-
-		if project is None:
-			return (False, "NoneType object passed to validator.")
-
-
-		return (True, None)
-
-
-	@staticmethod
 	def is_valid_name(name):
 		"""is_valid_name(name:string)
 		Returns true if the specified project name is valid, false otherwise.
