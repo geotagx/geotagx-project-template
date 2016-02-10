@@ -338,6 +338,89 @@ class Project:
 
 
 
+class ProjectX:
+	path = None
+	name = None
+	short_name = None
+	description = None
+	task_presenter = None
+	tutorial = None
+
+	def __init__(
+		self,
+		path,
+		project_configuration_filename="project.json",
+		task_presenter_configuration_filename="task_presenter.json",
+		tutorial_configuration_filename="tutorial.json"
+	):
+		"""__init__(self:Project, path:string, project_configuration_filename:string, task_presenter_configuration_filename:string, tutorial_configuration_filename:string)
+		Instantiates a Project object for the GeoTag-X project located at the specified path.
+		The path must point to a readable directory that contains valid project, task presenter,
+		and, optionally, tutorial configuration files.
+		"""
+		if not os.path.isdir(path) or not os.access(path, os.R_OK):
+			raise IOError("could not access '%s'. Please make sure the directory exists and that you have sufficient access permissions." % path)
+
+		filename = os.path.join(path, project_configuration_filename)
+		configuration = ProjectX.load_configuration(filename)
+		self.path = path
+		self.name = configuration["name"]
+		self.short_name = configuration["short_name"]
+		self.description = configuration["description"]
+
+		# Load the project's task presenter.
+		from project_task_presenter import ProjectTaskPresenter
+		filename = os.path.join(path, task_presenter_configuration_filename)
+		configuration = ProjectTaskPresenter.load_configuration(filename)
+		self.task_presenter = ProjectTaskPresenter(configuration)
+
+		# Load the project's tutorial.
+		from project_tutorial import ProjectTutorial
+		filename = os.path.join(path, tutorial_configuration_filename)
+		configuration = ProjectTutorial.load_configuration(filename)
+		self.tutorial = ProjectTutorial(self.task_presenter, configuration)
+
+
+	@staticmethod
+	def load_configuration(filename):
+		"""get_configuration(filename:string)
+		Returns a project configuration from the file with the specified filename.
+		If the file does not contain a valid configuration, a ProjectError exception is raised.
+		"""
+		from utils import load_configuration
+		configuration = load_configuration(filename)
+		valid, message = ProjectValidator.is_valid_configuration(configuration)
+		if not valid:
+			raise ProjectError(message)
+
+		return configuration
+
+
+	def __str__(self):
+		"""
+		Returns the project's string representation.
+		"""
+		return unicode(
+			"{name}\n"
+			"{underline}\n"
+			"PATH: {path}\n"
+			"SHORT NAME: {short_name}\n"
+			"DESCRIPTION: {description}\n"
+			"{task_presenter}\n"
+			"{tutorial}"
+		).format(
+			name = self.name,
+			underline = ("-" * len(self.name)),
+			path = self.path,
+			short_name = self.short_name,
+			description = self.description,
+			task_presenter = self.task_presenter,
+			tutorial = self.tutorial
+		).encode("utf-8")
+
+
+
+
 class ProjectValidator:
 	@staticmethod
 	def is_valid_configuration(configuration):
