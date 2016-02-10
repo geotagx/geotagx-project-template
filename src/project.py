@@ -372,7 +372,7 @@ class ProjectX:
 		from project_task_presenter import ProjectTaskPresenter
 		filename = os.path.join(path, task_presenter_configuration_filename)
 		configuration = ProjectTaskPresenter.load_configuration(filename)
-		self.task_presenter = ProjectTaskPresenter(configuration)
+		self.task_presenter = ProjectTaskPresenter(self, configuration)
 
 		# Load the project's tutorial.
 		from project_tutorial import ProjectTutorial
