@@ -13,8 +13,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-import os
-
 class ProjectTaskPresenter:
 	DEFAULT_LOCALE = "en-GB"
 
@@ -22,8 +20,8 @@ class ProjectTaskPresenter:
 		"""__init__(configuration:dict)
 		Instantiates a ProjectTaskPresenter object from the specified configuration.
 		"""
-		from project import ProjectX
-		assert isinstance(project, ProjectX), "project is not a Project instance."
+		from project import Project
+		assert isinstance(project, Project), "project is not a Project instance."
 
 		valid, message = ProjectTaskPresenterValidator.is_valid_configuration(configuration)
 		if not valid:
