@@ -58,7 +58,7 @@ class TestProjectValidator(unittest.TestCase):
 		self.assertTrue(ProjectValidator.is_valid_description("?")[0], "Description is a non-empty string.")
 		self.assertTrue(ProjectValidator.is_valid_description("   hello")[0], "Valid description with leading whitespace.")
 		self.assertTrue(ProjectValidator.is_valid_description("hello   ")[0], "Valid description with trailing whitespace.")
-		self.assertTrue(ProjectValidator.is_valid_name("   hello   ")[0], "Valid description with leading and trailing whitespace.")
+		self.assertTrue(ProjectValidator.is_valid_description("   hello   ")[0], "Valid description with leading and trailing whitespace.")
 
 	def test_illegal_description(self):
 		self.assertFalse(ProjectValidator.is_valid_description(None)[0], "NoneType object used as description.")
