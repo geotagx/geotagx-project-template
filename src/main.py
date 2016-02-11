@@ -19,7 +19,7 @@
 def main(argv):
 	exitval = 0
 	try:
-		from src._argparse import CustomArgumentParser, CustomHelpFormatter
+		from _argparse import CustomArgumentParser, CustomHelpFormatter
 
 		parser = CustomArgumentParser(
 			description="builds the task presenter and tutorial for the GeoTag-X projects located in the specified directories.",
@@ -38,7 +38,7 @@ def main(argv):
 			parser.print_usage()
 			exitval = 1
 		else:
-			from src.project import Project
+			from project import Project
 			import os
 
 			args = parser.parse_args()
@@ -48,11 +48,14 @@ def main(argv):
 				for path in args.path:
 					print Project(path)
 			else:
-				from src.theme import Theme
-				from src.htmlwriter import HtmlWriter
+				from theme import Theme
+				from htmlwriter import HtmlWriter
 
 				# If no path to a custom theme is specified, use the default theme.
 				args.theme = args.theme[0] if args.theme else os.path.join(os.path.dirname(os.path.realpath(__file__)), "theme")
+				print
+				print args.theme
+				print
 
 				theme = Theme(args.theme)
 				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
