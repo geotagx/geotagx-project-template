@@ -60,10 +60,6 @@ class Project:
 			self.language = config["language"] if "language" in config else {"default":"en", "available":{"en":"English"}}
 			self.subjecttype = str(config["subject-type"]).lower() if "subject-type" in config else "image"
 
-			valid, message = Project.isvalid(self)
-			if not valid:
-				raise Exception(message)
-
 
 	def __str__(self):
 		"""
@@ -232,69 +228,6 @@ class Project:
 
 
 	@staticmethod
-	def isvalid(project):
-		"""isvalid(project:Project)
-		Returns true if this project is valid, false otherwise.
-		"""
-		# Note that the Questionnaire object is validated upon instantiation.
-		validations = [
-			(Project.isname,        project.name),
-			(Project.isslug,        project.slug),
-			(Project.isdescription, project.description),
-			(Project.iswhy,         project.why),
-			(Project.istutorial,    project.tutorial),
-			(Project.islanguage,    project.language),
-			(Project.issubjecttype, project.subjecttype)
-		]
-		for validator, field in validations:
-			valid, message = validator(field)
-			if not valid:
-				return (False, message)
-
-		return (True, None)
-
-
-	@staticmethod
-	def isname(name):
-		"""isname(name:string)
-		Returns true if the specified name is valid, false otherwise.
-		"""
-		return (True, None)
-
-
-	@staticmethod
-	def isslug(short_name):
-		"""isslug(slug:string)
-		Returns true if the specified slug (short name) is valid, false otherwise.
-		"""
-		return (True, None)
-
-
-	@staticmethod
-	def isdescription(description):
-		"""isdescription(description:string)
-		Returns true if the specified description is valid, false otherwise.
-		"""
-		return (True, None)
-
-
-	@staticmethod
-	def iswhy(why):
-		"""iswhy(why:string)
-		Returns true if the specified reason is valid, false otherwise.
-		"""
-		return (True, None)
-
-
-	@staticmethod
-	def istutorial(tutorial):
-		"""iswhy(tutorial:dict)
-		Returns true if the specified tutorial is valid, false otherwise.
-		"""
-		return Tutorial.isvalid(tutorial)
-
-
-	@staticmethod
 	def islanguage(language):
 		"""islanguage(language:dict)
 		Returns true if the specified language configuration is valid, false otherwise.
@@ -427,10 +360,10 @@ class ProjectValidator:
 		"""is_valid_configuration(configuration:dict)
 		Returns true if the specified configuration is valid, false otherwise.
 		"""
-		# Check for mandatory keys.
-		for field in ["name", "short_name", "description"]:
-			if field not in configuration:
-				return (False, "the project configuration is missing the field '%s'." % field)
+		mandatory_keys = ["name", "short_name", "description"]
+		missing_keys = ["'%s'" % key for key in mandatory_keys if key not in configuration]
+		if missing_keys:
+			return (False, "the project configuration is missing the following key(s): %s." % ", ".join(missing_keys))
 
 		validations = [
 			(ProjectValidator.is_valid_name,        configuration["name"]),
@@ -442,7 +375,6 @@ class ProjectValidator:
 			if not valid:
 				return (False, message)
 
-
 		return (True, None)
 
 
@@ -450,49 +382,46 @@ class ProjectValidator:
 	def is_valid_name(name):
 		"""is_valid_name(name:string)
 		Returns true if the specified project name is valid, false otherwise.
+		A valid project name is simply a non-empty string.
 		"""
-		if not isinstance(name, basestring):
+		from utils import is_nonempty_string
+		try:
+			return (True, None) if is_nonempty_string(name) else (False, "the project name is empty.")
+		except ValueError:
 			return (False, "the project name is not a string.")
-		else:
-			if not name.strip():
-				return (False, "the project name is empty.")
-			else:
-				return (True, None)
-
-		return (True, None)
 
 
 	@staticmethod
 	def is_valid_short_name(short_name):
-		"""isslug(short_name:string)
+		"""is_valid_short_name(short_name:string)
 		Returns true if the specified project short name is valid, false otherwise.
+		A valid short name is a non-empty string that is comprised solely of
+		alphanumeric characters (a-z, A-Z, 0-9), hyphes (-) and underscores (_).
 		"""
-		if not isinstance(short_name, basestring):
-			return (False, "the project short name is not a string.")
-		else:
-			if not short_name.strip():
-				return (False, "the project short name is empty.")
-			else:
+		from utils import is_nonempty_string
+		try:
+			if is_nonempty_string(short_name):
 				from re import match
 				matches = match(r"[a-zA-Z0-9-_]+", short_name)
-				if matches is None or matches.group() != short_name:
-					return (False, "the project short name contains an invalid character. A short name may only be comprised of alphanumeric characters (a-z, 0-9), hyphens (-) and underscores (_).")
-
-		return (True, None)
+				matched = matches and (matches.group() == short_name)
+				return (True, None) if matched else (False, "the project short name contains an invalid character. A short name may only be comprised of alphanumeric characters (a-z, A-Z, 0-9), hyphens (-) and underscores (_).")
+			else:
+				return (False, "the project short name is empty.")
+		except ValueError:
+			return (False, "the project short name is not a string.")
 
 
 	@staticmethod
 	def is_valid_description(description):
 		"""is_valid_description(description:string)
 		Returns true if the specified project description is valid, false otherwise.
+		A valid project description is simply a non-empty string.
 		"""
-		if not isinstance(description, basestring):
+		from utils import is_nonempty_string
+		try:
+			return (True, None) if is_nonempty_string(description) else (False, "the project description is empty.")
+		except ValueError:
 			return (False, "the project description is not a string.")
-		else:
-			if not description.strip():
-				return (False, "the project description is empty.")
-
-		return (True, None)
 
 
 

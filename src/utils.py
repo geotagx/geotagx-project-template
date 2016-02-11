@@ -61,3 +61,14 @@ def load_css(filename):
 				css = data
 
 	return css
+
+
+def is_nonempty_string(s):
+	"""is_nonempty_string(s:string)
+	Returns true if the specified string is non-empty, false otherwise.
+	A non-empty string contains characters other than whitespace.
+	"""
+	if not isinstance(s, basestring):
+		raise ValueError("the expected input parameter is not a string.")
+
+	return s and s.strip()
