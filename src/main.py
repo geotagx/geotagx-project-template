@@ -31,7 +31,7 @@ def main(argv):
 		parser.add_argument("-f", "--force",     action="store_true", help="overwrites any existing task presenter and/or tutorial in the specified directory.")
 		parser.add_argument("-h", "--help",      action="help",       help="prints this help message and exits.")
 		parser.add_argument("-s", "--summarize", action="store_true", help="prints a project's overview.")
-		parser.add_argument("-t", "--theme",     nargs=1, metavar="THEME", help="sets the path to a user-defined theme.")
+		parser.add_argument("-t", "--theme",     nargs=1, metavar="THEME", help="sets the path to a user-defined theme.", dest="themedir")
 		parser.add_argument("-v", "--verbose",   action="store_true", help="explains what is being done.")
 
 		if len(sys.argv) < 2:
@@ -39,35 +39,35 @@ def main(argv):
 			exitval = 1
 		else:
 			from project import Project
-			import os
+			from os import path
 
 			args = parser.parse_args()
-			args.path = set([os.path.realpath(path) for path in args.path]) # Remove all duplicate paths, including symbolic links.
+			args.path = set([path.realpath(p) for p in args.path]) # Remove all duplicate paths, including symbolic links.
 
 			if args.summarize:
-				for path in args.path:
-					print Project(path)
+				for p in args.path:
+					print Project(p)
 			else:
 				from theme import Theme
 				from htmlwriter import HtmlWriter
 
-				# If no path to a custom theme is specified, use the default theme.
-				args.theme = args.theme[0] if args.theme else os.path.join(os.path.dirname(os.path.realpath(__file__)), "theme")
-				print
-				print args.theme
-				print
+				# If no path to a custom theme is specified, use the default theme. If a path
+				# is specified however, note that it will be stored as the first item in a list.
+				if not args.themedir:
+					current = path.dirname(path.realpath(__file__))
+					args.themedir = path.join(current, path.pardir, "theme")
+				else:
+					args.themedir = args.themedir[0]
 
-				theme = Theme(args.theme)
+				theme = Theme(args.themedir)
 				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
 
-				for path in args.path:
-					writable, message = writer.iswritabledir(path)
+				for p in args.path:
+					writable, message = writer.iswritabledir(p)
 					if writable:
-						project = Project(path)
-						writer.write(project)
+						writer.write(Project(p))
 					else:
 						print message
-
 	except Exception as e:
 		exitval = 1
 		if args.verbose:
