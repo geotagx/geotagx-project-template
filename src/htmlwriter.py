@@ -102,8 +102,8 @@ class HtmlWriter:
 		with open(os.path.join(project.path, "tutorial.html"), "w") as output:
 			if project.tutorial is not None:
 				tutorial_css, tutorial_js = self.theme.getasset("tutorial")
-				tutorial_css += tutorial.get_custom_css()
-				tutorial_js += tutorial.get_custom_js()
+				tutorial_css += project.tutorial.get_custom_css()
+				tutorial_js += project.tutorial.get_custom_js()
 
 				# Extend the context with variables required to render the the project's tutorial.
 				context["tutorial_exercises"] = project.tutorial.exercises
