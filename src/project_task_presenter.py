@@ -15,6 +15,10 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 class ProjectTaskPresenter:
 	DEFAULT_LOCALE = "en-GB"
+	SUBJECT_TYPES = {
+		"image":"Image",
+		"pdf":"Portable Document Format (PDF)"
+	}
 
 	def __init__(self, project, configuration):
 		"""__init__(configuration:dict)
@@ -204,10 +208,7 @@ class ProjectTaskPresenter:
 		"""get_subject_type_name(type:string)
 		Returns the human-readable name for the specified subject type.
 		"""
-		return {
-			"image":"Image",
-			"pdf":"Portable Document Format (PDF)"
-		}.get(type, "Unknown")
+		return ProjectTaskPresenter.SUBJECT_TYPES.get(type, "Invalid subject type")
 
 
 	def __str__(self):
@@ -270,7 +271,20 @@ class ProjectTaskPresenterValidator:
 		Returns true if the specified configuration is a valid subject configuration,
 		false otherwise.
 		"""
-		return (True, None)
+		if isinstance(configuration, dict):
+			mandatory_keys = {"type"}
+			missing_keys = ["'%s'" % key for key in mandatory_keys if key not in configuration]
+			if missing_keys:
+				return (False, "the subject configuration is missing the following keys: %s." % ", ".join(missing_keys))
+
+			# Make sure the subject type is valid.
+			subject_type = configuration["type"]
+			if subject_type not in ProjectTaskPresenter.SUBJECT_TYPES:
+				return (False, "the subject type '%s' is not recognized." % subject_type)
+
+			return (True, None)
+		else:
+			return (False, "subject configuration is not a dictionary.")
 
 
 
