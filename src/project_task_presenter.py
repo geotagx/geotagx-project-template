@@ -253,7 +253,31 @@ class ProjectTaskPresenterValidator:
 		Returns true if the specified configuration is a valid locale configuration,
 		false otherwise.
 		"""
-		return (True, None)
+		if isinstance(configuration, dict):
+			mandatory_keys = ["default", "available"]
+			missing_keys = ["'%s'" % key for key in mandatory_keys if key not in configuration]
+			if missing_keys:
+				return (False, "the locale configuration is missing the following keys: %s." % ", ".join(missing_keys))
+
+			# Make sure the available locales are valid.
+			available_locales = configuration["available"]
+			if isinstance(available_locales, list):
+				from multilanguage import is_locale_identifier
+				for locale in available_locales:
+					if not is_locale_identifier(locale):
+						return (False, "the default locale '%s' is not a valid locale identifier." % default_locale)
+
+				# Make sure the default locale is part of the available locales.
+				# If it is, then it is implied to be a valid locale identifier.
+				default_locale = configuration["default"]
+				if default_locale not in available_locales:
+					return (False, "the default locale '%s' is not part of the available locales." % default_locale)
+
+				return (True, None)
+			else:
+				return (False, "the 'available locale' configuration is not a list.")
+		else:
+			return (False, "locale configuration is not a dictionary.")
 
 
 	@staticmethod
@@ -272,7 +296,7 @@ class ProjectTaskPresenterValidator:
 		false otherwise.
 		"""
 		if isinstance(configuration, dict):
-			mandatory_keys = {"type"}
+			mandatory_keys = ["type"]
 			missing_keys = ["'%s'" % key for key in mandatory_keys if key not in configuration]
 			if missing_keys:
 				return (False, "the subject configuration is missing the following keys: %s." % ", ".join(missing_keys))
