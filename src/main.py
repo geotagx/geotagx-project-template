@@ -63,7 +63,7 @@ def main(argv):
 				writer = HtmlWriter(theme, args.compress, args.force, args.verbose)
 
 				for p in args.path:
-					writable, message = writer.iswritabledir(p)
+					writable, message = writer.is_writable_directory(p)
 					if writable:
 						writer.write(Project(p))
 					else:

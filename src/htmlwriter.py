@@ -33,8 +33,8 @@ class HtmlWriter:
 		self.verbose   = verbose
 
 
-	def iswritabledir(self, path):
-		"""iswritabledir(path:string)
+	def is_writable_directory(self, path):
+		"""is_writable_directory(self:HtmlWriter, path:string)
 		Returns true if the path points to a writable directory, false otherwise.
 		This method will also return false if the path contains an existing
 		task presenter (template.html) and tutorial (tutorial.html), and the
@@ -69,34 +69,48 @@ class HtmlWriter:
 		Writes the specified project's task presenter and tutorial.
 		"""
 		project = HtmlWriter.__preprocess(project)
-		css, js = self.getassets(project)
+
+		tp = project.task_presenter
+
+		task_presenter_css, task_presenter_js = self.theme.getassets(tp.get_asset_bundles())
+		task_presenter_css += tp.get_custom_css()
+		task_presenter_js += tp.get_custom_js()
+
+		# Set the variables required to render the project's task presenter.
 		context = {
 			"name":project.name,
-			"slug":project.slug,
+			"short_name":project.short_name,
 			"description":project.description,
-			"why":project.why,
-			"questionnaire":project.questionnaire,
-			"default_language":project.language["default"],
-			"available_languages":project.language["available"],
-			"subject_type":project.subjecttype,
-			"pdfmode":(project.subjecttype == "pdf"), # TODO Remove this when it is no longer used in the project theme.
-			"istutorial":False,
-			"js":js,
-			"css":css,
+			"why":tp.why,
+			"questionnaire":tp.questionnaire,
+			"default_language":tp.locale["default"],
+			"available_languages":tp.locale["available"],
+			"subject_type":tp.subject["type"],
+			"pdfmode":(tp.subject["type"] == "pdf"), # TODO Remove this when it is no longer used in the project theme.
+			"is_tutorial":False,
+			"js":task_presenter_js,
+			"css":task_presenter_css,
 		}
+
+		# Write the project's task presenter.
 		with open(os.path.join(project.path, "template.html"), "w") as output:
 			self.__render(context, output)
 
+		# Write the project's tutorial. Note that if no tutorial configuration
+		# exists, an empty 'tutorial.html' file is still created as it is a
+		# requirement for PyBossa's 'pbs' tool.
 		with open(os.path.join(project.path, "tutorial.html"), "w") as output:
-			# Note that in the event of a non-existent project tutorial configuration,
-			# an empty tutorial.html file is created.
 			if project.tutorial is not None:
-				css, js = self.theme.getasset("tutorial")
-				context["tutorial"] = str(project.tutorial)
-				context["tutorial_len"] = len(project.tutorial)
-				context["istutorial"] = True
-				context["css"] += css
-				context["js"] += js
+				tutorial_css, tutorial_js = self.theme.getasset("tutorial")
+				tutorial_css += tutorial.get_custom_css()
+				tutorial_js += tutorial.get_custom_js()
+
+				# Extend the context with variables required to render the the project's tutorial.
+				context["tutorial_exercises"] = project.tutorial.exercises
+				context["tutorial_length"] = len(project.tutorial)
+				context["is_tutorial"] = True
+				context["css"] += tutorial_css
+				context["js"] += tutorial_js
 
 				self.__render(context, output)
 
@@ -118,33 +132,22 @@ class HtmlWriter:
 	def __preprocess(project):
 		# TODO Document me.
 		if project is not None:
-			# Convert the control-flow dictionary into a Javascript object.
+			# Convert the control-flow graph and tutorial exercises into pure
+			# Javascript objects.
 			import json
-			project.questionnaire.controlflow = json.dumps(project.questionnaire.controlflow)
+			project.task_presenter.questionnaire.branches = json.dumps(project.task_presenter.questionnaire.branches)
+			project.tutorial.exercises = json.dumps(project.tutorial.exercises)
 
 			# Load questionnaire help, if it exists.
+			questions = project.task_presenter.questionnaire.questions
 			helpdir = os.path.join(project.path, "help")
 			if os.path.isdir(helpdir) and os.access(helpdir, os.R_OK):
 				for filename in [os.path.join(helpdir, f) for f in os.listdir(helpdir) if f.endswith(".html") and len(f) > 5]:
 					key = os.path.splitext(os.path.basename(filename))[0]
-					if key in project.questionnaire.questions:
+					if key in questions:
 						with open(filename) as file:
 							help = file.read().decode('utf-8').strip()
 							if len(help) > 0:
-								project.questionnaire.questions[key].help = help
-
-			# i18nify multilingual questionnaire parameters.
-			from src.i18n import i18nify
-			for question in project.questionnaire.questions.values():
-				parameters = question.parameters
-				# Select, checklist and illustrative checklist labels.
-				if question.type in ["select", "checklist", "illustrative-checklist"]:
-					for option in parameters["options"]:
-						option["label"] = i18nify(option["label"])
-
-				# Placeholders
-				if "placeholder" in question.parameters:
-					parameters["placeholder"] = i18nify(parameters["placeholder"])
-
+								questions[key].help = help
 
 		return project
