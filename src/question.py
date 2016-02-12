@@ -14,17 +14,31 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 class Question:
-	key = None
-	type = None
-	question = None
-	hint = None
-	help = None
-	parameters = None
-	__default_parameters = {
+	RESERVED_KEYS = {
+		"end",
+		"photoAccessible",
+		"photoVisible"
+	}
+	TYPES = {
+		"binary",
+		"dropdown-list",
+		"select",
+		"checklist",
+		"illustrative-checklist",
+		"text",
+		"longtext",
+		"number",
+		"datetime",
+		"date",
+		"url",
+		"geotagging",
+		"custom"
+	}
+	DEFAULT_PARAMETERS = {
 		"binary":{},
 		"dropdown-list":{
 			"options":None,
-			"prompt":{"en":"Please select an option"},
+			"prompt":"Please select an option",
 			"size":1
 		},
 		"select":{
@@ -47,7 +61,7 @@ class Question:
 			"maxlength":512
 		},
 		"number":{
-			"placeholder":{"en":"Please enter a number"},
+			"placeholder":"Please enter a number",
 			"min":None,
 			"max":None,
 			"maxlength":256
@@ -63,7 +77,7 @@ class Question:
 			"max":None
 		},
 		"url":{
-			"placeholder":{"en":"Please enter a URL e.g. http://www.example.com"},
+			"placeholder":"Please enter a URL e.g. http://www.example.com",
 			"maxlength":2000
 		},
 		"geotagging":{
@@ -72,118 +86,25 @@ class Question:
 	}
 
 
-	def __init__(self, key, entry):
-		"""__init__(key:string, entry:dict)
-		Instantiates a Question object with the given key, from the specified questionnaire entry.
+	def __init__(self, configuration):
+		"""__init__(self:Question, configuration:dict)
+		Instantiates a Question object from the specified configuration.
 		"""
-		from src.i18n import i18nify
-
-		self.key        = key
-		self.type       = entry.get("type")
-		self.type       = self.type.strip() if isinstance(self.type, basestring) else None
-		self.question   = i18nify(entry.get("question"))
-		self.hint       = i18nify(entry.get("hint"))
-		self.parameters = Question.getparameters(self.type, entry.get("parameters"))
-		valid, message  = Question.isvalid(self)
+		valid, message = QuestionValidator.is_valid_configuration(configuration)
 		if not valid:
-			raise Exception(message)
+			raise QuestionError(message)
+
+		self.key = configuration["key"]
+		self.type = configuration["type"]
+		self.title = configuration["title"]
+		self.hint = configuration.get("hint")
+		self.help = None
+		self.parameters = configuration.get("parameters")
 
 
 	@staticmethod
-	def isvalid(question):
-		"""isvalid(question:Question)
-		Returns true if the question is valid, false otherwise.
-		"""
-		validations = {
-			Question.iskey:        question.key,
-			Question.istype:       question.type,
-			Question.isquestion:   question.question,
-			Question.ishint:       question.hint,
-			Question.isparameters: question.parameters
-		}
-		for validator, value in validations.items():
-			valid, message = validator(value)
-			if not valid:
-				return (False, message)
-
-		return (True, None)
-
-
-	@staticmethod
-	def iskey(key):
-		"""iskey(key:string)
-		Returns true if the specified key is valid, false otherwise.
-		A key is considered valid if it is a non-empty string that is strictly
-		composed of alphanumeric characters, hypens or underscores, and no
-		whitespace. It must also not be reserved for internal use.
-		"""
-		from re import match
-
-		valid, message = False, None
-
-		if not isinstance(key, basestring) or len(key) < 1:
-			message = "Error! A question key must be a non-empty string."
-		elif match(r"[\w-]*", key).group() != key:
-			message = "Error! The key '{}' contains an illegal character. A key may only contain letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). It must not contain any whitespace.".format(key)
-		elif Question.isreservedkey(key):
-			message = "Error! The string '{}' is reserved for internal use and can not be used as a question key.".format(key)
-		else:
-			valid = True
-
-		return (valid, message)
-
-
-	@staticmethod
-	def isreservedkey(key):
-		"""isreservedkey(key:string)
-		Returns true if the specified key is reserved for internal use, false otherwise.
-		"""
-		return key in [
-			"end",
-			"photoAccessible",
-			"photoVisible",
-		]
-
-
-	@staticmethod
-	def istype(type):
-		"""istype(type:string)
-		Returns true if the type is valid, false otherwise.
-		"""
-		types = [
-			"binary",
-			"dropdown-list",
-			"select",
-			"checklist",
-			"illustrative-checklist",
-			"text",
-			"longtext",
-			"number",
-			"datetime",
-			"date",
-			"url",
-			"geotagging",
-			"custom"
-		]
-		deprecated = {
-			"single_choice":"select",
-			"multiple_choice":"checklist",
-			"illustrated_multiple_choice":"illustrative-checklist",
-			"textinput":"text",
-			"textarea":"longtext"
-		}
-		if type not in types:
-			if type in deprecated:
-				return (False, "Error! The question type '{}' is deprecated and has been replaced with '{}'.".format(type, deprecated.get(type)))
-			else:
-				return (False, "Error! The question type '{}' is not recognized.".format(type))
-		else:
-			return (True, None)
-
-
-	@staticmethod
-	def isquestion(question):
-		"""isquestion(question:dict)
+	def is_valid_title(title):
+		"""is_valid_title(title:dict)
 		Returns true if the question is an i18nified object, false otherwise.
 		An i18nified object is a dictionary that assigns a string to an ISO 639-1
 		language code, for instance {"en":"What is the answer to life?"}. Please
@@ -229,18 +150,195 @@ class Question:
 			return (False, "Error! Question parameters must be a dictionary.")
 
 
-	@staticmethod
-	def getparameters(type, defaults=None):
-		"""getparameters(type:string, defaults:dict)
-		Returns the parameters for the specified type of question. If the
-		defaults object is not empty, then any parameter found in it will be
-		used as a default value.
+
+
+class Questionnaire:
+	def __init__(self, configuration):
+		"""__init__(self:Questionnaire, configuration:dict)
+		Instantiates a Questionnaire object from the specified configuration.
 		"""
-		parameters = Question.__default_parameters[type].copy()
+		valid, message = QuestionnaireValidator.is_valid_configuration(configuration)
+		if not valid:
+			raise QuestionnaireError(message)
 
-		# Set the user-defined default values.
-		if defaults is not None:
-			for key in [k for k in defaults if defaults[k] is not None]:
-				parameters[key] = defaults[key]
+		import collections
+		self.questions = collections.OrderedDict()
+		self.branches = {}
+		for configuration in configuration["questions"]:
+			key = configuration["key"]
+			self.questions[key] = Question(configuration)
+			self.branches[key] = configuration.get("branch")
 
-		return parameters
+		valid, message = QuestionnaireValidator.is_valid_branching(self.branches)
+		if not valid:
+			raise QuestionnaireError(message)
+
+
+	def get_question(self, key):
+		"""get_question(self:Questionnaire, key:string)
+		Returns the Question instance with the specified key.
+		"""
+		return self.questions.get(key)
+
+
+	def get_question_types(self):
+		"""get_question_types(self:Questionnaire)
+		Returns a set containing the names of the question types in this questionnaire.
+		"""
+		return set([question.type for question in self.questions.itervalues()])
+
+
+	def __str__(self):
+		"""
+		Returns the questionnaire's string representation.
+		"""
+		from math import log10
+		output = []
+		output.append("  + Questions:")
+		for i, question in enumerate(self.questions.itervalues(), start=1):
+			# Each normalized question title is a <locale ID, string> mapping
+			# that contains a translation of the question in a specific language.
+			titles = question.title.iteritems()
+			(locale, title) = titles.next()
+			output.append("    %d. (%s) %s [%s]" % (i, locale, title, question.key))
+
+			# Output all remaining title translations.
+			for locale, title in titles:
+				whitespace = " " * (int(log10(i)) + 1) # Number of digits in N == log10(N) + 1
+				output.append("    %s  (%s) %s" % (whitespace, locale, title))
+
+		return unicode("\n".join(output)).encode("UTF-8") if len(output) > 0 else "Empty questionnaire."
+
+
+	def __len__(self):
+		"""
+		Returns the number of questions in this questionnaire.
+		"""
+		return len(self.questions)
+
+
+
+
+class QuestionValidator:
+	@staticmethod
+	def is_valid_configuration(configuration):
+		"""is_valid_configuration(configuration:dict)
+		Returns true if the specified configuration can be used to create a valid
+		Question instance, false otherwise.
+		"""
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid_question(question):
+		"""is_valid_question(question:Question)
+		Returns true if the specified question object is a valid Question instance,
+		false otherwise.
+		"""
+		validations = {
+			QuestionValidator.is_valid_key:        question.key,
+			QuestionValidator.is_valid_type:       question.type,
+			QuestionValidator.is_valid_title:      question.title,
+			QuestionValidator.is_valid_hint:       question.hint,
+			QuestionValidator.is_valid_parameters: question.parameters
+		}
+		for validator, value in validations.items():
+			valid, message = validator(value)
+			if not valid:
+				return (False, message)
+
+		return (True, None)
+
+
+	@staticmethod
+	def is_reserved_key(key):
+		"""is_reserved_key(key:string)
+		Returns true if the specified key is reserved for internal use, false otherwise.
+		"""
+		valid, message = True, None
+		if isinstance(key, basestring):
+			if key not in Question.RESERVED_KEYS:
+				valid, message = True, ("the key '%s' is not reserved." % key)
+		else:
+			valid, message = False, "key is not a string."
+
+		return (valid, message)
+
+
+	@staticmethod
+	def is_valid_key(key):
+		"""is_valid_key(key:string)
+		Returns true if the specified key is valid, false otherwise.
+		A key is considered valid if it is a non-empty string that is strictly
+		composed of alphanumeric characters, hypens or underscores, and no
+		whitespace. It must also not be reserved for internal use.
+		"""
+		from re import match
+
+		valid, message = False, None
+
+		if not isinstance(key, basestring) or len(key) < 1:
+			message = "Error! A question key must be a non-empty string."
+		elif match(r"[\w-]*", key).group() != key:
+			message = "Error! The key '{}' contains an illegal character. A key may only contain letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). It must not contain any whitespace.".format(key)
+		elif QuestionValidator.is_reserved_key(key):
+			message = "Error! The string '{}' is reserved for internal use and can not be used as a question key.".format(key)
+		else:
+			valid = True
+
+		return (valid, message)
+
+
+	@staticmethod
+	def is_valid_type(type):
+		"""is_valid_type(type:string)
+		Returns true if the specified type is a valid question type, false otherwise.
+		"""
+		valid, message = True, None
+		if isinstance(type, basestring):
+			if type not in Question.TYPES:
+				valid, message = False, ("the type '%s' is not valid." % key)
+		else:
+			valid, message = False, "type is not a string."
+
+		return (valid, message)
+
+
+
+
+class QuestionnaireValidator:
+	@staticmethod
+	def is_valid_configuration(configuration):
+		"""is_valid_configuration(configuration:dict)
+		Returns true if the specified configuration can be used to create a valid
+		Questionnaire instance, false otherwise.
+		"""
+		return (True, None)
+
+
+	@staticmethod
+	def is_valid_branching(branches):
+		"""is_valid_branching(branches:dict)
+		Returns true if the questionnaire has a valid branching tree, false otherwise.
+		"""
+		for branch in [branch for branch in branches.itervalues() if branch is not None]:
+			if isinstance(branch, basestring) and branch not in branches:
+				return (False, "the key %s does not exist." % branch)
+			elif isinstance(branch, dict):
+				for key in branch.itervalues():
+					if key not in branches:
+						return (False, "the key %s does not exist." % key)
+
+		return (True, None)
+
+
+
+
+class QuestionError(Exception):
+	pass
+
+
+
+
+class QuestionnaireError(Exception):
+	pass
