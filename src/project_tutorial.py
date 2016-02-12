@@ -14,18 +14,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 class ProjectTutorial:
-	def __init__(self, task_presenter, configuration):
-		"""__init__(self:Tutorial, task_presenter:TaskPresenter, configuration:dict)
+	def __init__(self, project, configuration):
+		"""__init__(self:Tutorial, project:Project, configuration:dict)
 		Instantiates a ProjectTutorial object from the specified configuration, and
-		that is bound to the given task presenter.
+		that is bound to the given project instance.
 		"""
+		from project import Project
 		from project_task_presenter import ProjectTaskPresenter
-		assert isinstance(task_presenter, ProjectTaskPresenter), "task_presenter is not a ProjectTaskPresenter instance."
+		assert isinstance(project, Project), "project is not a Project instance."
+		assert isinstance(project.task_presenter, ProjectTaskPresenter), "project's task presenter is not yet instantiated."
 
 		valid, message = ProjectTutorialValidator.is_valid_configuration(configuration)
 		if not valid:
 			raise ProjectTutorialError(message)
 
+		self.project = project
 		self.exercises = configuration["exercises"]
 
 

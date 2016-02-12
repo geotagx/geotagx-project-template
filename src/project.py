@@ -54,7 +54,7 @@ class Project:
 		from project_tutorial import ProjectTutorial
 		filename = os.path.join(path, tutorial_configuration_filename)
 		configuration = ProjectTutorial.load_configuration(filename, self.task_presenter.locale["default"])
-		self.tutorial = ProjectTutorial(self.task_presenter, configuration)
+		self.tutorial = ProjectTutorial(self, configuration)
 
 
 	@staticmethod
