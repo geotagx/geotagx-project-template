@@ -28,6 +28,8 @@ setup(
 	description="The GeoTag-X Project Builder Tool.",
 	long_description=read("README.md"),
 	zip_safe=True,
+	install_requires=["geotagx_sanitizer"],
+	dependency_links=["https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.3.tar.gz#egg=geotagx_sanitizer-0.0.3"],
 	# keywords="",
 	# author="",
 	# author_email="",
