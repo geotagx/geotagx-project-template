@@ -1,5 +1,5 @@
 # The GeoTag-X project builder tool.
-# This module contains the core elements that help build a project's HTML files.
+# This module contains the project builder's entry point.
 #
 # Copyright (c) 2016 UNITAR/UNOSAT
 #
@@ -21,83 +21,76 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-def main(paths, overwrite=False, compress=False, summarize=False, theme_path=None, verbose=False):
-	"""Builds the HTML files for the projects located at the specified paths.
+def _init_argparser(subparsers=None, parents=None):
+	"""Initializes the tool's command line argument parser."""
+	import argparse
 
-	Args:
-		paths (list): A collection of paths to GeoTag-X projects.
-		overwrite (bool): A flag that determines whether or not project configurations can be
-			overwritten with their formatted variations.
-		compress (bool): If set to True, the generated HTML files will be compressed.
-		summarize (bool): A flag that if set to True, will display a summary of the project at a
-			specified path, without building it.
-		theme_path (str): A path to a directory containing a custom project theme. If no theme is specified,
-			the default project theme is used.
-
-	Raises:
-		TypeError: If the 'paths' parameter is not a list.
-		ValueError: If the 'paths' parameter is an empty list.
-		IOError: If a path in the list of 'paths' can not be accessed.
-	"""
-	if not isinstance(paths, list):
-		raise TypeError("The 'paths' parameter must be a list of paths.")
-	elif not paths:
-		raise ValueError("The 'paths' parameter must contain at least one path.")
-
-	import os, logging
-
-	# Remove all duplicate, invalid target paths, including symbolic links.
-	paths = set([os.path.realpath(p) for p in paths])
-	# paths = filter(validators.Validator.has_project, paths)
-	if not paths:
-		logging.warning("No (valid) paths to build...")
-		return
-
-	if summarize:
-		for p in paths:
-			summarize_project(p)
+	PARAMETERS = {
+		"description":"A tool that builds a GeoTag-X project's task presenter and tutorial from its configurations.",
+		"add_help":False
+	}
+	parser = None
+	if subparsers is None:
+		parser = argparse.ArgumentParser(prog="geotagx-builder", **PARAMETERS)
+	elif isinstance(subparsers, argparse._SubParsersAction):
+		parser = subparsers.add_parser("build", help="Build one or more GeoTag-X projects.", **PARAMETERS)
+		parser.set_defaults(handler=_run)
 	else:
-		from html_writer import HtmlWriter
+		raise TypeError("'subparser' parameter must be a '_SubParsersAction' instance.")
 
-		# If no path to a custom theme is specified, use the default theme. If a path
-		# is specified however, note that it will be stored as the first item in a list.
-		if not theme_path or (isinstance(theme_path, basestring) and not theme_path.strip()):
-			theme_path = get_default_theme_path()
-		else:
-			theme_path = theme_path.strip()
+	options = parser.add_argument_group("OPTIONS")
+	options.add_argument("-c", "--compress", action="store_true", help="Compresses the generated HTML files.")
+	options.add_argument("-f", "--force", action="store_true", help="Forcefully overwrite existing HTML files.")
+	options.add_argument("-h", "--help", action="help", help="Display this help and exit.")
+	options.add_argument("-q", "--quiet", action="store_true", help="Suppress all warnings.")
+	options.add_argument("-s", "--summarize", action="store_true", help="Display a project's summary.")
+	options.add_argument("-t", "--theme", metavar="THEME", nargs=1, help="Set the path to a custom defined project theme.")
+	options.add_argument("-v", "--verbose", action="store_true", help="Detail the actions being performed.")
+	options.add_argument("-V", "--version", action="version", help="Display version information and exit.", version=_version())
 
-		writer = HtmlWriter(theme_path)
-		for p in paths:
-			writer.write(p, overwrite=overwrite, compress=compress, verbose=verbose)
+	parser.add_argument("paths", metavar="PATH", nargs="+")
+
+	return parser
 
 
-def summarize_project(path):
-	"""Summarizes the project at the specified path.
+def _version():
+	"""Returns the project's version string."""
+	from . import __version__
+	return "GeoTag-X Project Builder Tool v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
 
-	Args:
-		path (str): A path to the GeoTag-X project to summarize.
 
-	Raises:
-		TypeError: If the path is not a string.
-		ValueError: If the path is an empty string.
-		IOError: If the path is not a readable directory.
-	"""
+def _run(arguments):
+	"""Runs the builder with the specified arguments."""
+	exit_code = 0
 	import os, logging
-	if path is None:
-		logging.info("Unspecified path to summarize. Skipping...")
-		return
-	elif not isinstance(path, basestring):
-		raise TypeError("The 'path' parameter must be a string.")
-	elif not path.strip():
-		raise ValueError("The 'path' parameter must be a non-empty string.")
-	elif not (os.path.isdir(path) and os.access(path, os.R_OK)):
-		raise IOError("Could not open '%s'. Please make sure it is a directory and that you have the appropriate access permissions." % path)
+	try:
+		loglevel = logging.WARNING
+		if arguments.quiet:
+			loglevel = logging.ERROR
+		if arguments.verbose:
+			loglevel = logging.INFO
 
-	#TODO
-	raise NotImplementedError()
+		logging.basicConfig(format="[%(levelname)s] %(message)s", level=loglevel)
+
+		# If set, the 'theme' argument is a list of strings. Pick the first element of this list.
+		if arguments.theme is not None:
+			arguments.theme = arguments.theme[0]
+
+		import core
+		core.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize, theme_path=arguments.theme)
+	except Exception as e:
+		exit_code = 1
+		if arguments.verbose:
+			import traceback
+			traceback.print_exc()
+		else:
+			print e.__class__.__name__ if not str(e) else "%s: %s" % (e.__class__.__name__, e)
+	finally:
+		return exit_code
 
 
-def get_default_theme_path():
-	"""Returns the path to the default project theme."""
-	import os.path as path
-	return path.join(path.dirname(path.realpath(__file__)), "theme")
+def main(argv=None):
+	import sys
+	parser = _init_argparser()
+	return _run(parser.parse_args(sys.argv[1:] if argv is None else argv))
+

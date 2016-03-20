@@ -43,8 +43,8 @@ setup(
 	packages=["geotagx_builder"],
 	package_dir={"geotagx_builder":"builder"},
 	entry_points={
-			"console_scripts":[
-				"geotagx-builder=geotagx_builder.__main__:main"
+		"console_scripts":[
+			"geotagx-builder=geotagx_builder.core:main"
 		]
 	}
 )
