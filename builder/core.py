@@ -76,8 +76,8 @@ def _run(arguments):
 		if arguments.theme is not None:
 			arguments.theme = arguments.theme[0]
 
-		import core
-		core.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize, theme_path=arguments.theme)
+		import builder
+		builder.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize, theme_path=arguments.theme)
 	except Exception as e:
 		exit_code = 1
 		if arguments.verbose:
