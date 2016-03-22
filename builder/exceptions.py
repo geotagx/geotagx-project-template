@@ -24,3 +24,6 @@
 class BuilderError(Exception):
 	pass
 
+
+class HtmlWriterError(Exception):
+	pass
