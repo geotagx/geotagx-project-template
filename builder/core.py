@@ -44,7 +44,6 @@ def _init_argparser(subparsers=None, parents=None):
 	options.add_argument("-h", "--help", action="help", help="Display this help and exit.")
 	options.add_argument("-q", "--quiet", action="store_true", help="Suppress all warnings.")
 	options.add_argument("-s", "--summarize", action="store_true", help="Display a project's summary.")
-	options.add_argument("-t", "--theme", metavar="THEME", nargs=1, help="Set the path to a custom defined project theme.")
 	options.add_argument("-v", "--verbose", action="store_true", help="Detail the actions being performed.")
 	options.add_argument("-V", "--version", action="version", help="Display version information and exit.", version=_version())
 
@@ -72,12 +71,9 @@ def _run(arguments):
 
 		logging.basicConfig(format="[%(levelname)s] %(message)s", level=loglevel)
 
-		# If set, the 'theme' argument is a list of strings. Pick the first element of this list.
-		if arguments.theme is not None:
-			arguments.theme = arguments.theme[0]
 
 		import builder
-		builder.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize, theme_path=arguments.theme)
+		builder.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize)
 	except Exception as e:
 		exit_code = 1
 		if arguments.verbose:
@@ -87,6 +83,18 @@ def _run(arguments):
 			print e.__class__.__name__ if not str(e) else "%s: %s" % (e.__class__.__name__, e)
 	finally:
 		return exit_code
+
+
+def build_project(path, overwrite=False, compress=False):
+	#TODO Move builder.main here.
+	raise NotImplementedError()
+
+
+def summarize_project(path):
+	#TODO Move builder.summarize_project here.
+	raise NotImplementedError()
+
+
 
 
 def main(argv=None):
