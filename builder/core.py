@@ -66,14 +66,15 @@ def _run(arguments):
 		loglevel = logging.WARNING
 		if arguments.quiet:
 			loglevel = logging.ERROR
-		if arguments.verbose:
+		elif arguments.verbose:
 			loglevel = logging.INFO
 
 		logging.basicConfig(format="[%(levelname)s] %(message)s", level=loglevel)
 
-
-		import builder
-		builder.main(arguments.paths, overwrite=arguments.force, compress=arguments.compress, summarize=arguments.summarize)
+		if arguments.summarize:
+			summarize_projects(arguments.paths)
+		else:
+			build_projects(arguments.paths, overwrite=arguments.force, compress=arguments.compress)
 	except Exception as e:
 		exit_code = 1
 		if arguments.verbose:
@@ -85,16 +86,63 @@ def _run(arguments):
 		return exit_code
 
 
-def build_project(path, overwrite=False, compress=False):
-	#TODO Move builder.main here.
+def _filter_paths(paths):
+	"""Filters the list of specified paths to return a set of unique paths that contain GeoTag-X projects."""
+	# Remove all duplicate (including symbolic links) and invalid paths.
+	from os.path import realpath
+	from geotagx_sanitizer.validators import Validator
+	return filter(Validator.has_project, set([realpath(p) for p in paths]))
+
+
+#TODO Complete documentations.
+def build_projects(paths, overwrite=False, compress=False):
+	"""Builds the GeoTag-X projects at the specified paths.
+
+	If a path does not contain a valid GeoTag-X project, it will be skipped.
+
+	Raises:
+		TypeError: If the 'paths' parameter is not a list.
+		ValueError: If the 'paths' parameter is an empty list.
+		IOError: If a path in the list of 'paths' can not be accessed.
+	"""
+	if not isinstance(paths, list):
+		raise TypeError("The 'paths' parameter must be a list of paths.")
+	elif not paths:
+		raise ValueError("The 'paths' parameter must contain at least one path.")
+
+	paths = _filter_paths(paths)
+	if not paths:
+		logging.warning("No valid paths to build...")
+		return
+
+	import html_writer
+	writer = html_writer.HtmlWriter()
+	for p in paths:
+		writer.write(p, overwrite=overwrite, compress=compress)
+
+
+def summarize_projects(paths):
+	"""Summarizes the GeoTag-X projects at the specified paths.
+
+	If a path does not contain a valid GeoTag-X project, it will be skipped.
+
+	Raises:
+		TypeError: If the 'paths' parameter is not a list.
+		ValueError: If the 'paths' parameter is an empty list.
+		IOError: If a path in the list of 'paths' can not be accessed.
+	"""
+	if not isinstance(paths, list):
+		raise TypeError("The 'paths' parameter must be a list of paths.")
+	elif not paths:
+		raise ValueError("The 'paths' parameter must contain at least one path.")
+
+	paths = _filter_paths(paths)
+	if not paths:
+		logging.warning("No (valid) paths to summarize...")
+		return
+
+	#TODO
 	raise NotImplementedError()
-
-
-def summarize_project(path):
-	#TODO Move builder.summarize_project here.
-	raise NotImplementedError()
-
-
 
 
 def main(argv=None):
@@ -102,3 +150,15 @@ def main(argv=None):
 	parser = _init_argparser()
 	return _run(parser.parse_args(sys.argv[1:] if argv is None else argv))
 
+
+def _is_valid_path(path):
+	#TODO Move to geotagx_sanitizers.validators.Validator.has_project
+	import os, logging
+	if path is None:
+		return False
+	elif not isinstance(path, basestring):
+		raise TypeError("The 'path' parameter must be a string.")
+	elif not path.strip():
+		raise ValueError("The 'path' parameter must be a non-empty string.")
+	elif not (os.path.isdir(path) and os.access(path, os.R_OK)):
+		raise IOError("Could not open '%s'. Please make sure it is a directory and that you have the appropriate access permissions." % path)
