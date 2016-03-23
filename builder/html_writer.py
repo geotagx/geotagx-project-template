@@ -22,20 +22,20 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-import geotagx_sanitizer.sanitizer as sanitizer
-
 class HtmlWriter():
 	def __init__(self):
-		self.sanitizers = sanitizer.get_sanitizers()
+		from geotagx_sanitizer.core import get_sanitizers
+		self.sanitizers = get_sanitizers()
 
 
 	def _get_configurations(self, path):
 		"""Returns the sanitized project configurations located at the specified path."""
 		import os
-		from geotagx_sanitizer.utils import read_json
+		from geotagx_sanitizer.core import _deserialize_json
+		from geotagx_sanitizer.core import sanitize_configurations
 
 		filenames = {k: os.path.join(path, k + ".json") for k in self.sanitizers}
-		configurations = {k: read_json(filename) for k, filename in filenames.iteritems()}
+		configurations = {k: _deserialize_json(filename) for k, filename in filenames.iteritems()}
 
 		# Add help to the configurations.
 		questions = configurations["task_presenter"]["questionnaire"]["questions"]
@@ -51,7 +51,7 @@ class HtmlWriter():
 					from htmlmin import minify
 					question["help"] = minify(help_file.read(), remove_comments=True, remove_empty_space=True)
 
-		return sanitizer.sanitize(configurations, self.sanitizers)
+		return sanitize_configurations(configurations, self.sanitizers)
 
 
 	@staticmethod
