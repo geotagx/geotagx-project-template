@@ -149,16 +149,3 @@ def main(argv=None):
 	import sys
 	parser = _init_argparser()
 	return _run(parser.parse_args(sys.argv[1:] if argv is None else argv))
-
-
-def _is_valid_path(path):
-	#TODO Move to geotagx_sanitizers.validators.Validator.has_project
-	import os, logging
-	if path is None:
-		return False
-	elif not isinstance(path, basestring):
-		raise TypeError("The 'path' parameter must be a string.")
-	elif not path.strip():
-		raise ValueError("The 'path' parameter must be a non-empty string.")
-	elif not (os.path.isdir(path) and os.access(path, os.R_OK)):
-		raise IOError("Could not open '%s'. Please make sure it is a directory and that you have the appropriate access permissions." % path)
