@@ -55,12 +55,6 @@ class HtmlWriter():
 
 
 	@staticmethod
-	def timestamp():
-		import datetime
-		return datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00")
-
-
-	@staticmethod
 	def jsonify(input, compress=False):
 		import json
 		parameters = {
@@ -96,7 +90,6 @@ class HtmlWriter():
 
 		# Remove the fields that can be retrieved from the server's database.
 		project = configurations["project"]
-		project["last_updated"] = HtmlWriter.timestamp()
 		for key in ["name", "short_name", "description"]:
 			project.pop(key, None)
 
