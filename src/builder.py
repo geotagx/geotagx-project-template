@@ -54,7 +54,7 @@ def _init_argparser(subparsers=None, parents=None):
 
 def _version():
 	"""Returns the project's version string."""
-	from . import __version__
+	from __init__ import __version__
 	return "GeoTag-X Project Builder Tool v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
 
 

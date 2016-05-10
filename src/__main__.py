@@ -24,5 +24,5 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 if __name__ == "__main__":
-	import core
-	sys.exit(core.main())
+	import sys, builder
+	sys.exit(builder.main())
