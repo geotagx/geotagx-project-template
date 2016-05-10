@@ -24,12 +24,16 @@ def find_version(*file_paths):
 
 setup(
 	name="geotagx-builder",
-	version=find_version("builder", "__init__.py"),
+	version=find_version("src", "__init__.py"),
 	description="The GeoTag-X Project Builder Tool.",
 	long_description=read("README.md"),
 	zip_safe=True,
-	install_requires=["geotagx_sanitizer"],
-	dependency_links=["https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.3.tar.gz#egg=geotagx_sanitizer-0.0.3"],
+	install_requires=[
+		"geotagx_sanitizer>=0.0.6",
+	],
+	dependency_links=[
+		"https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.6.tar.gz#egg=geotagx_sanitizer-0.0.6",
+	],
 	# keywords="",
 	# author="",
 	# author_email="",
@@ -41,7 +45,7 @@ setup(
 	# platforms=[],
 	license="MIT",
 	packages=["geotagx_builder"],
-	package_dir={"geotagx_builder":"builder"},
+	package_dir={"geotagx_builder":"src"},
 	entry_points={
 		"console_scripts":[
 			"geotagx-builder=geotagx_builder.core:main"
