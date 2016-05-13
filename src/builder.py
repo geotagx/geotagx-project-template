@@ -24,7 +24,7 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
-from geotagx_sanitizer.helper import filter_paths
+from geotagx_sanitizer.helper import is_directory, filter_paths, serialize_json
 from geotagx_sanitizer.sanitizer import read_configurations, sanitize_configurations
 
 def _init_argparser(subparsers=None, parents=None):
@@ -62,6 +62,41 @@ def _version():
     """Returns the project's version string."""
     from __init__ import __version__
     return "GeoTag-X Project Builder Tool v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
+
+
+def _get_configurations(path):
+    """Returns the configurations for the GeoTag-X project located at the specified path.
+    """
+    configurations = read_configurations(path)
+
+    # Add a questionnaire index.
+    questionnaire = configurations["task_presenter"]["questionnaire"]
+    questionnaire["index"] = {q["key"]: i for (i, q) in enumerate(questionnaire["questions"])}
+
+    # Add the questionnaire help.
+    import os
+    for question in questionnaire["questions"]:
+        key = question["key"]
+        filename = os.path.join(path, "help", key + ".html")
+        try:
+            file = open(filename)
+        except IOError:
+            # A help file is not always guaranteed to exist so if an IOError occurs, ignore it.
+            pass
+        else:
+            with file:
+                from htmlmin import minify
+                filedata = file.read().decode("UTF-8").strip()
+                question["help"] = minify(filedata, remove_comments=True, remove_empty_space=True)
+
+    configurations = sanitize_configurations(configurations)
+
+    # Remove redundant fields. These can be retrieved from the server's database.
+    project = configurations["project"]
+    for key in ["name", "short_name", "description"]:
+        project.pop(key, None)
+
+    return configurations
 
 
 def parse_arguments():
@@ -120,13 +155,45 @@ def build(paths, overwrite=False, compress=False):
         raise TypeError("Invalid parameter type: build expects 'bool' for 'compress' parameter but got '{}'.".format(type(compress).__name__))
 
     for p in filter_paths(paths):
-        configurations = sanitize_configurations(read_configurations(p))
-        write(configurations, p, overwrite=overwrite, compress=compress)
+        write(_get_configurations(p), p, overwrite, compress)
 
 
 # TODO Document me
 def write(configurations, path, overwrite=False, compress=False):
-    raise NotImplementedError()
+    """
+    """
+    if not isinstance(configurations, dict):
+        raise TypeError("Invalid parameter type: write expects 'dict' for 'configurations' parameter but got '{}'.".format(type(configurations).__name__))
+    elif not isinstance(path, basestring):
+        raise TypeError("Invalid parameter type: write expects 'str' or 'unicode' for 'path' parameter but got '{}'.".format(type(path).__name__))
+    elif not is_directory(path, check_writable=True):
+        raise IOError("The path '{}' is not a writable directory. Please make sure you have the appropriate access permissions.".format(path))
+    elif not isinstance(compress, bool):
+        raise TypeError("Invalid parameter type: write expects 'bool' for 'compress' parameter but got '{}'.".format(type(compress).__name__))
+    elif not isinstance(overwrite, bool):
+        raise TypeError("Invalid parameter type: write expects 'bool' for 'overwrite' parameter but got '{}'.".format(type(overwrite).__name__))
+
+    import os
+    output = {
+        "task_presenter": os.path.join(path, "template.html"),
+        "tutorial": os.path.join(path, "tutorial.html")
+    }
+
+    # If the overwrite flag is not set, make sure none of the target HTML files exists.
+    if not overwrite and any(os.path.isfile(f) for f in output.values()):
+        raise RuntimeError("The directory '{}' already contains a task presenter (template.html) and, or, a tutorial (tutorial.html). To overwrite either, set the '-f' or '--force' flag.".format(path))
+
+    # Write the project's tutorial. Note that if no tutorial configuration exists,
+    # an empty 'tutorial.html' file is still created as it is a requirement for
+    # PyBossa's 'pbs' tool.
+    with open(output["tutorial"], "w") as file:
+        if configurations.get("tutorial") is not None:
+            file.write(serialize_json(configurations, compress))
+
+    # Write the task presenter.
+    with open(output["task_presenter"], "w") as file:
+        configurations.pop("tutorial", None) # Remove the tutorial configuration, if it exists.
+        file.write(serialize_json(configurations, compress))
 
 
 def main(arguments=None):
