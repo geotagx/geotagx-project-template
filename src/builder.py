@@ -21,6 +21,8 @@
 # DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
+from geotagx_sanitizer.helper import filter_paths
+
 def _init_argparser(subparsers=None, parents=None):
 	"""Initializes the tool's command line argument parser."""
 	import argparse
@@ -86,14 +88,6 @@ def _run(arguments):
 		return exit_code
 
 
-def _filter_paths(paths):
-	"""Filters the list of specified paths to return a set of unique paths that contain GeoTag-X projects."""
-	# Remove all duplicate (including symbolic links) and invalid paths.
-	from os.path import realpath
-	from geotagx_sanitizer.validators import Validator
-	return filter(Validator.has_project, set([realpath(p) for p in paths]))
-
-
 #TODO Complete documentations.
 def build_projects(paths, overwrite=False, compress=False):
 	"""Builds the GeoTag-X projects at the specified paths.
@@ -110,7 +104,7 @@ def build_projects(paths, overwrite=False, compress=False):
 	elif not paths:
 		raise ValueError("The 'paths' parameter must contain at least one path.")
 
-	paths = _filter_paths(paths)
+	paths = filter_paths(paths)
 	if not paths:
 		logging.warning("No valid paths to build...")
 		return
@@ -136,7 +130,7 @@ def summarize_projects(paths):
 	elif not paths:
 		raise ValueError("The 'paths' parameter must contain at least one path.")
 
-	paths = _filter_paths(paths)
+	paths = filter_paths(paths)
 	if not paths:
 		logging.warning("No (valid) paths to summarize...")
 		return

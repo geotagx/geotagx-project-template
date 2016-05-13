@@ -24,15 +24,14 @@
 # OR OTHER DEALINGS IN THE SOFTWARE.
 class HtmlWriter():
 	def __init__(self):
-		from geotagx_sanitizer.core import get_sanitizers
-		self.sanitizers = get_sanitizers()
+		pass
 
 
 	def _get_configurations(self, path):
 		"""Returns the sanitized project configurations located at the specified path."""
 		import os
-		from geotagx_sanitizer.core import _deserialize_json
-		from geotagx_sanitizer.core import sanitize_configurations
+		from geotagx_sanitizer.sanitizer import _deserialize_json
+		from geotagx_sanitizer.sanitizer import sanitize_configurations
 
 		filenames = {k: os.path.join(path, k + ".json") for k in self.sanitizers}
 		configurations = {k: _deserialize_json(filename) for k, filename in filenames.iteritems()}
