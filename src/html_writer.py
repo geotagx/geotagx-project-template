@@ -71,12 +71,11 @@ class HtmlWriter():
 	#TODO Make this write(self, configurations, overwrite)
 	def write(self, path, overwrite=False, compress=False):
 		import os, logging
-		from exceptions import HtmlWriterError
 
 		if not os.path.isdir(path):
-			raise HtmlWriterError("The path '%s' does not point to a directory." % path)
+			raise RuntimeError("The path '%s' does not point to a directory." % path)
 		elif not os.access(path, os.W_OK):
-			raise HtmlWriterError("The directory '%s' is not writable. Please make sure you have the appropriate access permissions." % path)
+			raise RuntimeError("The directory '%s' is not writable. Please make sure you have the appropriate access permissions." % path)
 
 		# If the overwrite flag is not set, make sure none of the target HTML files do not exist.
 		TARGET_FILES = {
@@ -84,7 +83,7 @@ class HtmlWriter():
 			"tutorial": os.path.join(path, "tutorial.html")
 		}
 		if not overwrite and any(os.path.isfile(f) for f in TARGET_FILES.values()):
-			raise HtmlWriterError("The directory '%s' already contains a generated task presenter (template.html) and or a tutorial (tutorial.html). To overwrite either, set the '-f' or '--force' flag." % path)
+			raise RuntimeError("The directory '%s' already contains a generated task presenter (template.html) and or a tutorial (tutorial.html). To overwrite either, set the '-f' or '--force' flag." % path)
 
 		configurations = self._get_configurations(path)
 
