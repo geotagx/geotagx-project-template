@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #
-# The GeoTag-X project builder tool.
-# This module contains the entry point for the builder tool.
+# This module is part of the GeoTag-X project builder tool.
+#
+# Author: Jeremy Othieno (j.othieno@gmail.com)
 #
 # Copyright (c) 2016 UNITAR/UNOSAT
 #

@@ -1,5 +1,8 @@
-# The GeoTag-X project builder tool.
-# This module contains the project builder's entry point.
+# -*- coding: utf-8 -*-
+#
+# This module is part of the GeoTag-X project builder tool.
+#
+# Author: Jeremy Othieno (j.othieno@gmail.com)
 #
 # Copyright (c) 2016 UNITAR/UNOSAT
 #
@@ -22,6 +25,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 # OR OTHER DEALINGS IN THE SOFTWARE.
 from geotagx_sanitizer.helper import filter_paths
+from geotagx_sanitizer.sanitizer import read_configurations, sanitize_configurations
 
 def _init_argparser(subparsers=None, parents=None):
 	"""Initializes the tool's command line argument parser."""
@@ -36,7 +40,7 @@ def _init_argparser(subparsers=None, parents=None):
 		parser = argparse.ArgumentParser(prog="geotagx-builder", **PARAMETERS)
 	elif isinstance(subparsers, argparse._SubParsersAction):
 		parser = subparsers.add_parser("build", help="Build one or more GeoTag-X projects.", **PARAMETERS)
-		parser.set_defaults(handler=_run)
+		parser.set_defaults(handler=main)
 	else:
 		raise TypeError("'subparser' parameter must be a '_SubParsersAction' instance.")
 
@@ -60,9 +64,75 @@ def _version():
 	return "GeoTag-X Project Builder Tool v%s, Copyright (C) 2016 UNITAR/UNOSAT." % __version__
 
 
-def _run(arguments):
-	"""Runs the builder with the specified arguments."""
+def parse_arguments():
+	"""Parses the command line arguments passed to the program.
+
+	Returns:
+		(argparse.Namespace): The collection of parsed arguments.
+	"""
+	from sys import argv
+	return _init_argparser().parse_args(argv[1:])
+
+
+def summarize(paths):
+	"""Summarizes the GeoTag-X projects at the specified paths.
+
+	If a path does not contain a valid GeoTag-X project, it will be ignored.
+
+	Args:
+		paths (list): A list of paths to directories containing GeoTag-X projects to summarize.
+
+	Raises:
+		TypeError: If the 'paths' parameter is not a list.
+		IOError: If a path in the specified list of paths cannot be accessed.
+	"""
+	if not isinstance(paths, list):
+		raise TypeError("Invalid parameter type: summarize expects 'list' but got '{}'.".format(type(paths).__name__))
+
+	for p in filter_paths(paths):
+		raise NotImplementedError()
+
+
+def build(paths, overwrite=False, compress=False):
+	"""Builds the GeoTag-X projects at the specified paths.
+
+	This function will create the following HTML files:
+	- template.html: the project's task presenter template,
+	- tutorial.html: the project's tutorial template.
+
+	Note that if a path does not contain a valid GeoTag-X project, it will simply be ignored.
+
+	Args:
+		paths (list): A list of paths to directories containing GeoTag-X projects to build.
+		overwrite (bool): If set to True, all existing HTML files will be overwritten.
+		compress (bool): If set to True, all generated files will be compressed.
+
+	Raises:
+		TypeError: If the 'paths' parameter is not a list, or the 'overwrite' and 'compress'
+			parameters are not booleans.
+		IOError: If a path in the specified list of paths cannot be accessed.
+	"""
+	if not isinstance(paths, list):
+		raise TypeError("Invalid parameter type: build expects 'list' for 'paths' parameter but got '{}'.".format(type(paths).__name__))
+	elif not isinstance(overwrite, bool):
+		raise TypeError("Invalid parameter type: build expects 'bool' for 'overwrite' parameter but got '{}'.".format(type(overwrite).__name__))
+	elif not isinstance(compress, bool):
+		raise TypeError("Invalid parameter type: build expects 'bool' for 'compress' parameter but got '{}'.".format(type(compress).__name__))
+
+	for p in filter_paths(paths):
+		configurations = sanitize_configurations(read_configurations(p))
+		write(configurations, p, overwrite=overwrite, compress=compress)
+
+
+# TODO Document me
+def write(configurations, path, overwrite=False, compress=False):
+	raise NotImplementedError()
+
+
+def main(arguments=None):
+	arguments = parse_arguments() if arguments is None else arguments
 	exit_code = 0
+
 	import os, logging
 	try:
 		loglevel = logging.WARNING
@@ -74,9 +144,9 @@ def _run(arguments):
 		logging.basicConfig(format="[%(levelname)s] %(message)s", level=loglevel)
 
 		if arguments.summarize:
-			summarize_projects(arguments.paths)
+			summarize(arguments.paths)
 		else:
-			build_projects(arguments.paths, overwrite=arguments.force, compress=arguments.compress)
+			build(arguments.paths, overwrite=arguments.force, compress=arguments.compress) # TODO Change arguments.force to arguments.overwrite
 	except Exception as e:
 		exit_code = 1
 		if arguments.verbose:
@@ -86,60 +156,3 @@ def _run(arguments):
 			print e.__class__.__name__ if not str(e) else "%s: %s" % (e.__class__.__name__, e)
 	finally:
 		return exit_code
-
-
-#TODO Complete documentations.
-def build_projects(paths, overwrite=False, compress=False):
-	"""Builds the GeoTag-X projects at the specified paths.
-
-	If a path does not contain a valid GeoTag-X project, it will be skipped.
-
-	Raises:
-		TypeError: If the 'paths' parameter is not a list.
-		ValueError: If the 'paths' parameter is an empty list.
-		IOError: If a path in the list of 'paths' can not be accessed.
-	"""
-	if not isinstance(paths, list):
-		raise TypeError("The 'paths' parameter must be a list of paths.")
-	elif not paths:
-		raise ValueError("The 'paths' parameter must contain at least one path.")
-
-	paths = filter_paths(paths)
-	if not paths:
-		logging.warning("No valid paths to build...")
-		return
-
-	import html_writer
-	writer = html_writer.HtmlWriter()
-	for p in paths:
-		writer.write(p, overwrite=overwrite, compress=compress)
-
-
-def summarize_projects(paths):
-	"""Summarizes the GeoTag-X projects at the specified paths.
-
-	If a path does not contain a valid GeoTag-X project, it will be skipped.
-
-	Raises:
-		TypeError: If the 'paths' parameter is not a list.
-		ValueError: If the 'paths' parameter is an empty list.
-		IOError: If a path in the list of 'paths' can not be accessed.
-	"""
-	if not isinstance(paths, list):
-		raise TypeError("The 'paths' parameter must be a list of paths.")
-	elif not paths:
-		raise ValueError("The 'paths' parameter must contain at least one path.")
-
-	paths = filter_paths(paths)
-	if not paths:
-		logging.warning("No (valid) paths to summarize...")
-		return
-
-	#TODO
-	raise NotImplementedError()
-
-
-def main(argv=None):
-	import sys
-	parser = _init_argparser()
-	return _run(parser.parse_args(sys.argv[1:] if argv is None else argv))
