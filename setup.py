@@ -30,6 +30,7 @@ setup(
     zip_safe=True,
     install_requires=[
         "geotagx_sanitizer>=0.0.6",
+        "htmlmin>=0.1.10",
     ],
     dependency_links=[
         "https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.6.tar.gz#egg=geotagx_sanitizer-0.0.6",
