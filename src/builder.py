@@ -2,7 +2,7 @@
 #
 # This module is part of the GeoTag-X project builder tool.
 #
-# Author: Jeremy Othieno (j.othieno@gmail.com)
+# Authors: Jeremy Othieno (j.othieno@gmail.com), S. P. Mohanty
 #
 # Copyright (c) 2016 UNITAR/UNOSAT
 #

@@ -1,4 +1,8 @@
-# The GeoTag-X project builder tool.
+# -*- coding: utf-8 -*-
+#
+# This module is part of the GeoTag-X project builder tool.
+#
+# Authors: Jeremy Othieno (j.othieno@gmail.com), S. P. Mohanty
 #
 # Copyright (c) 2016 UNITAR/UNOSAT
 #
