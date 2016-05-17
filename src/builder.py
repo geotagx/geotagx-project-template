@@ -181,7 +181,7 @@ def write(configurations, path, overwrite=False, compress=False):
 
     # If the overwrite flag is not set, make sure none of the target HTML files exists.
     if not overwrite and any(os.path.isfile(f) for f in output.values()):
-        raise RuntimeError("The directory '{}' already contains a task presenter (template.html) and, or, a tutorial (tutorial.html). To overwrite either, set the '-f' or '--force' flag.".format(path))
+        raise HtmlFileExistsError("The directory '{}' already contains a task presenter (template.html) and, or, a tutorial (tutorial.html). To overwrite either, set the '-f' or '--force' flag.".format(path))
 
     # Write the project's tutorial. Note that if no tutorial configuration exists,
     # an empty 'tutorial.html' file is still created as it is a requirement for
@@ -214,6 +214,8 @@ def main(arguments=None):
             summarize(arguments.paths)
         else:
             build(arguments.paths, overwrite=arguments.force, compress=arguments.compress) # TODO Change arguments.force to arguments.overwrite
+    except HtmlFileExistsError as e:
+        print e
     except Exception as e:
         exit_code = 1
         if arguments.verbose:
@@ -223,3 +225,7 @@ def main(arguments=None):
             print e.__class__.__name__ if not str(e) else "%s: %s" % (e.__class__.__name__, e)
     finally:
         return exit_code
+
+
+class HtmlFileExistsError(Exception):
+    pass
