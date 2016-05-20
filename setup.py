@@ -29,11 +29,11 @@ setup(
     long_description=read("README.md"),
     zip_safe=True,
     install_requires=[
-        "geotagx_sanitizer>=0.0.6",
+        "geotagx_sanitizer>=0.0.7",
         "htmlmin>=0.1.10",
     ],
     dependency_links=[
-        "https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.6.tar.gz#egg=geotagx_sanitizer-0.0.6",
+        "https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.7.tar.gz#egg=geotagx_sanitizer-0.0.7",
     ],
     # keywords="",
     # author="",
