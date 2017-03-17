@@ -4,7 +4,7 @@
 #
 # Authors: Jeremy Othieno (j.othieno@gmail.com), S. P. Mohanty
 #
-# Copyright (c) 2016 UNITAR/UNOSAT
+# Copyright (c) 2016-2017 UNITAR/UNOSAT
 #
 # The MIT License (MIT)
 # Permission is hereby granted, free of charge, to any person obtaining a copy
