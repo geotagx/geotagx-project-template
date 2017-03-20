@@ -29,27 +29,36 @@ setup(
     long_description=read("README.md"),
     zip_safe=True,
     install_requires=[
-        "geotagx_sanitizer>=0.0.7",
+        "geotagx_validator>=0.1.0",
+        "geotagx_formatter>=0.1.0",
         "htmlmin>=0.1.10",
     ],
     dependency_links=[
-        "https://github.com/othieno/geotagx-tool-sanitizer/archive/v0.0.7.tar.gz#egg=geotagx_sanitizer-0.0.7",
+        "https://github.com/geotagx/geotagx-tool-validator/archive/v0.1.0.tar.gz#egg=geotagx_validator-0.1.0",
+        "https://github.com/geotagx/geotagx-tool-formatter/archive/v0.1.0.tar.gz#egg=geotagx_formatter-0.1.0",
     ],
-    # keywords="",
-    # author="",
-    # author_email="",
-    # maintainer="",
-    # maintainer_email="",
+    keywords="geotag-x project builder tool command line",
+    author="Jeremy Othieno, S.P. Mohanty",
+    author_email="j.othieno@gmail.com, sp.mohanty@cern.ch",
     url="https://github.com/geotagx/geotagx-tool-builder",
     download_url="https://github.com/geotagx/geotagx-tool-builder",
-    # classifiers=[],
-    # platforms=[],
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Utilities"
+    ],
+    platforms="any",
     license="MIT",
     packages=["geotagx_builder"],
-    package_dir={"geotagx_builder":"src"},
+    package_dir={"geotagx_builder": "src"},
     entry_points={
         "console_scripts":[
-            "geotagx-builder=geotagx_builder.builder:main"
+            "geotagx-builder=geotagx_builder.__main__:main"
         ]
     }
 )
