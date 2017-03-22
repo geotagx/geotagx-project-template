@@ -48,7 +48,7 @@ def run(arguments):
 
     from geotagx_validator.helper import sanitize_paths
     from geotagx_validator.core import is_configuration_set
-    from helper import get_formatted_configuration_set, serialize_configuration_set
+    from helper import get_formatted_configuration_set, generate_html
 
     exit_code = 0
     try:
@@ -63,7 +63,7 @@ def run(arguments):
                 exit_code = 1
                 break
             else:
-                serialize_configuration_set(configuration_set, path, arguments.force, arguments.compress)
+                generate_html(configuration_set, path, arguments.force, arguments.compress)
                 print "The project located at '{}' was successfully built.".format(path)
     except Exception as e:
         _print_exception(e, arguments.verbose)
