@@ -79,19 +79,9 @@ def generate_html(configuration_set, path, overwrite=False, compress=False):
 
     from geotagx_validator.core import is_configuration_set
     from geotagx_validator.helper import is_directory
+    from geotagx_formatter.helper import to_json_string
     from collections import OrderedDict
     import os
-
-    def to_json(dictionary):
-        import json
-        arguments = {
-            "indent": 0 if compress else 4,
-            "separators": (",", ":" if compress else ": "),
-            "encoding": "UTF-8",
-            "ensure_ascii": False
-        }
-        output = json.dumps(dictionary, **arguments).encode("UTF-8")
-        return output.replace("\n", "") if compress else output
 
     valid, message = is_configuration_set(configuration_set)
     if not valid:
@@ -124,14 +114,14 @@ def generate_html(configuration_set, path, overwrite=False, compress=False):
     # it is required by PyBossa's 'pbs' command-line tool.
     with open(output["tutorial"], "w") as file:
         if "tutorial" in configuration_set:
-            file.write(to_json(configuration_set))
+            file.write(to_json_string(configuration_set))
             # Remove the tutorial configuration so it's not written to the
             # template.html file created below.
             configuration_set.pop("tutorial", None)
 
     # Write the task presenter.
     with open(output["task_presenter"], "w") as file:
-        file.write(to_json(configuration_set))
+        file.write(to_json_string(configuration_set))
 
     # Restore the deleted configuration fields.
     configuration_set["project"] = old_project_configuration
